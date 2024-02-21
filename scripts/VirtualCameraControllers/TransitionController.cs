@@ -2,21 +2,37 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCameraControllers;
 
+// TODO Create a GroupTransitionController class that works just like this one, but that can handle transitions from
+// any camera in a node group instead of a single specific group. We could go even further and also create a
+// GlobalGroupTransitionController that should be attached to the GDirectorServer directly instead of to a specific
+// camera, and provides a default transition for any camera in a node group that is not handled by a specific transition
+// controller.
 public partial class TransitionController : VirtualCameraController
 {
+	/// <summary>
+	/// The camera for which this transition controller is responsible to transition from.
+	///
+	/// If this is not set, this transition controller will be the default transition controller for the camera it is
+	/// attached to, and will handle transitions from any camera for which there is no specific transition controller.
+	/// </summary>
 	[Export] public VirtualCamera? FromCamera;
+	/// <summary>
+	/// The duration of the transition in seconds.
+	/// </summary>
 	[Export] public float DurationSec = 0.5f;
+	/// <summary>
+	/// This curve controls the transition's progress over time.
+	///
+	/// If this is not set, it will interpolate the cameras linearly.
+	/// </summary>
 	[Export] public Curve? Curve;
 
-	private float ProgressSec = 0;
-	private VirtualCamera? PreviousCamera;
-    private Camera3D? RealCamera;
+	[Signal] public delegate void TransitionStartEventHandler();
+	[Signal] public delegate void TransitionFinishEventHandler();
+	[Signal] public delegate void TransitionCancelEventHandler();
+	[Signal] public delegate void TransitionEndEventHandler();
 
-    public bool Ongoing => this.ProgressSec < 1;
-	private float ProgressPct => this.DurationSec > 0
-		? Mathf.Clamp(this.ProgressSec / this.DurationSec, 0, 1)
-		: 1;
-	private float Weight => this.Curve?.Sample(this.ProgressPct) ?? this.ProgressPct;
+    public bool Ongoing => this.Tween?.IsRunning() == true;
 
     public override void _EnterTree()
 	{
@@ -28,23 +44,64 @@ public partial class TransitionController : VirtualCameraController
 		}
 	}
 
-	public override void _Process(double delta)
-	{
-		base._Process(delta);
-		if (!this.Ongoing || this.RealCamera == null || this.PreviousCamera == null) {
+	private Tween? Tween;
+
+    public void StartTransition()
+    {
+		// Cancel any previous transition that might be ongoing before starting a new one
+		this.CancelTransition();
+
+		// Get the previous camera
+		VirtualCamera? previousCamera = this.FromCamera ?? GDirectorServer.Instance.PreviousActiveCamera;
+
+		// If there is no previous camera, we can skip the transition
+		if (previousCamera == null) {
+			this.EmitSignal(SignalName.TransitionStart);
+			GDirectorServer.Instance.ManagedCamera.GlobalPosition = this.Camera.GlobalPosition;
+			GDirectorServer.Instance.ManagedCamera.GlobalRotation = this.Camera.GlobalRotation;
+			this.FinishTransition();
 			return;
 		}
-		this.ProgressSec += (float) delta;
-		this.RealCamera.GlobalPosition = this.PreviousCamera.GlobalPosition.Lerp(this.Camera.GlobalPosition, this.Weight);
-		this.RealCamera.GlobalRotation = this.PreviousCamera.GlobalRotation.Lerp(this.Camera.GlobalRotation, this.Weight);
-	}
 
-    public void StartTransition(Camera3D realCamera, VirtualCamera previousCamera)
-    {
-        this.PreviousCamera = previousCamera;
-		this.RealCamera = realCamera;
-		this.ProgressSec = 0;
-		this.RealCamera.GlobalPosition = this.PreviousCamera.GlobalPosition.Lerp(this.Camera.GlobalPosition, 0);
-		this.RealCamera.GlobalRotation = this.PreviousCamera.GlobalRotation.Lerp(this.Camera.GlobalRotation, 0);
+		// Setup the transition using Tweens
+		this.Tween = this.CreateTween();
+		this.Tween.TweenMethod(
+			Callable.From((float progress) => {
+				float lerpWeight = this.Curve?.Sample(progress) ?? progress;
+				GDirectorServer.Instance.ManagedCamera.GlobalPosition
+					= previousCamera.GlobalPosition.Lerp(this.Camera.GlobalPosition, lerpWeight);
+				GDirectorServer.Instance.ManagedCamera.GlobalRotation
+					= previousCamera.GlobalRotation.Lerp(this.Camera.GlobalRotation, lerpWeight);
+			}),
+			0f,
+			1f,
+			this.DurationSec
+		);
+		this.Tween.Finished += this.FinishTransition;
+
+		// Emit signals
+		this.EmitSignal(SignalName.TransitionStart);
     }
+
+    public void CancelTransition()
+    {
+        if (this.Tween == null) {
+			return;
+		}
+
+		this.Tween.Kill();
+		this.Tween = null;
+
+		// Emit signals
+		this.EmitSignal(SignalName.TransitionCancel);
+		this.EmitSignal(SignalName.TransitionEnd);
+    }
+
+	private void FinishTransition()
+	{
+		if (this.Tween == null) {
+			return;
+		}
+		this.Tween.CustomStep(float.PositiveInfinity);
+	}
 }

@@ -2,16 +2,70 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCameraControllers;
 
+/// <summary>
+/// This controller makes the camera move alongside a target node. It can mimic it's the follow target's position
+/// directly, or move at an offsetted position.
+///
+/// You can set a deadzone radius where the camera will remain still while the target moves within it. If the target is
+/// moves outside the deadzone radius, the camera will move toward it or alway from it, as appropriate, to keep the
+/// distance within the valid range.
+///
+/// This camera controller is useful for following objects that move at high speeds, but it's not ideal for
+/// player-controlled characters in most games.
+/// </summary>
 public partial class FollowPositionController : VirtualCameraController
 {
+	/// <summary>
+	/// The node to follow.
+	/// </summary>
 	[Export] public Node3D? FollowTarget;
+	/// <summary>
+	/// The offset to apply to the follow target in the target's local space.
+	/// </summary>
 	[Export] public Vector3 LocalOffset;
+	/// <summary>
+	/// The global offset to apply to the follow target.
+	/// </summary>
 	[Export] public Vector3 GlobalOffset;
-
-	[ExportGroup("Smoothing")]
-	[Export(PropertyHint.Range, "0.01,1,0.01")] public float LerpWeight = 1f;
-	[Export] public float DeadZoneRadius = 0;
+	/// <summary>
+	/// The maximum distance the camera can be from the follow target. If the camera is farther than this distance from
+	/// the follow target, it will move directly to the follow target to keep the distance within the valid range.
+	///
+	/// This value must be greater than the <see cref="DeadZoneFartherLimit"/>.
+	/// </summary>
 	[Export] public float MaxDistance = float.PositiveInfinity;
+	/// <summary>
+	/// The radius of the dead zone around the follow target. The camera will remain still for as long as the follow
+	/// target is within at least this distance and the distance set by <see cref="DeadZoneCloserLimit"/>.
+	///
+	/// This value must be greater than or equal to the <see cref="DeadZoneCloserLimit"/> and lower than or equal to the
+	/// <see cref="MaxDistance"/>.
+	/// </summary>
+	[Export] public float DeadZoneFartherLimit = 0;
+	/// <summary>
+	/// The radius of the dead zone around the follow target. The camera will remain still for as long as the follow
+	/// target is within at least this distance and the distance set by <see cref="DeadZoneFartherLimit"/>.
+	///
+	/// This value must be greater than or equal to the <see cref="MinDistance"/> and lower than or equal to the
+	/// <see cref="DeadZoneFartherLimit"/>.
+	/// </summary>
+	[Export] public float DeadZoneCloserLimit = 0;
+	/// <summary>
+	/// The minimum distance the camera can be from the follow target. If the camera is closer than this distance from
+	/// the follow target, it will move directly alway from it to keep the distance within the valid range.
+	///
+	/// This value must be lower than or equal to the <see cref="DeadZoneCloserLimit"/>.
+	/// </summary>
+	[Export] public float MinDistance;
+	/// <summary>
+	/// This is the weight of the linear interpolation used to smoothly move the camera toward the follow target while
+	/// it's outside the deadzone radius. (see <see cref="DeadZoneCloserLimit"/>)
+	///
+	/// Values closer to 1 mean less smoothing, and values closer to 0 mean more smoothing. If this is set to 1, the
+	/// camera will always be within the deadzone radius or in it's limites. If it's set to 0, the camera will
+	/// ignore the deadzone radius and will only move when it's farther than the <see cref="MaxDistance"/>.
+	/// </summary>
+	[Export(PropertyHint.Range, "0,1,0.01")] public float LerpWeight = 0.2f;
 
     public override void _Process(double delta)
 	{
@@ -26,18 +80,22 @@ public partial class FollowPositionController : VirtualCameraController
 			+ this.LocalOffset * this.FollowTarget.Basis
 			+ this.GlobalOffset;
 
-		// Calculate the position to move the camera to
-		Vector3 targetPosition = this.Camera.GlobalPosition.DirectionTo(offesetFollowTarget)
-			* (this.Camera.GlobalPosition.DistanceTo(offesetFollowTarget) - this.DeadZoneRadius);
+		// Calculate the distance between the camera and the follow target
+		float currentDistance = this.Camera.GlobalPosition.DistanceTo(offesetFollowTarget);
 
-		// Lerp toward the target position
-		float distanceToTarget = this.Camera.GlobalPosition.DistanceTo(targetPosition);
+		// Calculate the direction from the camera to the follow target
+		Vector3 cameraDirection = (this.Camera.GlobalPosition - offesetFollowTarget).Normalized();
 
-		// Check if it's able to lerp toward the target and still be within valid distance of the target, then lerp;
-		// otherwise move directly to the target to keep the camera within the valid distance.
-		if (distanceToTarget * (1 - this.LerpWeight) > this.MaxDistance) {
-			this.Camera.GlobalPosition = targetPosition.MoveToward(this.Camera.GlobalPosition, this.MaxDistance);
-		} else {
+		// Move the camera according to it's position relative to the follow target
+		if (currentDistance > this.MaxDistance) {
+			this.Camera.GlobalPosition = offesetFollowTarget + cameraDirection * this.MaxDistance;
+		} else if (currentDistance > this.DeadZoneFartherLimit) {
+			Vector3 targetPosition = offesetFollowTarget + cameraDirection * this.DeadZoneFartherLimit;
+			this.Camera.GlobalPosition = this.Camera.GlobalPosition.Lerp(targetPosition, this.LerpWeight);
+		} else if (currentDistance < this.MinDistance) {
+			this.Camera.GlobalPosition = offesetFollowTarget + cameraDirection * this.MinDistance;
+		} else if (currentDistance < this.DeadZoneCloserLimit) {
+			Vector3 targetPosition = offesetFollowTarget + cameraDirection * this.DeadZoneCloserLimit;
 			this.Camera.GlobalPosition = this.Camera.GlobalPosition.Lerp(targetPosition, this.LerpWeight);
 		}
 	}

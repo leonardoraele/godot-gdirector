@@ -2,36 +2,53 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCameraControllers;
 
+
+// TODO Instead of forcing the camera to orbit around the Y axis, allow the player to select the axis around
+// which the camera should orbit.
+// TODO Add the ability to make Automatic Orbiting move toward a specific direction (e.g. the player's character's back)
+// instead of always orbiting around the pivot's Y axis.
+// TODO Add a bool parameter to allow the user to select the camera behavior when the camera disaligns from the pivot.
+// Right now, the behavior is to preserve the angle of the camera from the pivot, while changing the camera's position
+// as needed. The alternative would be to make the move as little as possible while remaining in the orbit, and changing
+// the camera angle as much as needed.
 public partial class OrbitalPositionController : VirtualCameraController
 {
-
-	// -------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------------------
 	// EXPORTED FIELDS
-	// -------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------------------
 
 	/// <summary>
-	/// The pivot around which the camera will orbit. If this is not set, the camera will orbit around the world origin.
+	/// The pivot around which the camera will orbit.
+	///
+	/// If this property is not set, the camera will orbit around the world origin.
 	/// </summary>
 	[Export] public Node3D? Pivot;
 	/// <summary>
-	/// Offsets the camera's position relative to the pivot's local space.
+	/// Offset applied to the pivot's position. This is the position the camera will orbit around.
 	///
-	/// If the pivot is null, this is ignored.
-	/// </summary>
-	[Export] public Vector3 LocalOffset;
-	/// <summary>
-	/// Offsets the camera's position relative to the world space.
-	/// </summary>
-	[Export] public Vector3 GlobalOffset;
-	/// <summary>
-	/// The camera's initial distance from the pivot when the scene starts.
+	/// This takes the pivot's global transform into account. i.e. If the pivot is rotated or scaled, this offset will
+	/// also be rotated or scaled.
 	///
-	/// This can be modified at runtime by the player if player-controlled camera zoom is enabled.
+	/// If the pivot is not set, this property offsets from the world origin to determine the position the camera will
+	/// orbit around.
+	/// </summary>
+	[Export] public Vector3 PivotOffset;
+	/// <summary>
+	/// The camera distance from the pivot.
+	///
+	/// If player-controller zoom is enabled, this is the initial distance the camera will be from the pivot when the
+	/// scene starts, and the player will be able to modify this distance at runtime.
 	/// </summary>
 	[Export] public float Distance = 4f;
 	/// <summary>
-	/// The camera's initial angle, in degrees, from the ZX plane at the pivot's position when the scene starts.
-	/// Positive values rotate the camera upwards, negative values rotate it downwards.
+	/// By default, the camera orbits the pivot around the world Y axis. This property determines the angle, from the XZ
+	/// plane at the pivot's position, where the camera will inhabit, in degrees.
+	///
+	/// Positive values rotate the camera upwards, negative values rotate it downwards. A value of 0 (zero) means the
+	/// camera will be at the same height as the pivot.
+	///
+	/// If player-controlled spherical movement is enabled, this is the initial angle the camera will be when the scene
+	/// starts, and the player will be able to move the camera around the orbit at runtime.
 	/// </summary>
 	[Export(PropertyHint.Range, "-90,90,1,or_greater,or_less,degrees")] public float AngleDeg = 0f;
 
@@ -39,14 +56,15 @@ public partial class OrbitalPositionController : VirtualCameraController
 	/// <summary>
 	/// The speed at which the camera will automatically rotate around the pivot, in degrees per second.
 	///
-	/// The automatic orbiting is disabled while the player is controlling the camera.
+	/// If player-controlled spherical movement is enabled, the automatic orbiting is disabled while the player is
+	/// controlling the camera.
 	/// </summary>
 	[Export] public float DegreesPerSecond = 0f;
 	/// <summary>
 	/// The delay, in seconds, after the player stops controlling the camera before the camera starts automatically
 	/// rotating around the pivot again.
 	/// </summary>
-	[Export] public float DelayAfterPlayerControlSec = 2f; // TODO
+	[Export] public float DelayAfterPlayerControlSec = 2f;
 
 	[ExportGroup("Player Controls")]
 	// TODO
@@ -128,39 +146,35 @@ public partial class OrbitalPositionController : VirtualCameraController
 	/// </summary>
 	[Export(PropertyHint.Range, "0.01,1,0.01")] public float ZoomLerpWeight = 0.15f;
 
-	// -------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------------------
 	// PRIVATE FIELDS
-	// -------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------------------
 
-	private float TargetZoomDistance = 0f;
 	private Vector3 TargetCameraDirection = Vector3.Back;
 	private ulong LastSphericalMovementPlayerInputTimestamp = 0;
 	private ulong TimeSinceLastSphericalMovementPlayerInputMs
 		=> Time.GetTicksMsec() - this.LastSphericalMovementPlayerInputTimestamp;
 
-    // -------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
     // PROPERTIES
-    // -------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 
     private float MinAngleRad => Mathf.DegToRad(this.MinAngleDeg);
 	private float MaxAngleRad => Mathf.DegToRad(this.MaxAngleDeg);
 	private Vector3 PivotOffsetedPosition
 		=> this.Pivot == null
-			? Vector3.Zero
-			: this.Pivot.GlobalPosition
-				+ this.GlobalOffset
-				+ this.LocalOffset * this.Pivot.Basis;
+			? this.PivotOffset
+			: this.Pivot.GlobalPosition + this.Pivot.GlobalTransform.Basis * this.PivotOffset;
 	private float InitialAngleRad => Mathf.DegToRad(this.AngleDeg);
 	private float AutomaticHorizontalMovementRadPSec => Mathf.DegToRad(this.DegreesPerSecond);
 
-    // -------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
     // METHODS
-    // -------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 
     public override void _Ready()
     {
         base._Ready();
-		this.TargetZoomDistance = this.Distance;
 		Vector3 camRelPos = this.Camera.GlobalPosition - this.PivotOffsetedPosition;
 		this.TargetCameraDirection = camRelPos.LengthSquared() > Mathf.Epsilon
 			&& !GodotUtil.CheckNormalsAreParallel(camRelPos.Normalized(), Vector3.Up)
@@ -177,9 +191,11 @@ public partial class OrbitalPositionController : VirtualCameraController
 		Vector3 camRelPos = this.Camera.GlobalPosition - this.PivotOffsetedPosition;
 		float camDistance = camRelPos.Length();
 
-		// Rotate camera around the pivot based on the player's mouse input
+		// Rotate camera around the pivot
 		if (camDistance > Mathf.Epsilon) {
 			Vector2 mouseVelocity = Input.GetLastMouseVelocity();
+
+			// Rotate the camera based on the player's input
 			if (this.EnableMouseMotionControls && mouseVelocity.LengthSquared() > Mathf.Epsilon) {
 				float xAngleInput = Mathf.DegToRad(mouseVelocity.X * (float) delta / this.PixelsPerDegree) * this.MouseSensibilityX;
 				float yAngleInput = Mathf.DegToRad(mouseVelocity.Y * (float) delta / this.PixelsPerDegree) * this.MouseSensibilityY;
@@ -191,7 +207,8 @@ public partial class OrbitalPositionController : VirtualCameraController
 				float newVerticalAngle = Mathf.Clamp(currentVerticalAngle + yAngleInput, this.MinAngleRad, this.MaxAngleRad);
 				this.TargetCameraDirection = xRotatedCamDir.Rotated(crossAxis, newVerticalAngle - currentVerticalAngle);
 				this.LastSphericalMovementPlayerInputTimestamp = Time.GetTicksMsec();
-			// Apply automatic rotation
+
+			// Rotate the camera based on automatic rotation settings
 			} else if (
 				!this.EnableMouseMotionControls
 				|| this.TimeSinceLastSphericalMovementPlayerInputMs > this.DelayAfterPlayerControlSec * 1000
@@ -203,30 +220,38 @@ public partial class OrbitalPositionController : VirtualCameraController
 			}
 		}
 
-		Vector3 currentCamDirection = camDistance > Mathf.Epsilon
-			? camRelPos.Normalized()
-			: Vector3.Back;
-		Vector3 newCamDirection = currentCamDirection.Slerp(this.TargetCameraDirection, this.LerpWeight).Normalized();
-
 		// Zoom in and out based on the player's input
 		if (this.EnableZoomControls) {
 			if (!string.IsNullOrEmpty(this.ZoomOutAction) && Input.IsActionJustPressed(this.ZoomOutAction)) {
-				this.TargetZoomDistance = Mathf.Clamp(
-					this.TargetZoomDistance + this.ZoomAmountUnPerTick,
+				this.Distance = Mathf.Clamp(
+					this.Distance + this.ZoomAmountUnPerTick,
 					this.MinDistance,
 					this.MaxDistance
 				);
 			} else if (!string.IsNullOrEmpty(this.ZoomInAction) && Input.IsActionJustPressed(this.ZoomInAction)) {
-				this.TargetZoomDistance = Mathf.Clamp(
-					this.TargetZoomDistance - this.ZoomAmountUnPerTick,
+				this.Distance = Mathf.Clamp(
+					this.Distance - this.ZoomAmountUnPerTick,
 					this.MinDistance,
 					this.MaxDistance
 				);
 			}
 		}
 
-		float newCamDistance = Mathf.Lerp(camDistance, this.TargetZoomDistance, this.ZoomLerpWeight);
+		// Calculate the new camera direction by approximating the current direction to the expected direction
+		// (determined by this.TargetCameraDirection).
+		Vector3 currentCamDirection = camDistance > Mathf.Epsilon
+			? camRelPos.Normalized()
+			: Vector3.Back;
+		float angle = currentCamDirection.AngleTo(this.TargetCameraDirection);
+		Vector3 newCamDirection = angle < Mathf.Epsilon
+			? this.TargetCameraDirection
+			: currentCamDirection.Slerp(this.TargetCameraDirection, this.LerpWeight);
 
+		// Calculates the new distance to the pivot by approximating the current distance to the expected distance
+		// (determined by this.Distance).
+		float newCamDistance = Mathf.Lerp(camDistance, this.Distance, this.ZoomLerpWeight);
+
+		// Apply the new camera position
 		this.Camera.GlobalPosition = this.PivotOffsetedPosition + newCamDirection * newCamDistance;
 	}
 }

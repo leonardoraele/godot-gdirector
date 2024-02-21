@@ -1,7 +1,7 @@
 # GDirector (WIP)
 
-A Godot addon for configuring procedural behavior for 3D cameras, heavily inspired by Unity's Cinemachine, made with
-both cutscenes and gameplay in mind.
+A Godot addon that provides a complete solution for operating 3D cameras with dynamic behavior, for both cutscenes and
+gameplay. Inspired by Unity's Cinemachine package.
 
 <!--
 GDirector adds highly configurable pre-implemented camera behavior nodes that control the camera's position and rotation
@@ -22,7 +22,7 @@ pre-implemented by the many GDirector pre-implemented camera behavior nodes.
 
 ## Installation
 
-> ⚠ GDirector is a work in progress. It is not feature complete yet and is likely to contain bugs.
+> ⚠ GDirector is still a work in progress. It is not feature complete yet and is likely to contain bugs.
 If you find any, please create an issue in GitHub.
 
 In your project's `addons` folder, run:
@@ -33,21 +33,27 @@ In your project's `addons` folder, run:
 
 #### Position Controllers
 - [X] FollowPositionController
-- [ ] FramingPositionController <!-- Select wether the controller should change the camera's XY position, Z position, or FOV to accomodate the framed target; or a combination of the three in set weights -->
+- [ ] FramingPositionController <!-- Add option to select wether the controller should change the camera's local XY position, local Z position, a set global plane, or FOV to accomodate the framed target; or a combination of the three in set weights -->
 - [X] OrbitalPositionController
-- [X] PathTrackPositionController
+- [ ] PathTrackPositionController <!-- Moves the camera in a Path3D while trying to follow a target node without leaving the path -->
+- [X] PathFollowPositionController <!-- Uses a PathFollow node to move the camera through a Path3D -->
+- [ ] PathConstraintController <!-- Forces the camera to remain in a Path3D. If it leaves the Path3D (probably caused by another controller), moves it back to the track. -->
 - [ ] BouncePositionController
 - [ ] PlayerInputPositionController
+- [ ] AreaConstraintController <!-- Forces the camera to remain inside an Area3D -->
 
 #### Look Direction Controllers
 - [X] LookAtTargetController
 - [ ] LookAtGroupController <!-- Create option to look at dynamic groups (node groups) -->
+- [ ] LookAtPathController <!-- Contains the look to a Path3D, looking to the closest point in the Path3D to a follow target -->
 - [X] MimicRotationController
 - [ ] PlayerInputLookController
 - [ ] TiltController
 
 #### Priority Controllers <!-- Each priority controller should have a blend mode (either Add, Sub, or Override) -->
-- [ ] DistanceBasedPriorityController <!-- Controls priority by multiplying the distance between two targets by a set factor and base values -->
+- [X] FramingPriorityController
+- [X] ProximityPriorityController <!-- Controls priority by multiplying the distance between two targets by a set factor and base values -->
+- [X] LineOfSightPriorityController
 - [ ] NodeCountPriorityController <!-- Controls priority by counting the number of nodes on the scene with a specific group -->
 - [ ] PlayerInputPriorityController <!-- Adds priority when the player enters camera-control inputs; and reduce priority later after a delay -->
 - [ ] VelocityBasedPriorityController <!-- This controller compares the camera's position between this and the previous frame to set priority -->
