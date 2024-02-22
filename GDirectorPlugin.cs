@@ -1,4 +1,5 @@
 #if TOOLS
+using System;
 using System.Text.RegularExpressions;
 using Godot;
 using Raele.GDirector.VirtualCameraControllers;
@@ -38,7 +39,16 @@ public partial class GDirectorPlugin : EditorPlugin
 
     public void SetupCustomNodes()
     {
-        Texture2D noIcon = ImageTexture.CreateFromImage(Image.Create(16, 16, false, Image.Format.L8));
+        // Texture2D noIcon = ImageTexture.CreateFromImage(Image.Create(16, 16, false, Image.Format.L8));
+        Texture2D vcamIcon = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/vcam.svg");
+        Texture2D vcamPosIcon = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/vcam_pos_white.svg");
+        Texture2D vcamRotIcon = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/vcam_rot_white.svg");
+        Texture2D vcamPriIcon = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/vcam_pri_white.svg");
+        Texture2D vcamTraIcon = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/vcam_tra_white.svg");
+
+        Func<string, Script> GetControllerScript = (className) => GD.Load<Script>(
+            $"res://addons/{nameof(GDirector)}/scripts/{nameof(VirtualCameraControllers)}/{className}.cs"
+        );
 
         // this.AddCustomType(
         //     $"{nameof(GDirector)}_{nameof(GDirectorServer)}",
@@ -51,32 +61,52 @@ public partial class GDirectorPlugin : EditorPlugin
             $"{nameof(GDirector)}_{nameof(VirtualCamera)}",
             nameof(Node3D),
             GD.Load<Script>($"res://addons/{nameof(GDirector)}/scripts/{nameof(VirtualCamera)}.cs"),
-            noIcon
+            vcamIcon
         );
 
-        // Virtual Camera Controllers
-        string[] states = new string[] {
-            // Position controllers
-			nameof(FollowPositionController),
-			nameof(OrbitalPositionController),
-			nameof(PathFollowPositionController),
+        // Position controllers
+        foreach (
+            string className
+            in new string[] {
+                nameof(FollowPositionController),
+                nameof(OrbitalPositionController),
+                nameof(PathFollowPositionController),
+            }
+        ) {
+            this.AddCustomType($"{nameof(GDirector)}_{nameof(VirtualCameraController)}_{className}", nameof(Node), GetControllerScript(className), vcamPosIcon);
+        }
 
-			// Rotation controllers
-			nameof(LookAtTargetController),
-			nameof(MimicRotationController),
+        // Rotation controllers
+        foreach (
+            string className
+            in new string[] {
+                nameof(LookAtTargetController),
+                nameof(MimicRotationController),
+            }
+        ) {
+            this.AddCustomType($"{nameof(GDirector)}_{nameof(VirtualCameraController)}_{className}", nameof(Node), GetControllerScript(className), vcamRotIcon);
+        }
 
-			// Priority controllers
-			// ...
+        // Priority controllers
+        foreach (
+            string className
+            in new string[] {
+                nameof(FramingPriorityController),
+                nameof(LineOfSightPriorityController),
+                nameof(ProximityPriorityController),
+            }
+        ) {
+            this.AddCustomType($"{nameof(GDirector)}_{nameof(VirtualCameraController)}_{className}", nameof(Node), GetControllerScript(className), vcamPriIcon);
+        }
 
-			// Transition controllers
-			nameof(TransitionController),
-
-			// Other controllers
-			// ...
-        };
-        foreach (string stateName in states) {
-            Script script = GD.Load<Script>($"res://addons/{nameof(GDirector)}/scripts/{nameof(VirtualCameraControllers)}/{stateName}.cs");
-            this.AddCustomType($"{nameof(GDirector)}_{nameof(VirtualCameraController)}_{stateName}", nameof(Node), script, noIcon);
+        // Transition controllers
+        foreach (
+            string className
+            in new string[] {
+                nameof(TransitionController),
+            }
+        ) {
+            this.AddCustomType($"{nameof(GDirector)}_{nameof(VirtualCameraController)}_{className}", nameof(Node), GetControllerScript(className), vcamTraIcon);
         }
     }
 }

@@ -77,8 +77,8 @@ public partial class GDirectorServer : Node
 			// If the currently active camera is already in the newly set active group, it's remains a valid active
 			// camera, so we don't need to do anything else. Otherwise, we need to reevaluate the camera selection.
 			if (
-				!string.IsNullOrEmpty(this._activeGroup)
-				&& this.CurrentActiveCamera?.IsInGroup(this._activeGroup) != true
+				string.IsNullOrEmpty(this._activeGroup)
+				|| this.CurrentActiveCamera?.IsInGroup(this._activeGroup) != true
 			) {
 				this.ReevaluateCameraSelection();
 			}
@@ -134,7 +134,6 @@ public partial class GDirectorServer : Node
 
 	private void EvaluateCameraPriority(VirtualCamera camera)
 	{
-		GD.PrintS("New VCam Priority:", new { Id = camera.GetInstanceId(), camera.Priority });
         if (
 			this.ActiveCameraOverride == null
 			&& camera.Priority > (this.CurrentActiveCamera?.Priority ?? float.NegativeInfinity)

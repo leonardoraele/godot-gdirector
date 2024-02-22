@@ -63,7 +63,7 @@ In your project's `addons` folder, run:
 
 #### Other
 - [ ] PreemptiveObstacleAvoidanceController <!-- Perform raycasts at angles and pivot the camera around obstacles to avoid breaking LOS—pivot toward the obstacle's normal -->
-- [ ] CollisionController <!-- Add collisiton detection to the VCam—basically, it's a Rigidbody that moves toward the VCam and, when it can't, moves the VCam toward it -->
+- [ ] CollisionController <!-- Add collisiton detection to the VCam—basically, it's a Rigidbody that moves from the follow target to the VCam and, when it can't, moves the VCam toward it. Alternativelly, it could be a ray cast -->
 - [ ] DynamicCameraDistanceController <!-- Pulls the camera toward closer to the player through an obstacle to prevent breaking LOS  -->
 - [ ] NoiseController <!-- I think two 1D perlim noise, applied to each axis should do -->
 - [ ] BlendedVirtualCamera <!-- A VCam whose position and rotation are derived from other cameras and a slider control -->

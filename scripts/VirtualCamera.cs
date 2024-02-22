@@ -10,7 +10,8 @@ public partial class VirtualCamera : Node3D
 	// EXPORTED VARS
 	// -----------------------------------------------------------------------------------------------------------------
 
-    [Export] public float Priority;
+    [ExportGroup("Priority")]
+    [Export] public float BasePriority = 0;
     // [Export] public bool ResetPositionOnTransitionStart;
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -31,6 +32,7 @@ public partial class VirtualCamera : Node3D
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
+    public float Priority;
     public Dictionary<VirtualCamera, TransitionController> TransitionControllers { get; private set; } = new();
     public TransitionController? DefaultTransitionController;
 
@@ -68,8 +70,8 @@ public partial class VirtualCamera : Node3D
             GDirectorServer.Instance.ManagedCamera.GlobalPosition = this.GlobalPosition;
             GDirectorServer.Instance.ManagedCamera.GlobalRotation = this.GlobalRotation;
         }
-        this.Priority = 0;
         this.CallDeferred(nameof(this.CheckPriorityChange), this.Priority);
+        this.Priority = this.BasePriority;
     }
 
     private void CheckPriorityChange(long oldPriority)

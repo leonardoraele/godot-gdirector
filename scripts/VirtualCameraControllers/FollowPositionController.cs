@@ -22,11 +22,7 @@ public partial class FollowPositionController : VirtualCameraController
 	/// <summary>
 	/// The offset to apply to the follow target in the target's local space.
 	/// </summary>
-	[Export] public Vector3 LocalOffset;
-	/// <summary>
-	/// The global offset to apply to the follow target.
-	/// </summary>
-	[Export] public Vector3 GlobalOffset;
+	[Export] public Vector3 FollowTargetOffset;
 	/// <summary>
 	/// The maximum distance the camera can be from the follow target. If the camera is farther than this distance from
 	/// the follow target, it will move directly to the follow target to keep the distance within the valid range.
@@ -65,7 +61,16 @@ public partial class FollowPositionController : VirtualCameraController
 	/// camera will always be within the deadzone radius or in it's limites. If it's set to 0, the camera will
 	/// ignore the deadzone radius and will only move when it's farther than the <see cref="MaxDistance"/>.
 	/// </summary>
-	[Export(PropertyHint.Range, "0,1,0.01")] public float LerpWeight = 0.2f;
+	[Export(PropertyHint.Range, "0,1,0.01")] public float LerpWeight = 1f;
+
+	public Vector3 FollowTargetPosition {
+		get {
+			Transform3D? transform = this.FollowTarget?.GlobalTransform;
+			return transform != null
+				? transform.Value.Origin + transform.Value.Basis * this.FollowTargetOffset
+				: this.FollowTargetOffset;
+		}
+	}
 
     public override void _Process(double delta)
 	{
@@ -76,26 +81,26 @@ public partial class FollowPositionController : VirtualCameraController
 		}
 
 		// Apply the offset to the follow target
-		Vector3 offesetFollowTarget = this.FollowTarget.GlobalPosition
-			+ this.LocalOffset * this.FollowTarget.Basis
-			+ this.GlobalOffset;
+		Vector3 followTargetPosition = this.FollowTargetPosition; // Read FollowTargetPosition only once bc it has some computational cost
 
 		// Calculate the distance between the camera and the follow target
-		float currentDistance = this.Camera.GlobalPosition.DistanceTo(offesetFollowTarget);
+		float currentDistance = this.Camera.GlobalPosition.DistanceTo(followTargetPosition);
 
 		// Calculate the direction from the camera to the follow target
-		Vector3 cameraDirection = (this.Camera.GlobalPosition - offesetFollowTarget).Normalized();
+		Vector3 cameraDirection = currentDistance > Mathf.Epsilon
+			? (this.Camera.GlobalPosition - followTargetPosition).Normalized()
+			: this.Camera.GlobalTransform.Basis.Z;
 
 		// Move the camera according to it's position relative to the follow target
 		if (currentDistance > this.MaxDistance) {
-			this.Camera.GlobalPosition = offesetFollowTarget + cameraDirection * this.MaxDistance;
+			this.Camera.GlobalPosition = followTargetPosition + cameraDirection * this.MaxDistance;
 		} else if (currentDistance > this.DeadZoneFartherLimit) {
-			Vector3 targetPosition = offesetFollowTarget + cameraDirection * this.DeadZoneFartherLimit;
+			Vector3 targetPosition = followTargetPosition + cameraDirection * this.DeadZoneFartherLimit;
 			this.Camera.GlobalPosition = this.Camera.GlobalPosition.Lerp(targetPosition, this.LerpWeight);
 		} else if (currentDistance < this.MinDistance) {
-			this.Camera.GlobalPosition = offesetFollowTarget + cameraDirection * this.MinDistance;
+			this.Camera.GlobalPosition = followTargetPosition + cameraDirection * this.MinDistance;
 		} else if (currentDistance < this.DeadZoneCloserLimit) {
-			Vector3 targetPosition = offesetFollowTarget + cameraDirection * this.DeadZoneCloserLimit;
+			Vector3 targetPosition = followTargetPosition + cameraDirection * this.DeadZoneCloserLimit;
 			this.Camera.GlobalPosition = this.Camera.GlobalPosition.Lerp(targetPosition, this.LerpWeight);
 		}
 	}

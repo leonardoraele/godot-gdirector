@@ -20,7 +20,7 @@ public partial class LineOfSightPriorityController : VirtualCameraController
 	[Export] public Vector3 LineOfSightTargetOffset;
 	[Export] public float PriorityOnLineOfSight = 1;
 	[Export] public float FallOffDurationSec = 0.25f;
-	[Export(PropertyHint.ExpEasing, "attenuation")] public float PriorityFallOff = 2f;
+	[Export(PropertyHint.ExpEasing, "attenuation")] public float PriorityFallOff = 1f;
 
 	[ExportGroup("Collision Mask")]
 	[Export(PropertyHint.Layers3DPhysics)] public uint ObstaclesMask = 1;

@@ -10,7 +10,7 @@ public partial class ProximityPriorityController : VirtualCameraController
 	[Export] public float MaxDistance = 10f;
 	[Export] public float MinDistance = 1f;
 	[Export] public int PriorityOnIdealDistance = 1;
-	[Export(PropertyHint.ExpEasing, "attenuation")] public float PriorityFallOff = 2f;
+	[Export(PropertyHint.ExpEasing, "attenuation")] public float PriorityFallOff = 1f;
 
 	public Vector3 ProximityTargetPosition {
 		get {

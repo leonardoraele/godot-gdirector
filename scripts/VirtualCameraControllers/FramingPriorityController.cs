@@ -29,7 +29,7 @@ public partial class FramingPriorityController : VirtualCameraController
 	/// the <see cref="PriorityOnCenter"/> property, and low values mean the priority added to the virtual camera will
 	/// be closer to zero.
 	/// </summary>
-	[Export(PropertyHint.ExpEasing, "attenuation")] public float PriorityFallOff = 2f;
+	[Export(PropertyHint.ExpEasing, "attenuation")] public float PriorityFallOff = 1f;
 
 	public Vector3 FramingTargetPosition {
 		get {
