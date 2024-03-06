@@ -13,7 +13,7 @@ namespace Raele.GDirector.VirtualCameraControllers;
 /// This camera controller is useful for following objects that move at high speeds, but it's not ideal for
 /// player-controlled characters in most games.
 /// </summary>
-public partial class FollowPositionController : VirtualCameraController
+public partial class FollowPosition : VirtualCameraController
 {
 	/// <summary>
 	/// The node to follow.
@@ -76,7 +76,7 @@ public partial class FollowPositionController : VirtualCameraController
 	{
 		base._Process(delta);
 		if (this.FollowTarget == null) {
-			GD.PushWarning(nameof(FollowPositionController) + " node requires a valid FollowTarget, but it's empty.");
+			GD.PushWarning(nameof(FollowPosition) + " node requires a valid FollowTarget, but it's empty.");
 			return;
 		}
 

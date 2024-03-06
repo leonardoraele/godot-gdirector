@@ -33,17 +33,17 @@ public partial class VirtualCamera : Node3D
 	// -----------------------------------------------------------------------------------------------------------------
 
     public float Priority;
-    public Dictionary<VirtualCamera, TransitionController> TransitionControllers { get; private set; } = new();
-    public TransitionController? DefaultTransitionController;
+    public Dictionary<VirtualCamera, CameraTransition> TransitionControllers { get; private set; } = new();
+    public CameraTransition? DefaultTransitionController;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// PROPERTIES
 	// -----------------------------------------------------------------------------------------------------------------
 
     public bool IsActive => GDirectorServer.Instance.CurrentActiveCamera == this;
-    private TransitionController? ActiveTransitionController
+    private CameraTransition? ActiveTransitionController
         => GDirectorServer.Instance.PreviousActiveCamera != null
-            && this.TransitionControllers.TryGetValue(GDirectorServer.Instance.PreviousActiveCamera, out TransitionController? controller)
+            && this.TransitionControllers.TryGetValue(GDirectorServer.Instance.PreviousActiveCamera, out CameraTransition? controller)
                 ? controller
                 : this.DefaultTransitionController;
 

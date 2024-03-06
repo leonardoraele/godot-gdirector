@@ -68,45 +68,44 @@ public partial class GDirectorPlugin : EditorPlugin
         foreach (
             string className
             in new string[] {
-                nameof(FollowPositionController),
-                nameof(OrbitalPositionController),
-                nameof(PathFollowPositionController),
+                nameof(FollowPosition),
+                nameof(OrbitalMovement),
             }
         ) {
-            this.AddCustomType($"{nameof(GDirector)}_{nameof(VirtualCameraController)}_{className}", nameof(Node), GetControllerScript(className), vcamPosIcon);
+            this.AddCustomType($"{nameof(GDirector)}_{className}", nameof(Node), GetControllerScript(className), vcamPosIcon);
         }
 
         // Rotation controllers
         foreach (
             string className
             in new string[] {
-                nameof(LookAtTargetController),
-                nameof(MimicRotationController),
+                nameof(LookAtTarget),
+                nameof(MimicRotation),
             }
         ) {
-            this.AddCustomType($"{nameof(GDirector)}_{nameof(VirtualCameraController)}_{className}", nameof(Node), GetControllerScript(className), vcamRotIcon);
+            this.AddCustomType($"{nameof(GDirector)}_{className}", nameof(Node), GetControllerScript(className), vcamRotIcon);
         }
 
         // Priority controllers
         foreach (
             string className
             in new string[] {
-                nameof(FramingPriorityController),
-                nameof(LineOfSightPriorityController),
-                nameof(ProximityPriorityController),
+                nameof(FramingPriority),
+                nameof(LineOfSightPriority),
+                nameof(ProximityPriority),
             }
         ) {
-            this.AddCustomType($"{nameof(GDirector)}_{nameof(VirtualCameraController)}_{className}", nameof(Node), GetControllerScript(className), vcamPriIcon);
+            this.AddCustomType($"{nameof(GDirector)}_{className}", nameof(Node), GetControllerScript(className), vcamPriIcon);
         }
 
         // Transition controllers
         foreach (
             string className
             in new string[] {
-                nameof(TransitionController),
+                nameof(CameraTransition),
             }
         ) {
-            this.AddCustomType($"{nameof(GDirector)}_{nameof(VirtualCameraController)}_{className}", nameof(Node), GetControllerScript(className), vcamTraIcon);
+            this.AddCustomType($"{nameof(GDirector)}_{className}", nameof(Node), GetControllerScript(className), vcamTraIcon);
         }
     }
 }

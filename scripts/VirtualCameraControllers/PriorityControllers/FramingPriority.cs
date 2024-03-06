@@ -2,7 +2,7 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCameraControllers;
 
-public partial class FramingPriorityController : VirtualCameraController
+public partial class FramingPriority : VirtualCameraController
 {
 	/// <summary>
 	/// The target to frame.

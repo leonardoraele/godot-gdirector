@@ -7,7 +7,7 @@ namespace Raele.GDirector.VirtualCameraControllers;
 // GlobalGroupTransitionController that should be attached to the GDirectorServer directly instead of to a specific
 // camera, and provides a default transition for any camera in a node group that is not handled by a specific transition
 // controller.
-public partial class TransitionController : VirtualCameraController
+public partial class CameraTransition : VirtualCameraController
 {
 	/// <summary>
 	/// The camera for which this transition controller is responsible to transition from.

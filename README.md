@@ -31,40 +31,33 @@ In your project's `addons` folder, run:
 
 ## Feature Roadmap
 
-#### Position Controllers
-- [X] FollowPositionController
-- [ ] FramingPositionController <!-- Add option to select wether the controller should change the camera's local XY position, local Z position, a set global plane, or FOV to accomodate the framed target; or a combination of the three in set weights -->
-- [X] OrbitalPositionController
-- [ ] PathTrackPositionController <!-- Moves the camera in a Path3D while trying to follow a target node without leaving the path -->
-- [X] PathFollowPositionController <!-- Uses a PathFollow node to move the camera through a Path3D -->
-- [ ] PathConstraintController <!-- Forces the camera to remain in a Path3D. If it leaves the Path3D (probably caused by another controller), moves it back to the track. -->
-- [ ] BouncePositionController
-- [ ] PlayerInputPositionController
-- [ ] AreaConstraintController <!-- Forces the camera to remain inside an Area3D -->
+#### Camera Position Nodes
+- [X] FollowPosition
+- [ ] FramingConstraint <!-- Add option to select wether the controller should change the camera's local XY position, local Z position, a set global plane, or FOV to accomodate the framed target; or a combination of the three in set weights -->
+- [X] OrbitalMovement
+- [ ] FollowAlongPath <!-- Tries to follow a target node while moving the camera only within a Path3D. -->
+- [ ] AreaConstraint <!-- Forces the camera to remain inside an Area3D -->
+- [ ] FreeRoam
+- [ ] Noise <!-- I think two 1D perlim noises applied to each axis should do -->
+- [ ] Bounce
+- [ ] ObstacleAvoidance <!-- Perform raycasts at angles and pivot the camera around obstacles to avoid breaking LOS—pivot toward the obstacle's normal -->
+- [ ] ClipPrevention <!-- Prevents the camera from clipping through walls or other obstacles. The proposed solution is to add an invisible spherical rigidbody that follow the camera. Every physics frame, it moves toward the camera as much as possible, then sets the camera position to it's position. It should also slide alongside the wall to prevent hard snaps while the camera moves behind the wall. -->
 
-#### Look Direction Controllers
-- [X] LookAtTargetController
-- [ ] LookAtGroupController <!-- Create option to look at dynamic groups (node groups) -->
-- [ ] LookAtPathController <!-- Contains the look to a Path3D, looking to the closest point in the Path3D to a follow target -->
-- [X] MimicRotationController
-- [ ] PlayerInputLookController
-- [ ] TiltController
+#### Camera Rotation Nodes
+- [X] LookAtTarget
+- [ ] LookAtGroup <!-- Create option to look at dynamic groups (node groups) -->
+- [X] MimicRotation
+- [ ] FreeLook
 
-#### Priority Controllers <!-- Each priority controller should have a blend mode (either Add, Sub, or Override) -->
-- [X] FramingPriorityController
-- [X] ProximityPriorityController <!-- Controls priority by multiplying the distance between two targets by a set factor and base values -->
-- [X] LineOfSightPriorityController
-- [ ] NodeCountPriorityController <!-- Controls priority by counting the number of nodes on the scene with a specific group -->
-- [ ] PlayerInputPriorityController <!-- Adds priority when the player enters camera-control inputs; and reduce priority later after a delay -->
-- [ ] VelocityBasedPriorityController <!-- This controller compares the camera's position between this and the previous frame to set priority -->
-
-#### Transition Controllers
-- [ ] TransitionController
+#### Prioritization Nodes <!-- Each priority controller should have a blend mode (either Add, Sub, or Override) -->
+- [X] FramingPriority
+- [X] ProximityPriority <!-- Controls priority by multiplying the distance between two targets by a set factor and base values -->
+- [X] LineOfSightPriority
+- [ ] NodeCountPriority <!-- Controls priority by counting the number of nodes on the scene with a specific group -->
+- [ ] VelocityBasedPriority <!-- This controller compares the camera's position between this and the previous frame to set priority -->
+- [ ] PlayerInputPriority <!-- Adds priority when the player enters camera-control inputs; and reduce priority later after a delay -->
 
 #### Other
-- [ ] PreemptiveObstacleAvoidanceController <!-- Perform raycasts at angles and pivot the camera around obstacles to avoid breaking LOS—pivot toward the obstacle's normal -->
-- [ ] CollisionController <!-- Add collisiton detection to the VCam—basically, it's a Rigidbody that moves from the follow target to the VCam and, when it can't, moves the VCam toward it. Alternativelly, it could be a ray cast -->
-- [ ] DynamicCameraDistanceController <!-- Pulls the camera toward closer to the player through an obstacle to prevent breaking LOS  -->
-- [ ] NoiseController <!-- I think two 1D perlim noise, applied to each axis should do -->
+- [X] CameraTransition
 - [ ] BlendedVirtualCamera <!-- A VCam whose position and rotation are derived from other cameras and a slider control -->
-- [ ] ScreenShakeController
+- [ ] CameraSettings

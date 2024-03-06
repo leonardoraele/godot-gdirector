@@ -2,7 +2,7 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCameraControllers;
 
-public partial class MimicRotationController : VirtualCameraController
+public partial class MimicRotation : VirtualCameraController
 {
 	[Export] public Node3D? RotationReference;
 	[Export] public Vector3 EulerOffsetDeg;
