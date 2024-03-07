@@ -3,8 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://djybuwr2lsdq6" path="res://demos/scenes/levels/scifi_base.tscn" id="1_5im5p"]
 [ext_resource type="PackedScene" uid="uid://ba67v0sr3y5h" path="res://demos/scenes/player_characters/PlatformerPlayerCharacter/PlatformerPlayerCharacter.tscn" id="2_4iipx"]
 [ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCamera.cs" id="3_ro5io"]
-[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/MovementControllers/OrbitalMovement.cs" id="4_qnrs0"]
-[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/RotationControllers/LookAtTarget.cs" id="5_613yy"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/OrbitalMovement.cs" id="4_qnrs0"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/LookAtTarget.cs" id="5_613yy"]
 
 [node name="PlatformerExample" type="Node3D"]
 

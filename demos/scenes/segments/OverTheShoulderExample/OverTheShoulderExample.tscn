@@ -3,11 +3,11 @@
 [ext_resource type="PackedScene" uid="uid://djybuwr2lsdq6" path="res://demos/scenes/levels/scifi_base.tscn" id="1_ltyg8"]
 [ext_resource type="PackedScene" uid="uid://ba67v0sr3y5h" path="res://demos/scenes/player_characters/PlatformerPlayerCharacter/PlatformerPlayerCharacter.tscn" id="2_nek8o"]
 [ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCamera.cs" id="3_my13c"]
-[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/MovementControllers/OrbitalMovement.cs" id="4_rt3k6"]
-[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/RotationControllers/LookAtTarget.cs" id="5_7eqra"]
-[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/Other/CameraTransition.cs" id="6_ad1vd"]
-[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/MovementControllers/FollowPosition.cs" id="7_8ynyv"]
-[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/RotationControllers/MimicRotation.cs" id="7_ja1k4"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/OrbitalMovement.cs" id="4_rt3k6"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/LookAtTarget.cs" id="5_7eqra"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/CameraTransition.cs" id="6_ad1vd"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/FollowPosition.cs" id="7_8ynyv"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/MimicRotation.cs" id="7_ja1k4"]
 
 [node name="PlatformerExample" type="Node3D"]
 
