@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://q7ukpiamuv4r"
+path="res://.godot/imported/LongWindow_Wall_SideB.obj-e16c645be5690eeb7c23c84eececc8fc.mesh"
+
+[deps]
+
+files=["res://.godot/imported/LongWindow_Wall_SideB.obj-e16c645be5690eeb7c23c84eececc8fc.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/LongWindow_Wall_SideB.obj"
+dest_files=["res://.godot/imported/LongWindow_Wall_SideB.obj-e16c645be5690eeb7c23c84eececc8fc.mesh", "res://.godot/imported/LongWindow_Wall_SideB.obj-e16c645be5690eeb7c23c84eececc8fc.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

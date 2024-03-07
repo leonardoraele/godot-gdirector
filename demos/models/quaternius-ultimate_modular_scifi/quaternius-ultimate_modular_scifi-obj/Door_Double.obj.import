@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bdwl76rr3ny4d"
+path="res://.godot/imported/Door_Double.obj-16fcd808fa92711724d947f1d19900fa.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Door_Double.obj-16fcd808fa92711724d947f1d19900fa.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Door_Double.obj"
+dest_files=["res://.godot/imported/Door_Double.obj-16fcd808fa92711724d947f1d19900fa.mesh", "res://.godot/imported/Door_Double.obj-16fcd808fa92711724d947f1d19900fa.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

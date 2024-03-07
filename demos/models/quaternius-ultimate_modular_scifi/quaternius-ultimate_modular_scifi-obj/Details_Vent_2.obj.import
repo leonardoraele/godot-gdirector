@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://1xxkeiuoybw6"
+path="res://.godot/imported/Details_Vent_2.obj-a478efd9d8e4c01e6d15d8f3850d5ef2.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Details_Vent_2.obj-a478efd9d8e4c01e6d15d8f3850d5ef2.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Details_Vent_2.obj"
+dest_files=["res://.godot/imported/Details_Vent_2.obj-a478efd9d8e4c01e6d15d8f3850d5ef2.mesh", "res://.godot/imported/Details_Vent_2.obj-a478efd9d8e4c01e6d15d8f3850d5ef2.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

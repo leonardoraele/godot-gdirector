@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://pnmj27f8b2rr"
+path="res://.godot/imported/Details_Plate_Long.obj-c876e5fd473f3c6c1f92cfda9784efce.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Details_Plate_Long.obj-c876e5fd473f3c6c1f92cfda9784efce.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Details_Plate_Long.obj"
+dest_files=["res://.godot/imported/Details_Plate_Long.obj-c876e5fd473f3c6c1f92cfda9784efce.mesh", "res://.godot/imported/Details_Plate_Long.obj-c876e5fd473f3c6c1f92cfda9784efce.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

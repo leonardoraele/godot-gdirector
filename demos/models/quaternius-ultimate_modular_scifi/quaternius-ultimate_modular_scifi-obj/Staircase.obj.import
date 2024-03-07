@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://ches86peuw1ct"
+path="res://.godot/imported/Staircase.obj-53e103e69f08f71da65d02b8a3a3a4b2.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Staircase.obj-53e103e69f08f71da65d02b8a3a3a4b2.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Staircase.obj"
+dest_files=["res://.godot/imported/Staircase.obj-53e103e69f08f71da65d02b8a3a3a4b2.mesh", "res://.godot/imported/Staircase.obj-53e103e69f08f71da65d02b8a3a3a4b2.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

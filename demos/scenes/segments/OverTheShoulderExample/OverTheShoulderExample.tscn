@@ -1,0 +1,55 @@
+[gd_scene load_steps=9 format=3 uid="uid://cc5nfr8ge2xix"]
+
+[ext_resource type="PackedScene" uid="uid://djybuwr2lsdq6" path="res://demos/scenes/levels/scifi_base.tscn" id="1_ltyg8"]
+[ext_resource type="PackedScene" uid="uid://ba67v0sr3y5h" path="res://demos/scenes/player_characters/Platformer/Platfomer.tscn" id="2_nek8o"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCamera.cs" id="3_my13c"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/MovementControllers/OrbitalMovement.cs" id="4_rt3k6"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/RotationControllers/LookAtTarget.cs" id="5_7eqra"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/Other/CameraTransition.cs" id="6_ad1vd"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/MovementControllers/FollowPosition.cs" id="7_8ynyv"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/RotationControllers/MimicRotation.cs" id="7_ja1k4"]
+
+[node name="PlatformerExample" type="Node3D"]
+
+[node name="SciFiBase" parent="." instance=ExtResource("1_ltyg8")]
+
+[node name="CharacterBody3D" parent="." instance=ExtResource("2_nek8o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, -7)
+TurnSpeedDegPSec = 720.0
+
+[node name="WalkCamera" type="Node3D" parent="."]
+script = ExtResource("3_my13c")
+BasePriority = 1.0
+
+[node name="OrbitalMovement" type="Node" parent="WalkCamera" node_paths=PackedStringArray("Pivot")]
+script = ExtResource("4_rt3k6")
+Pivot = NodePath("../../CharacterBody3D")
+PivotOffset = Vector3(0, 1, 0)
+Distance = 1.5
+EnableMouseMotionControls = true
+
+[node name="LookAtTarget" type="Node" parent="WalkCamera" node_paths=PackedStringArray("LookTarget")]
+script = ExtResource("5_7eqra")
+LookTarget = NodePath("../../CharacterBody3D")
+OffsetPosition = Vector3(0, 1, 0)
+RotationOffsetDeg = Vector2(-30, 0)
+
+[node name="CameraTransition" type="Node" parent="WalkCamera"]
+script = ExtResource("6_ad1vd")
+
+[node name="AimCamera" type="Node3D" parent="." groups=["aim_camera"]]
+transform = Transform3D(0.999877, 0.000860435, 0.0156455, 1.16415e-10, 0.998491, -0.0549131, -0.0156691, 0.0549063, 0.998369, -6.48448, 1.44509, -6.5173)
+script = ExtResource("3_my13c")
+
+[node name="FollowPosition" type="Node" parent="AimCamera" node_paths=PackedStringArray("FollowTarget")]
+script = ExtResource("7_8ynyv")
+FollowTarget = NodePath("../../CharacterBody3D")
+
+[node name="MimicRotation" type="Node" parent="AimCamera" node_paths=PackedStringArray("RotationReference")]
+script = ExtResource("7_ja1k4")
+RotationReference = NodePath("../../CharacterBody3D")
+
+[node name="CameraTransition" type="Node" parent="AimCamera"]
+script = ExtResource("6_ad1vd")
+
+[node name="Camera3D" type="Camera3D" parent="."]

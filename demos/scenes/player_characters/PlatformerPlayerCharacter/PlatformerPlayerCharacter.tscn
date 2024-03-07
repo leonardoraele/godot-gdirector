@@ -1,0 +1,79 @@
+[gd_scene load_steps=6 format=3 uid="uid://ba67v0sr3y5h"]
+
+[ext_resource type="Script" path="res://demos/scenes/player_characters/PlatformerPlayerCharacter/PlatformerPlayerCharacter.cs" id="1_ej2jp"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_e6fhp"]
+radius = 0.25
+height = 1.5
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_2uxc0"]
+radius = 0.25
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wshn8"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_q4mij"]
+radius = 0.05
+height = 0.1
+
+[node name="PlatformerPlayerCharacter" type="CharacterBody3D"]
+collision_layer = 16
+script = ExtResource("1_ej2jp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("CapsuleShape3D_e6fhp")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.75, 0)
+mesh = SubResource("CapsuleMesh_2uxc0")
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="MeshInstance3D"]
+transform = Transform3D(1.444, 0, 0, 0, 1.481, 0, 0, 0, 1.481, -0.00620933, 0.476, 0.275)
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="MeshInstance3D/CSGCombiner3D"]
+transform = Transform3D(-4.37114e-08, 0, -1, -1, 2.66454e-15, 4.37114e-08, 0, 1, 0, 0.0745321, -0.0113128, -0.0712203)
+radius = 0.0765703
+height = 0.173733
+material = SubResource("StandardMaterial3D_wshn8")
+
+[node name="CSGCylinder3D2" type="CSGCylinder3D" parent="MeshInstance3D/CSGCombiner3D"]
+transform = Transform3D(-4.37114e-08, 0, -1, -1, 2.66454e-15, 4.37114e-08, 0, 1, 0, -0.066574, -0.0113128, -0.0630403)
+radius = 0.0765703
+height = 0.167663
+material = SubResource("StandardMaterial3D_wshn8")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="MeshInstance3D/CSGCombiner3D"]
+transform = Transform3D(-4.37114e-08, 3.11343e-29, -1, -1, 2.66454e-15, 4.37114e-08, 0, 1, 0, 0.00303797, -0.0113128, -0.0564331)
+size = Vector3(0.150649, 0.179795, 0.145543)
+material = SubResource("StandardMaterial3D_wshn8")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="MeshInstance3D/CSGCombiner3D"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 2.0324e-08, -0.0113128, 0.0799254)
+operation = 2
+size = Vector3(0.356156, 0.419116, 0.16266)
+material = SubResource("StandardMaterial3D_wshn8")
+
+[node name="CSGCylinder3D3" type="CSGCylinder3D" parent="MeshInstance3D/CSGCombiner3D"]
+transform = Transform3D(-3.57875e-08, 0, -0.818723, -0.863589, 2.30106e-15, 3.77487e-08, 0, 1, 0, 0.0613466, -0.0116268, 0.200281)
+operation = 2
+radius = 0.0765703
+height = 0.433429
+material = SubResource("StandardMaterial3D_wshn8")
+
+[node name="CSGCylinder3D4" type="CSGCylinder3D" parent="MeshInstance3D/CSGCombiner3D"]
+transform = Transform3D(-3.57875e-08, 0, -0.818723, -0.863589, 2.30106e-15, 3.77487e-08, 0, 1, 0, -0.0541803, -0.0116268, 0.200281)
+operation = 2
+radius = 0.0765703
+height = 0.433429
+material = SubResource("StandardMaterial3D_wshn8")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="MeshInstance3D/CSGCombiner3D"]
+transform = Transform3D(-3.57875e-08, 2.54904e-29, -0.818723, -0.863589, 2.30106e-15, 3.77487e-08, 0, 1, 0, 0.0028127, -0.0116268, 0.200281)
+operation = 2
+size = Vector3(0.150649, 0.423921, 0.145543)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MeshInstance3D"]
+transform = Transform3D(1.444, 0, 0, 0, 1.481, 0, 0, 0, 1.481, 0, 0.342533, 0.249959)
+mesh = SubResource("SphereMesh_q4mij")

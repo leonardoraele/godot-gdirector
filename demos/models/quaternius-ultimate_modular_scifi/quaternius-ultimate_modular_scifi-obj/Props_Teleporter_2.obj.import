@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://d0l8us03o2qx2"
+path="res://.godot/imported/Props_Teleporter_2.obj-ea96c4cd4f537da6bc61ae361f8f938f.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Props_Teleporter_2.obj-ea96c4cd4f537da6bc61ae361f8f938f.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Props_Teleporter_2.obj"
+dest_files=["res://.godot/imported/Props_Teleporter_2.obj-ea96c4cd4f537da6bc61ae361f8f938f.mesh", "res://.godot/imported/Props_Teleporter_2.obj-ea96c4cd4f537da6bc61ae361f8f938f.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

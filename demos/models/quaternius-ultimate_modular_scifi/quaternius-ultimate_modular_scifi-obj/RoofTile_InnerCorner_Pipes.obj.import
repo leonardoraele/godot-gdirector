@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://b7ijfon1wkli8"
+path="res://.godot/imported/RoofTile_InnerCorner_Pipes.obj-022cd39a905d7b2deee60f331468de89.mesh"
+
+[deps]
+
+files=["res://.godot/imported/RoofTile_InnerCorner_Pipes.obj-022cd39a905d7b2deee60f331468de89.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/RoofTile_InnerCorner_Pipes.obj"
+dest_files=["res://.godot/imported/RoofTile_InnerCorner_Pipes.obj-022cd39a905d7b2deee60f331468de89.mesh", "res://.godot/imported/RoofTile_InnerCorner_Pipes.obj-022cd39a905d7b2deee60f331468de89.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

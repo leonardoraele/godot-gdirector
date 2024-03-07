@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://b1yaky2wfugsy"
+path="res://.godot/imported/Props_ContainerFull.obj-f1deb879b3fb2a870266c04be1daa0ae.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Props_ContainerFull.obj-f1deb879b3fb2a870266c04be1daa0ae.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Props_ContainerFull.obj"
+dest_files=["res://.godot/imported/Props_ContainerFull.obj-f1deb879b3fb2a870266c04be1daa0ae.mesh", "res://.godot/imported/Props_ContainerFull.obj-f1deb879b3fb2a870266c04be1daa0ae.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

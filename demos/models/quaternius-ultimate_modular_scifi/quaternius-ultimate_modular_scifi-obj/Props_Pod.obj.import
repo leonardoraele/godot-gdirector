@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bs1crdwc8r7sv"
+path="res://.godot/imported/Props_Pod.obj-a78e76406ffac754e55f6b1603394b0f.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Props_Pod.obj-a78e76406ffac754e55f6b1603394b0f.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Props_Pod.obj"
+dest_files=["res://.godot/imported/Props_Pod.obj-a78e76406ffac754e55f6b1603394b0f.mesh", "res://.godot/imported/Props_Pod.obj-a78e76406ffac754e55f6b1603394b0f.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

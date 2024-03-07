@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://ncbfi7brtcd7"
+path="res://.godot/imported/Details_Pipes_Medium.obj-e6c92e12e7b43c320e575f9da4b931bc.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Details_Pipes_Medium.obj-e6c92e12e7b43c320e575f9da4b931bc.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Details_Pipes_Medium.obj"
+dest_files=["res://.godot/imported/Details_Pipes_Medium.obj-e6c92e12e7b43c320e575f9da4b931bc.mesh", "res://.godot/imported/Details_Pipes_Medium.obj-e6c92e12e7b43c320e575f9da4b931bc.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

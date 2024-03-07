@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dauyqg1qirffd"
+path="res://.godot/imported/ThreeWindows_Wall_SideA.obj-0069c41fd57c3e6460db6b5d9395a6d2.mesh"
+
+[deps]
+
+files=["res://.godot/imported/ThreeWindows_Wall_SideA.obj-0069c41fd57c3e6460db6b5d9395a6d2.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/ThreeWindows_Wall_SideA.obj"
+dest_files=["res://.godot/imported/ThreeWindows_Wall_SideA.obj-0069c41fd57c3e6460db6b5d9395a6d2.mesh", "res://.godot/imported/ThreeWindows_Wall_SideA.obj-0069c41fd57c3e6460db6b5d9395a6d2.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

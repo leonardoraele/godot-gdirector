@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://0xxb1yd2j3ca"
+path="res://.godot/imported/Props_Vessel_Tall.obj-8249c1b34454a756e69d2ef70d1c53d2.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Props_Vessel_Tall.obj-8249c1b34454a756e69d2ef70d1c53d2.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Props_Vessel_Tall.obj"
+dest_files=["res://.godot/imported/Props_Vessel_Tall.obj-8249c1b34454a756e69d2ef70d1c53d2.mesh", "res://.godot/imported/Props_Vessel_Tall.obj-8249c1b34454a756e69d2ef70d1c53d2.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

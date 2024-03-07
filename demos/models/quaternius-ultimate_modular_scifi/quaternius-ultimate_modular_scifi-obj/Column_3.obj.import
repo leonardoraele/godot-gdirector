@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bet7y10e6y7me"
+path="res://.godot/imported/Column_3.obj-a0e15e36fe4ce2e48f56b36edc338400.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Column_3.obj-a0e15e36fe4ce2e48f56b36edc338400.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Column_3.obj"
+dest_files=["res://.godot/imported/Column_3.obj-a0e15e36fe4ce2e48f56b36edc338400.mesh", "res://.godot/imported/Column_3.obj-a0e15e36fe4ce2e48f56b36edc338400.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

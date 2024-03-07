@@ -1,0 +1,431 @@
+[gd_scene load_steps=7 format=3 uid="uid://itlkg3u5sgjs"]
+
+[ext_resource type="PackedScene" uid="uid://djybuwr2lsdq6" path="res://demos/scenes/levels/scifi_base.tscn" id="1_b6x8s"]
+[ext_resource type="PackedScene" uid="uid://ba67v0sr3y5h" path="res://demos/scenes/player_characters/Platformer/Platfomer.tscn" id="2_8av1o"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCamera.cs" id="3_jn5da"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/PriorityControllers/FramingPriority.cs" id="4_lpdlg"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/PriorityControllers/LineOfSightPriority.cs" id="5_6jp4i"]
+[ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/PriorityControllers/ProximityPriority.cs" id="5_f217e"]
+
+[node name="FixedCameraExample" type="Node3D"]
+
+[node name="SciFiBase" parent="." instance=ExtResource("1_b6x8s")]
+
+[node name="CharacterBody3D" parent="." instance=ExtResource("2_8av1o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, -3)
+TurnSpeedDegPSec = 720.0
+
+[node name="GDirector_VirtualCamera" type="Node3D" parent="."]
+transform = Transform3D(0.995884, -0.0263129, 0.0867313, -0.0167922, 0.886797, 0.461855, -0.0890658, -0.46141, 0.882705, -25.8555, 2.91086, 19.8409)
+script = ExtResource("3_jn5da")
+
+[node name="LOSPriorityController" type="Node" parent="GDirector_VirtualCamera" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="ProximityPriorityController" type="Node" parent="GDirector_VirtualCamera" node_paths=PackedStringArray("ProximityTarget")]
+script = ExtResource("5_f217e")
+ProximityTarget = NodePath("../../CharacterBody3D")
+ProximityTargetOffset = Vector3(0, 1, 0)
+IdealDistance = 6.0
+MaxDistance = 12.0
+MinDistance = 0.0
+
+[node name="GDirector_VirtualCamera2" type="Node3D" parent="."]
+transform = Transform3D(0.000732069, -0.84311, 0.537741, 0.010774, 0.537717, 0.843057, -0.999942, 0.00517642, 0.00947727, -17.624, 7.89232, -4.22912)
+script = ExtResource("3_jn5da")
+
+[node name="FramingPriorityController2" type="Node" parent="GDirector_VirtualCamera2" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="LOSPriorityController2" type="Node" parent="GDirector_VirtualCamera2" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera3" type="Node3D" parent="."]
+transform = Transform3D(-0.994364, -0.0381991, 0.0988962, -0.00743884, 0.955673, 0.294338, -0.105756, 0.291943, -0.950571, -25.9393, 3.34218, -3.1545)
+script = ExtResource("3_jn5da")
+
+[node name="FramingPriorityController3" type="Node" parent="GDirector_VirtualCamera3" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="LOSPriorityController3" type="Node" parent="GDirector_VirtualCamera3" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera4" type="Node3D" parent="."]
+transform = Transform3D(-0.803148, 0.0326213, -0.594886, -0.00743884, 0.997873, 0.0647626, 0.595734, 0.0564392, -0.801197, -20.3927, 1.45717, -19.6971)
+script = ExtResource("3_jn5da")
+
+[node name="FramingPriorityController4" type="Node" parent="GDirector_VirtualCamera4" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="LOSPriorityController4" type="Node" parent="GDirector_VirtualCamera4" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera5" type="Node3D" parent="."]
+transform = Transform3D(0.572483, 0.326223, -0.752225, -0.0524341, 0.930129, 0.363471, 0.818239, -0.168638, 0.549587, -18.0471, 8.9993, -1.65874)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera5" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="LOSPriorityController5" type="Node" parent="GDirector_VirtualCamera5" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera6" type="Node3D" parent="."]
+transform = Transform3D(0.312547, -0.507272, 0.803112, -0.0622189, 0.83272, 0.550188, -0.947863, -0.221928, 0.228702, -16.7527, 8.36109, -6.97247)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera6" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="LOSPriorityController6" type="Node" parent="GDirector_VirtualCamera6" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera7" type="Node3D" parent="."]
+transform = Transform3D(-0.726822, 0.339374, -0.597123, 0.00750493, 0.873266, 0.487185, 0.686785, 0.349615, -0.637256, -12.4823, 9.64441, -31.4664)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera7" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController" type="Node" parent="GDirector_VirtualCamera7" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera8" type="Node3D" parent="."]
+transform = Transform3D(0.639438, 0.1984, -0.742803, 0, 0.966132, 0.25805, 0.768842, -0.165007, 0.617782, -6.09315, 8.29613, -0.357473)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController" type="Node" parent="GDirector_VirtualCamera8" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera8" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera9" type="Node3D" parent="."]
+transform = Transform3D(0.969228, -0.0969912, 0.22625, 0, 0.919105, 0.394012, -0.246163, -0.381888, 0.890823, -7.97063, 9.8959, 14.1331)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController" type="Node" parent="GDirector_VirtualCamera9" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera9" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera10" type="Node3D" parent="."]
+transform = Transform3D(0.00435018, -0.0733138, 0.997299, 0, 0.997309, 0.0733145, -0.999991, -0.000318931, 0.00433848, -9.67301, 8.46777, 4.93412)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController" type="Node" parent="GDirector_VirtualCamera10" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera11" type="Node3D" parent="."]
+transform = Transform3D(0.99725, -0.0478432, 0.056606, 0, 0.763747, 0.645516, -0.0741162, -0.643741, 0.761646, -18.5869, 10.196, 15.9492)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController" type="Node" parent="GDirector_VirtualCamera11" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera11" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera12" type="Node3D" parent="."]
+transform = Transform3D(-0.300714, -0.152553, 0.941435, 0, 0.987124, 0.159956, -0.953714, 0.0481011, -0.296842, -6.45436, 8.49431, 14.6697)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController" type="Node" parent="GDirector_VirtualCamera12" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera12" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera13" type="Node3D" parent="."]
+transform = Transform3D(-0.346109, 0.0973247, -0.933133, 0, 0.994605, 0.103736, 0.938194, 0.035904, -0.344242, -16.7174, 8.16514, 14.409)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera13" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController" type="Node" parent="GDirector_VirtualCamera13" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera14" type="Node3D" parent="."]
+transform = Transform3D(-0.0218058, 0.353462, -0.935195, 0, 0.935417, 0.353546, 0.999762, 0.00770936, -0.0203975, -8.24931, 3.28406, -22.0193)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera14" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController" type="Node" parent="GDirector_VirtualCamera14" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera15" type="Node3D" parent="."]
+transform = Transform3D(0.438357, -0.435121, 0.786456, 0, 0.875006, 0.484113, -0.898801, -0.212214, 0.383564, -5.08062, 3.74095, -16.5441)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera15" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController" type="Node" parent="GDirector_VirtualCamera15" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera16" type="Node3D" parent="."]
+transform = Transform3D(-0.722384, -0.218891, 0.655933, 0, 0.948576, 0.316549, -0.691492, 0.22867, -0.685236, -5.23338, 3.25094, -19.7987)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController" type="Node" parent="GDirector_VirtualCamera16" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera16" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera17" type="Node3D" parent="."]
+transform = Transform3D(-0.61568, -0.549407, 0.564881, 0, 0.716857, 0.69722, -0.787996, 0.429264, -0.441355, 21.4192, 4.66374, -37.7797)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera17" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+PriorityOnCenter = 2
+PriorityFallOff = 2.0
+
+[node name="GDirector_VirtualCamera18" type="Node3D" parent="."]
+transform = Transform3D(0.5, -0.334266, 0.798916, 0, 0.922509, 0.385977, -0.866025, -0.192988, 0.461254, 23.2453, 3.71482, -14.0417)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController" type="Node" parent="GDirector_VirtualCamera18" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController" type="Node" parent="GDirector_VirtualCamera18" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera19" type="Node3D" parent="."]
+transform = Transform3D(-0.390746, 0.249155, -0.886137, 0, 0.962671, 0.270674, 0.920498, 0.105765, -0.37616, 12.8362, 1.78985, -25.4826)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController2" type="Node" parent="GDirector_VirtualCamera19" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController2" type="Node" parent="GDirector_VirtualCamera19" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera20" type="Node3D" parent="."]
+transform = Transform3D(0.748957, 0.409809, -0.520692, 0, 0.78581, 0.618468, 0.662619, -0.463206, 0.588537, 26.077, 5.22881, -20.7505)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController3" type="Node" parent="GDirector_VirtualCamera20" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController3" type="Node" parent="GDirector_VirtualCamera20" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera21" type="Node3D" parent="."]
+transform = Transform3D(0.999915, 0.0129942, -0.00137623, 0, 0.105322, 0.994438, 0.0130669, -0.994353, 0.105313, 36.173, 9.51094, -15.0851)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController4" type="Node" parent="GDirector_VirtualCamera21" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController4" type="Node" parent="GDirector_VirtualCamera21" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera23" type="Node3D" parent="."]
+transform = Transform3D(-0.152133, 0.30877, -0.938891, 0, 0.949949, 0.312406, 0.98836, 0.0475273, -0.144518, 42.874, 1.47961, -27.8401)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController5" type="Node" parent="GDirector_VirtualCamera23" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController5" type="Node" parent="GDirector_VirtualCamera23" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera22" type="Node3D" parent="."]
+transform = Transform3D(-0.859414, 0.465998, -0.210364, 0, 0.411446, 0.911434, 0.51128, 0.7833, -0.353603, 47.4484, 7.81005, -18.8131)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController6" type="Node" parent="GDirector_VirtualCamera22" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController6" type="Node" parent="GDirector_VirtualCamera22" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera24" type="Node3D" parent="."]
+transform = Transform3D(0.973381, -0.040604, 0.22557, 0, 0.984182, 0.177159, -0.229195, -0.172443, 0.957984, 51.1861, 0.496929, -18.5964)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController7" type="Node" parent="GDirector_VirtualCamera24" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController7" type="Node" parent="GDirector_VirtualCamera24" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera25" type="Node3D" parent="."]
+transform = Transform3D(-0.390719, 0.174921, -0.903737, 0, 0.981779, 0.190026, 0.92051, 0.074247, -0.3836, 27.953, 0.636714, -39.3884)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController8" type="Node" parent="GDirector_VirtualCamera25" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController8" type="Node" parent="GDirector_VirtualCamera25" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera26" type="Node3D" parent="."]
+transform = Transform3D(0.999658, 0.0227035, -0.0130002, 0, 0.496909, 0.867803, 0.0261621, -0.867506, 0.496739, 34.237, 5.71305, -28.9748)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController9" type="Node" parent="GDirector_VirtualCamera26" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController9" type="Node" parent="GDirector_VirtualCamera26" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera27" type="Node3D" parent="."]
+transform = Transform3D(-0.304884, -0.86804, 0.391858, 0, 0.411447, 0.911434, -0.952389, 0.277882, -0.125444, 29.2492, 5.92323, -38.3543)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController10" type="Node" parent="GDirector_VirtualCamera27" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController10" type="Node" parent="GDirector_VirtualCamera27" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera28" type="Node3D" parent="."]
+transform = Transform3D(0.999991, 0.000487634, -0.0043105, 0, 0.993662, 0.11241, 0.004338, -0.112409, 0.993653, 26.8695, 0.751819, -22.8717)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController11" type="Node" parent="GDirector_VirtualCamera28" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController11" type="Node" parent="GDirector_VirtualCamera28" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera29" type="Node3D" parent="."]
+transform = Transform3D(0.354272, -0.41659, 0.837224, 0, 0.89529, 0.445483, -0.935142, -0.157822, 0.317176, 15.3685, 12.857, -26.2198)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController12" type="Node" parent="GDirector_VirtualCamera29" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController12" type="Node" parent="GDirector_VirtualCamera29" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCamera30" type="Node3D" parent="."]
+transform = Transform3D(-0.99999, 0.0036454, -0.00246309, 0, 0.559855, 0.828591, 0.00439952, 0.828583, -0.559849, 16.0884, 13.4304, -39.433)
+script = ExtResource("3_jn5da")
+
+[node name="GDirector_VirtualCameraController_LineOfSightPriorityController13" type="Node" parent="GDirector_VirtualCamera30" node_paths=PackedStringArray("LineOfSightTarget")]
+script = ExtResource("5_6jp4i")
+LineOfSightTarget = NodePath("../../CharacterBody3D")
+LineOfSightTargetOffset = Vector3(0, 1, 0)
+
+[node name="GDirector_VirtualCameraController_FramingPriorityController13" type="Node" parent="GDirector_VirtualCamera30" node_paths=PackedStringArray("FramingTarget")]
+script = ExtResource("4_lpdlg")
+FramingTarget = NodePath("../../CharacterBody3D")
+FramingTargetOffset = Vector3(0, 1, 0)

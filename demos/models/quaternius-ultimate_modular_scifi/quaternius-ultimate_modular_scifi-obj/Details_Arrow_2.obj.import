@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://phcoxrih5aqw"
+path="res://.godot/imported/Details_Arrow_2.obj-053aa8d31ae7f95c6f3edc1a4759e844.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Details_Arrow_2.obj-053aa8d31ae7f95c6f3edc1a4759e844.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Details_Arrow_2.obj"
+dest_files=["res://.godot/imported/Details_Arrow_2.obj-053aa8d31ae7f95c6f3edc1a4759e844.mesh", "res://.godot/imported/Details_Arrow_2.obj-053aa8d31ae7f95c6f3edc1a4759e844.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

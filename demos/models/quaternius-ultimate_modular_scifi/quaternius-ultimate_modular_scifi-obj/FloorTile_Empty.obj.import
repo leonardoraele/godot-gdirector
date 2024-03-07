@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bkxqkowmprl76"
+path="res://.godot/imported/FloorTile_Empty.obj-5f8ac53932211ca4bca7e747f9c721e8.mesh"
+
+[deps]
+
+files=["res://.godot/imported/FloorTile_Empty.obj-5f8ac53932211ca4bca7e747f9c721e8.mesh"]
+
+source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/FloorTile_Empty.obj"
+dest_files=["res://.godot/imported/FloorTile_Empty.obj-5f8ac53932211ca4bca7e747f9c721e8.mesh", "res://.godot/imported/FloorTile_Empty.obj-5f8ac53932211ca4bca7e747f9c721e8.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

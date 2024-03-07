@@ -1,0 +1,161 @@
+[gd_scene load_steps=9 format=3 uid="uid://b01sge5bktxns"]
+
+[ext_resource type="Script" path="res://demos/scenes/props/door.gd" id="1_0k047"]
+[ext_resource type="ArrayMesh" uid="uid://dmkrbomu680fo" path="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Door_Single.obj" id="2_pem1o"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tyhrr"]
+size = Vector3(1.51483, 2.82558, 0.528973)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cgx7d"]
+size = Vector3(3.597, 3, 5.963)
+
+[sub_resource type="Animation" id="Animation_i58x3"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:position:z")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="Animation" id="Animation_wbuyj"]
+resource_name = "close"
+length = 0.15
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.15)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(-3, -0.25, 0, 0.064452, 1.29909, 0, -0.0779196, -1.56371, 0.25, 0),
+"times": PackedFloat32Array(0, 0.148143)
+}
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:position:z")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.15)
+}
+
+[sub_resource type="Animation" id="Animation_3nn6f"]
+length = 0.15
+step = 0.01
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.15)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.11, -1.39908, -3, -0.12, 1.35397, 0.25, 0),
+"times": PackedFloat32Array(0, 0.15)
+}
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:position:z")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.15)
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0e5bp"]
+_data = {
+"RESET": SubResource("Animation_i58x3"),
+"close": SubResource("Animation_wbuyj"),
+"open": SubResource("Animation_3nn6f")
+}
+
+[node name="Door" type="Node3D"]
+script = ExtResource("1_0k047")
+
+[node name="DoorSingle" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_pem1o")
+skeleton = NodePath("../../..")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="DoorSingle"]
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorSingle/StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.40514, -0.407292)
+shape = SubResource("BoxShape3D_tyhrr")
+
+[node name="Area3D" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 16
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("BoxShape3D_cgx7d")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("../DoorSingle")
+autoplay = "RESET"
+libraries = {
+"": SubResource("AnimationLibrary_0e5bp")
+}
+
+[connection signal="close" from="." to="AnimationPlayer" method="play" binds= ["close"]]
+[connection signal="open" from="." to="AnimationPlayer" method="play" binds= ["open"]]
+[connection signal="body_entered" from="Area3D" to="." method="on_open" unbinds=1]
+[connection signal="body_exited" from="Area3D" to="." method="on_close" unbinds=1]
