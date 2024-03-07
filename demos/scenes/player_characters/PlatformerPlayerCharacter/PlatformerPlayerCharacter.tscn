@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://ba67v0sr3y5h"]
+[gd_scene load_steps=7 format=3 uid="uid://ba67v0sr3y5h"]
 
 [ext_resource type="Script" path="res://demos/scenes/player_characters/PlatformerPlayerCharacter/PlatformerPlayerCharacter.cs" id="1_ej2jp"]
+[ext_resource type="PackedScene" uid="uid://3ne6rhpywbwc" path="res://demos/models/quaternius-ultimate_modular_men_pack/Spacesuit.gltf" id="2_hqhfp"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_e6fhp"]
 radius = 0.25
@@ -17,9 +18,10 @@ albedo_color = Color(0, 0, 0, 1)
 radius = 0.05
 height = 0.1
 
-[node name="PlatformerPlayerCharacter" type="CharacterBody3D"]
+[node name="PlatformerPlayerCharacter" type="CharacterBody3D" node_paths=PackedStringArray("AnimationPlayer")]
 collision_layer = 16
 script = ExtResource("1_ej2jp")
+AnimationPlayer = NodePath("Spacesuit/AnimationPlayer")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
@@ -27,6 +29,7 @@ shape = SubResource("CapsuleShape3D_e6fhp")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.75, 0)
+visible = false
 mesh = SubResource("CapsuleMesh_2uxc0")
 
 [node name="CSGCombiner3D" type="CSGCombiner3D" parent="MeshInstance3D"]
@@ -77,3 +80,29 @@ size = Vector3(0.150649, 0.423921, 0.145543)
 [node name="MeshInstance3D" type="MeshInstance3D" parent="MeshInstance3D"]
 transform = Transform3D(1.444, 0, 0, 0, 1.481, 0, 0, 0, 1.481, 0, 0.342533, 0.249959)
 mesh = SubResource("SphereMesh_q4mij")
+
+[node name="Spacesuit" parent="." instance=ExtResource("2_hqhfp")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="Skeleton3D" parent="Spacesuit/CharacterArmature" index="0"]
+bones/5/rotation = Quaternion(0.00363649, 1.82809e-10, -2.11031e-09, 0.999993)
+bones/7/rotation = Quaternion(-0.0245109, -0.000275392, 0.000120303, 0.9997)
+bones/8/rotation = Quaternion(0.456199, 0.840231, 0.106907, -0.272881)
+bones/9/rotation = Quaternion(-0.674998, 0.403884, 0.387776, 0.480506)
+bones/10/rotation = Quaternion(-0.121328, -0.0295654, -0.184313, 0.974902)
+bones/11/rotation = Quaternion(0.0112397, 0.0177445, 0.0104792, 0.999724)
+bones/13/rotation = Quaternion(-0.0408909, -0.0321456, 0.0670435, 0.996393)
+bones/17/rotation = Quaternion(-0.0935594, 0.0249633, 0.0400872, 0.994493)
+bones/21/rotation = Quaternion(-0.0819329, 0.160517, -0.0365543, 0.982947)
+bones/25/rotation = Quaternion(-0.129029, 0.157212, -0.0646215, 0.976965)
+bones/30/rotation = Quaternion(-0.0885877, -0.0556028, 0.121992, 0.987005)
+bones/32/rotation = Quaternion(-0.626873, -0.307534, -0.439377, 0.565157)
+bones/33/rotation = Quaternion(-0.205763, -0.193786, 0.323958, 0.902862)
+bones/52/rotation = Quaternion(0.0417277, 0.122015, -0.0851815, 0.987985)
+bones/53/rotation = Quaternion(-0.0885877, 0.0556028, -0.121992, 0.987005)
+bones/54/rotation = Quaternion(0.535611, -0.021101, -0.835662, 0.11977)
+bones/55/rotation = Quaternion(0.186823, 0.681981, -0.186823, 0.68198)
+bones/56/rotation = Quaternion(0.554986, 0.125435, 0.804819, 0.168886)
+bones/57/rotation = Quaternion(0.167543, -0.686971, 0.167543, 0.686971)
+
+[editable path="Spacesuit"]

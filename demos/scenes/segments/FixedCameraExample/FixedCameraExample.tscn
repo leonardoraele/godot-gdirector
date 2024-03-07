@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://itlkg3u5sgjs"]
 
 [ext_resource type="PackedScene" uid="uid://djybuwr2lsdq6" path="res://demos/scenes/levels/scifi_base.tscn" id="1_b6x8s"]
-[ext_resource type="PackedScene" uid="uid://ba67v0sr3y5h" path="res://demos/scenes/player_characters/Platformer/Platfomer.tscn" id="2_8av1o"]
+[ext_resource type="PackedScene" uid="uid://ba67v0sr3y5h" path="res://demos/scenes/player_characters/PlatformerPlayerCharacter/PlatformerPlayerCharacter.tscn" id="2_8av1o"]
 [ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCamera.cs" id="3_jn5da"]
 [ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/PriorityControllers/FramingPriority.cs" id="4_lpdlg"]
 [ext_resource type="Script" path="res://addons/GDirector/scripts/VirtualCameraControllers/PriorityControllers/LineOfSightPriority.cs" id="5_6jp4i"]

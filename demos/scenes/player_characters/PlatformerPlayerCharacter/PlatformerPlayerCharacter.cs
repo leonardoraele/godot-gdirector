@@ -1,6 +1,5 @@
+using System;
 using Godot;
-
-namespace Raele.GDirector.Demos;
 
 public partial class PlatformerPlayerCharacter : CharacterBody3D
 {
@@ -16,6 +15,9 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
     [Export] public float JumpHeightUn = 4;
     [Export] public float JumpUpDurationSec = 0.5f;
 	[Export] public float SpeedMultiplierWhileAimingDownSights = 0.25f;
+
+	[ExportGroup("Animation")]
+	[Export] public AnimationPlayer? AnimationPlayer;
 
 	/// ----------------------------------------------------------------------------------------------------------------
 	/// PRIVATE FIELDS
@@ -55,7 +57,7 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 
 		// Subscribe to transition start event. This is used to reset the camera used for reference for directional
 		// input when a camera cut happens.
-		GDirectorServer.Instance.TransitionStart += this.OnTransitionStart;
+		Raele.GDirector.GDirectorServer.Instance.TransitionStart += this.OnTransitionStart;
 	}
 
 	private void OnTransitionStart(ulong nextCameraId, ulong previousCameraId, ulong transitionControllerId)
@@ -63,14 +65,20 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 		// If there is no transition controller, then it's an instantaneous camera cut. When this happens, we must save
 		// the camera direction to use for input direction.
 		if (transitionControllerId == 0 && this.CameraDirection == Vector3.Zero) {
-			this.CameraDirection = GDirectorServer.Instance.ManagedCamera.GlobalTransform.Basis.Z with { Y = 0 };
+			this.CameraDirection = Raele.GDirector.GDirectorServer.Instance.ManagedCamera.GlobalTransform.Basis.Z with { Y = 0 };
 		}
 	}
 
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
+		this.ReadPlayerInput();
+		this.UpdateActiveCamera();
+		this.UpdateAnimation();
+	}
 
+    private void ReadPlayerInput()
+    {
 		// Read directional input
 		this.DirectionalInput = Input.GetVector(
 				"character_move_left",
@@ -85,15 +93,31 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 			this.CameraDirection = Vector3.Zero;
 		}
 
-		// Buffers jump input
+		// Other inputs
 		this.JumpQueued = this.JumpQueued || Input.IsActionJustPressed("character_jump");
-
-		// Change active camera group when aiming
 		this.AimingDownSights = Input.IsActionPressed("character_aim");
-		GDirectorServer.Instance.ActiveGroup = this.AimingDownSights ? "aim_camera" : null;
-	}
+    }
 
-	public override void _PhysicsProcess(double delta)
+    private void UpdateActiveCamera()
+    {
+		// Change active camera group when aiming
+		Raele.GDirector.GDirectorServer.Instance.ActiveGroup = this.AimingDownSights ? "aim_camera" : null;
+    }
+
+    private void UpdateAnimation()
+    {
+		if (this.Velocity.LengthSquared() < Mathf.Epsilon) {
+			if (this.AnimationPlayer?.CurrentAnimation != "Idle") {
+        		this.AnimationPlayer?.Play("Idle");
+			}
+		} else {
+			if (this.AnimationPlayer?.CurrentAnimation != "Run") {
+				this.AnimationPlayer?.Play("Run");
+			}
+		}
+    }
+
+    public override void _PhysicsProcess(double delta)
 	{
 		base._PhysicsProcess(delta);
 
@@ -117,7 +141,7 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 		Vector3 cameraDirection = (
 				this.CameraDirection != Vector3.Zero
 					? this.CameraDirection
-					: GDirectorServer.Instance.ManagedCamera.Basis.Z with { Y = 0 }
+					: Raele.GDirector.GDirectorServer.Instance.ManagedCamera.Basis.Z with { Y = 0 }
 			)
 			.Normalized()
 			* -1;
@@ -126,7 +150,7 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 			: currentHDirection;
 		Vector3 newHDirection = this.AimingDownSights ? targetHDirection
 			: currentHSpeed < Mathf.Epsilon ? targetHDirection
-			: GodotUtil.RotateToward(currentHDirection, targetHDirection, this.TurnSpeedRadPSec * (float) delta);
+			: Raele.GDirector.GodotUtil.RotateToward(currentHDirection, targetHDirection, this.TurnSpeedRadPSec * (float) delta);
 
 		// Calculate vertical speed
 		float newVSpeed;
@@ -145,7 +169,7 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 
 		// Update facing direction
 		Vector3 lookDirection = this.AimingDownSights
-			? (GDirectorServer.Instance.ManagedCamera.GlobalTransform.Basis.Z with { Y = 0} * -1).Normalized()
+			? (Raele.GDirector.GDirectorServer.Instance.ManagedCamera.GlobalTransform.Basis.Z with { Y = 0} * -1).Normalized()
 			: newHDirection;
 		this.LookAt(this.GlobalPosition + lookDirection, Vector3.Up);
 	}
