@@ -7,6 +7,14 @@ namespace Raele.GDirector.VirtualCameraControllers;
 // GlobalGroupTransitionController that should be attached to the GDirectorServer directly instead of to a specific
 // camera, and provides a default transition for any camera in a node group that is not handled by a specific transition
 // controller.
+// TODO Some times, a camera transition might be triggered while another transition is already happening.
+// When this happens, the camera is cut from it's position directly to the position of the virtual camera that is both
+// the end of the previous transition and the start of the new transition, and then the new transition starts.
+// To avoid this cut, instead of this behavior,
+// the new transition should be anchored at it's start not to that virtual camera,
+// but to the target positoin of the previous transition.
+// (i.e. the position the camera should be positioned if that transition had not be canceled)
+// This way the camera will smoothly blend from one transition to the next without an abrupt cut.
 public partial class CameraTransition : VirtualCameraController
 {
 	/// <summary>
