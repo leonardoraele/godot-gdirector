@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -25,16 +26,19 @@ public partial class GDirectorServer : Node
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
-    public Camera3D ManagedCamera { get; private set; } = null!;
 	public VirtualCamera? CurrentActiveCamera { get; private set; }
 	public VirtualCamera? PreviousActiveCamera { get; private set; }
-	private VirtualCamera? _activeCameraOverride;
+
     private HashSet<VirtualCamera> ManagedCameras = new();
+	private VirtualCamera? _activeCameraOverride;
     private string? _activeGroup;
+	private Camera3D _ownCamera = null!;
 
     // -----------------------------------------------------------------------------------------------------------------
     // PROPERTIES
     // -----------------------------------------------------------------------------------------------------------------
+
+    public Camera3D ManagedCamera => this.GetTree().Root.GetCamera3D() ?? this._ownCamera;
 
     /// <summary>
     /// The active camera override. If this is set to a non-null value, this camera will be the active camera,
@@ -103,11 +107,12 @@ public partial class GDirectorServer : Node
     public override void _Ready()
     {
         base._Ready();
-		this.ManagedCamera = this.GetTree().Root.GetCamera3D();
-		if (this.ManagedCamera == null) {
-			this.ManagedCamera = new Camera3D();
-			this.AddChild(this.ManagedCamera);
-		}
+		this.AddChild(this._ownCamera = new Camera3D());
+		// this.ManagedCamera = this.GetTree().Root.GetCamera3D();
+		// if (this.ManagedCamera == null) {
+		// 	this.ManagedCamera = new Camera3D();
+		// 	this.AddChild(this.ManagedCamera);
+		// }
 		this.ReevaluateCameraSelection();
 	}
 

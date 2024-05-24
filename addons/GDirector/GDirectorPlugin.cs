@@ -1,3 +1,4 @@
+#nullable enable
 #if TOOLS
 using System;
 using System.Text.RegularExpressions;
@@ -23,7 +24,7 @@ public partial class GDirectorPlugin : EditorPlugin
         CameraPreviewWindow preview = new CameraPreviewWindow();
         this.AddChild(preview);
 
-        EditorSelection editorSelection = this.GetEditorInterface().GetSelection();
+        EditorSelection editorSelection = EditorInterface.Singleton.GetSelection();
         editorSelection.SelectionChanged += () => {
             Node? selectedNode = editorSelection.GetSelectedNodes().Count > 0
                 ? editorSelection.GetSelectedNodes()[0]
@@ -70,6 +71,8 @@ public partial class GDirectorPlugin : EditorPlugin
             in new string[] {
                 nameof(FollowPosition),
                 nameof(OrbitalMovement),
+                nameof(MimicMovement),
+                nameof(FramingConstraint),
             }
         ) {
             this.AddCustomType($"{nameof(GDirector)}_{className}", nameof(Node), GetControllerScript(className), vcamPosIcon);

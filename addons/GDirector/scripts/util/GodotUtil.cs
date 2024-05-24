@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using Godot;
 
@@ -20,9 +21,9 @@ public static class GodotUtil {
 		return from.Slerp(to, weight);
 	}
 
-    public static bool CheckNormalsAreParallel(Vector3 a, Vector3 b, float epsilon = Mathf.Epsilon)
+    public static bool CheckNormalsAreParallel(Vector3 a, Vector3 b)
     {
 		float dot = a.Dot(b);
-		return dot <= -1 + epsilon || dot >= 1 - epsilon;
+		return Mathf.IsEqualApprox(dot, -1) || Mathf.IsEqualApprox(dot, 1);
     }
 }
