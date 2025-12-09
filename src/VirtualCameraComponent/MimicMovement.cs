@@ -1,8 +1,8 @@
 using Godot;
 
-namespace Raele.GDirector.VirtualCameraControllers;
+namespace Raele.GDirector.VirtualCameraComponents;
 
-public partial class MimicMovement : VirtualCameraController
+public partial class MimicMovement : VirtualCameraComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS

@@ -1,9 +1,9 @@
 using System;
 using Godot;
 
-namespace Raele.GDirector.VirtualCameraControllers;
+namespace Raele.GDirector.VirtualCameraComponents;
 
-public partial class FramingConstraint : VirtualCameraController
+public partial class FramingConstraint : VirtualCameraComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Godot;
-using Raele.GDirector.VirtualCameraControllers;
+using Raele.GDirector.VirtualCameraComponents;
 
 namespace Raele.GDirector;
 

@@ -1,8 +1,8 @@
 using Godot;
 
-namespace Raele.GDirector.VirtualCameraControllers;
+namespace Raele.GDirector.VirtualCameraComponents;
 
-public partial class LookAtTarget : VirtualCameraController
+public partial class LookAtTarget : VirtualCameraComponent
 {
 	[Export] public Node3D? LookTarget;
 	/// <summary>

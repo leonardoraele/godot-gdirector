@@ -2,7 +2,7 @@ using Godot;
 
 namespace Raele.GDirector;
 
-public partial class VirtualCameraController : Node
+public partial class VirtualCameraComponent : Node
 {
     protected VirtualCamera Camera { get; private set; } = null!;
 

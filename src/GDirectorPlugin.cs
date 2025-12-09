@@ -1,6 +1,6 @@
 #if TOOLS
 using Godot;
-using Raele.GDirector.VirtualCameraControllers;
+using Raele.GDirector.VirtualCameraComponents;
 
 namespace Raele.GDirector;
 
@@ -24,16 +24,16 @@ public partial class GDirectorPlugin : EditorPlugin
 		// Custom Nodes
 		this.AddCustomType(nameof(VirtualCamera), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera)}.cs"), vcamIcon);
 
-		this.AddCustomType(nameof(FollowPosition), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraControllers)}/{nameof(FollowPosition)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(OrbitalMovement), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraControllers)}/{nameof(OrbitalMovement)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(MimicMovement), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraControllers)}/{nameof(MimicMovement)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(FramingConstraint), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraControllers)}/{nameof(FramingConstraint)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(LookAtTarget), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraControllers)}/{nameof(LookAtTarget)}.cs"), vcamRotIcon);
-		this.AddCustomType(nameof(MimicRotation), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraControllers)}/{nameof(MimicRotation)}.cs"), vcamRotIcon);
-		this.AddCustomType(nameof(FramingPriority), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraControllers)}/{nameof(FramingPriority)}.cs"), vcamPriIcon);
-		this.AddCustomType(nameof(LineOfSightPriority), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraControllers)}/{nameof(LineOfSightPriority)}.cs"), vcamPriIcon);
-		this.AddCustomType(nameof(ProximityPriority), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraControllers)}/{nameof(ProximityPriority)}.cs"), vcamPriIcon);
-		this.AddCustomType(nameof(CameraTransition), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraControllers)}/{nameof(CameraTransition)}.cs"), vcamTraIcon);
+		this.AddCustomType(nameof(FollowPosition), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(FollowPosition)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(OrbitalMovement), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(OrbitalMovement)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(MimicMovement), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(MimicMovement)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(FramingConstraint), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(FramingConstraint)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(LookAtTarget), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(LookAtTarget)}.cs"), vcamRotIcon);
+		this.AddCustomType(nameof(MimicRotation), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(MimicRotation)}.cs"), vcamRotIcon);
+		this.AddCustomType(nameof(FramingPriority), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(FramingPriority)}.cs"), vcamPriIcon);
+		this.AddCustomType(nameof(LineOfSightPriority), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(LineOfSightPriority)}.cs"), vcamPriIcon);
+		this.AddCustomType(nameof(ProximityPriority), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(ProximityPriority)}.cs"), vcamPriIcon);
+		this.AddCustomType(nameof(CameraTransition), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(CameraTransition)}.cs"), vcamTraIcon);
 
 		// Camera Preview Window
 		// this.SetupCameraPreviewWindow();

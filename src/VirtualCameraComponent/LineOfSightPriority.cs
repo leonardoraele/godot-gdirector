@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Raele.GDirector.VirtualCameraControllers;
+namespace Raele.GDirector.VirtualCameraComponents;
 
 /// <summary>
 /// This controller adds priority to the virtual camera when the target is in the line of sight of the camera.
@@ -14,7 +14,7 @@ namespace Raele.GDirector.VirtualCameraControllers;
 /// an optional offset). If the target has a mesh (e.g. a character) this controller might determine the target is out
 /// of sight even though parts of it's body other than it's origin position might still be visible.
 /// </summary>
-public partial class LineOfSightPriority : VirtualCameraController
+public partial class LineOfSightPriority : VirtualCameraComponent
 {
 	[Export] public Node3D? LineOfSightTarget;
 	[Export] public Vector3 LineOfSightTargetOffset;

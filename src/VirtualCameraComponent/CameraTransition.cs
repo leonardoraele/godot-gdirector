@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Raele.GDirector.VirtualCameraControllers;
+namespace Raele.GDirector.VirtualCameraComponents;
 
 // TODO Create a GroupTransitionController class that works just like this one, but that can handle transitions from
 // any camera in a node group instead of a single specific group. We could go even further and also create a
@@ -15,7 +15,7 @@ namespace Raele.GDirector.VirtualCameraControllers;
 // but to the target positoin of the previous transition.
 // (i.e. the position the camera should be positioned if that transition had not be canceled)
 // This way the camera will smoothly blend from one transition to the next without an abrupt cut.
-public partial class CameraTransition : VirtualCameraController
+public partial class CameraTransition : VirtualCameraComponent
 {
 	/// <summary>
 	/// The camera for which this transition controller is responsible to transition from.
