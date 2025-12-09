@@ -3,7 +3,7 @@ using Godot;
 namespace Raele.GDirector.VirtualCameraComponents;
 
 // TODO Create a GroupTransitionController class that works just like this one, but that can handle transitions from
-// any camera in a node group instead of a single specific group. We could go even further and also create a
+// any camera in a node group instead of a single specific camera. We could go even further and also create a
 // GlobalGroupTransitionController that should be attached to the GDirectorServer directly instead of to a specific
 // camera, and provides a default transition for any camera in a node group that is not handled by a specific transition
 // controller.
@@ -15,7 +15,7 @@ namespace Raele.GDirector.VirtualCameraComponents;
 // but to the target positoin of the previous transition.
 // (i.e. the position the camera should be positioned if that transition had not be canceled)
 // This way the camera will smoothly blend from one transition to the next without an abrupt cut.
-public partial class CameraTransition : VirtualCameraComponent
+public partial class CameraTransition3D : VirtualCameraComponent3D
 {
 	/// <summary>
 	/// The camera for which this transition controller is responsible to transition from.
@@ -23,7 +23,7 @@ public partial class CameraTransition : VirtualCameraComponent
 	/// If this is not set, this transition controller will be the default transition controller for the camera it is
 	/// attached to, and will handle transitions from any camera for which there is no specific transition controller.
 	/// </summary>
-	[Export] public VirtualCamera? FromCamera;
+	[Export] public VirtualCamera3D? FromCamera;
 	/// <summary>
 	/// The duration of the transition in seconds.
 	/// </summary>
@@ -40,9 +40,9 @@ public partial class CameraTransition : VirtualCameraComponent
 	[Signal] public delegate void TransitionCancelEventHandler();
 	[Signal] public delegate void TransitionEndEventHandler();
 
-    public bool Ongoing => this.Tween?.IsRunning() == true;
+	public bool Ongoing => this.Tween?.IsRunning() == true;
 
-    public override void _EnterTree()
+	public override void _EnterTree()
 	{
 		base._EnterTree();
 		if (this.FromCamera != null) {
@@ -54,19 +54,19 @@ public partial class CameraTransition : VirtualCameraComponent
 
 	private Tween? Tween;
 
-    public void StartTransition()
-    {
+	public void StartTransition()
+	{
 		// Cancel any previous transition that might be ongoing before starting a new one
 		this.CancelTransition();
 
 		// Get the previous camera
-		VirtualCamera? previousCamera = this.FromCamera ?? GDirectorServer.Instance.PreviousActiveCamera;
+		VirtualCamera3D? previousCamera = this.FromCamera ?? GDirectorServer.Instance.PreviousActiveCamera3D;
 
 		// If there is no previous camera, we can skip the transition
 		if (previousCamera == null) {
 			this.EmitSignal(SignalName.TransitionStart);
-			GDirectorServer.Instance.ManagedCamera.GlobalPosition = this.Camera.GlobalPosition;
-			GDirectorServer.Instance.ManagedCamera.GlobalRotation = this.Camera.GlobalRotation;
+			GDirectorServer.Instance.ManagedCamera3D.GlobalPosition = this.Camera.GlobalPosition;
+			GDirectorServer.Instance.ManagedCamera3D.GlobalRotation = this.Camera.GlobalRotation;
 			this.FinishTransition();
 			return;
 		}
@@ -76,9 +76,9 @@ public partial class CameraTransition : VirtualCameraComponent
 		this.Tween.TweenMethod(
 			Callable.From((float progress) => {
 				float lerpWeight = this.Curve?.Sample(progress) ?? progress;
-				GDirectorServer.Instance.ManagedCamera.GlobalPosition
+				GDirectorServer.Instance.ManagedCamera3D.GlobalPosition
 					= previousCamera.GlobalPosition.Lerp(this.Camera.GlobalPosition, lerpWeight);
-				GDirectorServer.Instance.ManagedCamera.GlobalRotation
+				GDirectorServer.Instance.ManagedCamera3D.GlobalRotation
 					= previousCamera.GlobalRotation.Lerp(this.Camera.GlobalRotation, lerpWeight);
 			}),
 			0f,
@@ -89,11 +89,11 @@ public partial class CameraTransition : VirtualCameraComponent
 
 		// Emit signals
 		this.EmitSignal(SignalName.TransitionStart);
-    }
+	}
 
-    public void CancelTransition()
-    {
-        if (this.Tween == null) {
+	public void CancelTransition()
+	{
+		if (this.Tween == null) {
 			return;
 		}
 
@@ -103,7 +103,7 @@ public partial class CameraTransition : VirtualCameraComponent
 		// Emit signals
 		this.EmitSignal(SignalName.TransitionCancel);
 		this.EmitSignal(SignalName.TransitionEnd);
-    }
+	}
 
 	private void FinishTransition()
 	{

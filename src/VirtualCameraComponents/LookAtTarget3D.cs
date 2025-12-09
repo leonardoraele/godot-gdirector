@@ -2,7 +2,7 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCameraComponents;
 
-public partial class LookAtTarget : VirtualCameraComponent
+public partial class LookAtTarget3D : VirtualCameraComponent3D
 {
 	[Export] public Node3D? LookTarget;
 	/// <summary>
@@ -51,7 +51,7 @@ public partial class LookAtTarget : VirtualCameraComponent
 	public float OffsetRotationRadX => Mathf.DegToRad(this.OffsetRotationDeg.X);
 	public float OffsetRotationRadY => Mathf.DegToRad(this.OffsetRotationDeg.Y);
 
-    public Vector3 OffsetedLookTargetPosition {
+	public Vector3 OffsetedLookTargetPosition {
 		get {
 			if (this.LookTarget == null) {
 				return Vector3.Zero;
@@ -61,7 +61,7 @@ public partial class LookAtTarget : VirtualCameraComponent
 		}
 	}
 
-    public override void _Ready()
+	public override void _Ready()
 	{
 		base._Ready();
 		this.initialDirection = this.Camera.GlobalBasis.Z * -1;

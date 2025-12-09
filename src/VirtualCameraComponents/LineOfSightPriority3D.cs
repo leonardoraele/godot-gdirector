@@ -14,7 +14,7 @@ namespace Raele.GDirector.VirtualCameraComponents;
 /// an optional offset). If the target has a mesh (e.g. a character) this controller might determine the target is out
 /// of sight even though parts of it's body other than it's origin position might still be visible.
 /// </summary>
-public partial class LineOfSightPriority : VirtualCameraComponent
+public partial class LineOfSightPriority3D : VirtualCameraComponent3D
 {
 	[Export] public Node3D? LineOfSightTarget;
 	[Export] public Vector3 LineOfSightTargetOffset;
@@ -56,15 +56,15 @@ public partial class LineOfSightPriority : VirtualCameraComponent
 		this.Camera.Priority += this.PriorityOnLineOfSight * fallOffMultiplier;
 	}
 
-    public override void _PhysicsProcess(double delta)
-    {
-        base._PhysicsProcess(delta);
-        PhysicsDirectSpaceState3D spaceState = this.Camera.GetWorld3D().DirectSpaceState;
-        Godot.Collections.Dictionary result = spaceState.IntersectRay(new() {
+	public override void _PhysicsProcess(double delta)
+	{
+		base._PhysicsProcess(delta);
+		PhysicsDirectSpaceState3D spaceState = this.Camera.GetWorld3D().DirectSpaceState;
+		Godot.Collections.Dictionary result = spaceState.IntersectRay(new() {
 			From = this.Camera.GlobalPosition,
 			To = this.LineOfSightTargetPosition,
 			CollisionMask = this.ObstaclesMask,
 		});
 		this.HasLOS = result.Count == 0;
-    }
+	}
 }

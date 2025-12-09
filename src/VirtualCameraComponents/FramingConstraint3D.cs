@@ -1,8 +1,9 @@
+using System;
 using Godot;
 
 namespace Raele.GDirector.VirtualCameraComponents;
 
-public partial class MimicMovement : VirtualCameraComponent
+public partial class FramingConstraint3D : VirtualCameraComponent3D
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
@@ -14,28 +15,39 @@ public partial class MimicMovement : VirtualCameraComponent
 	// EXPORTS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	[Export] public Node3D? Reference;
-	/// <summary>
-	/// If false, the camera will move to the exact position of the reference node at the start of the scene. If true,
-	/// the camera will preserve it's starting position.
-	/// </summary>
-	[Export] public bool PreserveDistance = true;
+	[Export] public Node3D? FramingTarget;
+	[Export] public Vector3 Offset;
+	[Export(PropertyHint.Range, "0,1")] public Vector2 ScreenPosition = new Vector2(0.5f, 0.5f);
+	[Export] public MovementModeEnum MovementPlane = MovementModeEnum.Global_XZ_Plane;
 
-	[ExportGroup("Smoothing")]
-	[Export(PropertyHint.Range, "0.01,1,0.01")] public float LerpWeight = 1f;
-	[Export] public float MaxDistance = 4f;
+	// TODO
+	// [Export(PropertyHint.Range, "0,1")] public float DeadZoneRadius = 0;
+
+	// TODO
+	// [Export] public float MinDistance = 4;
+	// [Export] public float MaxDistance = float.PositiveInfinity;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	private Vector3 offset;
+
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// PROPERTIES
 	// -----------------------------------------------------------------------------------------------------------------
 
-
+	private Vector2 ScreenPositionPx => this.GetViewport().GetWindow().Size * this.ScreenPosition;
+	private Plane MovementPlaneAsPlane => this.MovementPlane switch {
+		MovementModeEnum.Global_XZ_Plane => new Plane(Vector3.Up, this.Camera.GlobalPosition),
+		MovementModeEnum.Global_XY_Plane => new Plane(Vector3.Forward, this.Camera.GlobalPosition),
+		MovementModeEnum.Global_YZ_Plane => new Plane(Vector3.Right, this.Camera.GlobalPosition),
+		MovementModeEnum.Local_XY_Plane => new Plane(this.Camera.GlobalBasis.Z * -1, this.Camera.GlobalPosition),
+		_ => throw new NotImplementedException("VirtualCamera's FramingConstraint node is set to an invalid MovementPlane option."),
+	};
+	private Vector3 FramingTargetOffsetedPosition => this.FramingTarget != null
+		? this.FramingTarget.GlobalPosition + this.Offset * this.FramingTarget.GlobalBasis
+		: Vector3.Zero;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
@@ -47,9 +59,12 @@ public partial class MimicMovement : VirtualCameraComponent
 	// INTERNAL TYPES
 	// -----------------------------------------------------------------------------------------------------------------
 
-	// private enum Type {
-	// 	Value1,
-	// }
+	public enum MovementModeEnum {
+		Global_XZ_Plane,
+		Global_XY_Plane,
+		Global_YZ_Plane,
+		Local_XY_Plane,
+	}
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// EVENTS
@@ -60,24 +75,26 @@ public partial class MimicMovement : VirtualCameraComponent
 	// 	base._EnterTree();
 	// }
 
-	public override void _Ready()
-	{
-		base._Ready();
-		this.offset = this.Reference != null ? this.Camera.GlobalPosition - this.Reference.GlobalPosition : Vector3.Zero;
-	}
+	// public override void _Ready()
+	// {
+	// 	base._Ready();
+	// }
 
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
-		if (this.Reference == null) {
+		if (this.FramingTarget == null) {
 			return;
 		}
-        Vector3 targetPosition = this.Reference.GlobalPosition + this.offset;
-		Vector3 candidateNewPosition = this.Camera.GlobalPosition.Lerp(targetPosition, this.LerpWeight);
-		float distanceToTarget = candidateNewPosition.DistanceTo(targetPosition);
-		this.Camera.GlobalPosition = distanceToTarget <= this.MaxDistance
-			? candidateNewPosition
-			: targetPosition.MoveToward(this.Camera.GlobalPosition, this.MaxDistance);
+
+		// TODO
+		// Vector2 framingTargetScreenPosition = GDirectorServer.Instance.ManagedCamera.UnprojectPosition(this.FramingTargetOffsetedPosition) / this.GetViewport().GetWindow().Size;
+		// if (framingTargetScreenPosition.DistanceTo(this.ScreenPosition) < this.DeadZoneRadius) {
+		// 	return;
+		// }
+
+		Vector3 screenPositionNormal = this.Camera.GlobalBasis * GDirectorServer.Instance.ManagedCamera3D.ProjectLocalRayNormal(this.ScreenPositionPx);
+		this.Camera.GlobalPosition = this.MovementPlaneAsPlane.IntersectsRay(this.FramingTargetOffsetedPosition, screenPositionNormal * -1) ?? this.Camera.GlobalPosition;
 	}
 
 	// public override void _PhysicsProcess(double delta)

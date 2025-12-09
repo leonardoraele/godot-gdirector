@@ -1,6 +1,6 @@
 # GDirector
 
-![GDirector Logo](/logo.png)
+![GDirector Logo](./icons/logo.png)
 
 GDirector is an addon for Godot that provides a complete solution for operating 3D cameras with dynamic behavior,
 for both cutscenes and gameplay.

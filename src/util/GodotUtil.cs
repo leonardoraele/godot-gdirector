@@ -20,9 +20,6 @@ public static class GodotUtil {
 		return from.Slerp(to, weight);
 	}
 
-    public static bool CheckNormalsAreParallel(Vector3 a, Vector3 b)
-    {
-		float dot = a.Dot(b);
-		return Mathf.IsEqualApprox(dot, -1) || Mathf.IsEqualApprox(dot, 1);
-    }
+	public static bool CheckNormalsAreParallel(Vector3 a, Vector3 b)
+		=> Mathf.IsEqualApprox(Math.Abs(a.Dot(b)), 1);
 }
