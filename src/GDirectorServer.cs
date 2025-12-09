@@ -10,7 +10,9 @@ public partial class GDirectorServer : Node
 	// STATIC STUFF
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public static GDirectorServer Instance { get; private set; } = null!;
+	public static GDirectorServer Instance => field ??= Engine.GetMainLoop() is SceneTree tree
+		? tree.Root.GetNode<GDirectorServer>(nameof(GDirectorServer))
+		: throw new System.Exception("No GDirectorServer instance found in the scene tree. Make sure to add a GDirectorServer node to the scene tree.");
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
@@ -28,29 +30,27 @@ public partial class GDirectorServer : Node
 	public VirtualCamera? CurrentActiveCamera { get; private set; }
 	public VirtualCamera? PreviousActiveCamera { get; private set; }
 
-    private HashSet<VirtualCamera> ManagedCameras = new();
-	private VirtualCamera? _activeCameraOverride;
-    private string? _activeGroup;
-	private Camera3D _ownCamera = null!;
+    private HashSet<VirtualCamera> ManagedCameras { get; init; } = new();
+	private Camera3D OwnCamera { get; init; } = new();
 
     // -----------------------------------------------------------------------------------------------------------------
     // PROPERTIES
     // -----------------------------------------------------------------------------------------------------------------
 
-    public Camera3D ManagedCamera => this.GetTree().Root.GetCamera3D() ?? this._ownCamera;
+    public Camera3D ManagedCamera => this.GetTree().Root.GetCamera3D() ?? this.OwnCamera;
 
     /// <summary>
     /// The active camera override. If this is set to a non-null value, this camera will be the active camera,
-    /// regardless of its priority or group. Set this to null to make GDirector go back to its normal camera selection
-    /// process, based on camera priority.
+    /// regardless of its priority or camera group. Set this to null to make GDirector go back to its normal camera
+	/// selection process, based on priority.
     /// </summary>
     public VirtualCamera? ActiveCameraOverride {
-		get => this._activeCameraOverride;
+		get => field;
 		set {
-			if (this._activeCameraOverride == value) {
+			if (field == value) {
 				return;
 			}
-			this._activeCameraOverride = value;
+			field = value;
 			this.ReevaluateCameraSelection();
 		}
 	}
@@ -59,61 +59,54 @@ public partial class GDirectorServer : Node
 	/// The active group of cameras. If this is set to a non-null value, only cameras in this group will be electible
 	/// for activation. If this is set to null, all cameras will be electible.
 	///
-	/// If this is set to a group that doesn't contain the active camera, the active camera will be changed to the next
-	/// best camera available.
+	/// When this property is set, if the current active camera is not in the newly set active group, the active camera
+	/// will be changed to the best camera available in the active group.
 	///
 	/// Note that ActiveCameraOverride takes precedence over this property. If ActiveCameraOverride is set to a non-null
 	/// value, the active camera will be the camera set in ActiveCameraOverride, regardless of the active group.
 	/// </summary>
     public string? ActiveGroup {
-		get => this._activeGroup;
+		get => field;
 		set {
 			// If the active group is the same as the current active group, nothing changes, so we don't need to do
 			// anything.
-			if (this._activeGroup == value) {
+			if (field == value) {
 				return;
 			}
 
 			// Update the active group.
-			this._activeGroup = value;
+			field = value;
 
 			// If the currently active camera is already in the newly set active group, it's remains a valid active
 			// camera, so we don't need to do anything else. Otherwise, we need to reevaluate the camera selection.
 			if (
-				string.IsNullOrEmpty(this._activeGroup)
-				|| this.CurrentActiveCamera?.IsInGroup(this._activeGroup) != true
+				string.IsNullOrEmpty(field)
+				|| this.CurrentActiveCamera?.IsInGroup(field) != true
 			) {
 				this.ReevaluateCameraSelection();
 			}
 		}
 	}
 
-	// -----------------------------------------------------------------------------------------------------------------
-	// METHODS
-	// -----------------------------------------------------------------------------------------------------------------
+	public IEnumerable<VirtualCamera> ActiveGroupCameras
+		=> string.IsNullOrEmpty(this.ActiveGroup)
+			? this.ManagedCameras
+			: this.ManagedCameras.Where(camera => camera.IsInGroup(this.ActiveGroup));
 
-    public override void _EnterTree()
-    {
-        base._EnterTree();
-		if (GDirectorServer.Instance != null) {
-			GD.PushError("There can only be one " + nameof(GDirectorServer) + " in the scene.");
-			this.QueueFree();
-			return;
-		}
-		GDirectorServer.Instance = this;
-    }
+	// -----------------------------------------------------------------------------------------------------------------
+	// OVERRIDES
+	// -----------------------------------------------------------------------------------------------------------------
 
     public override void _Ready()
     {
         base._Ready();
-		this.AddChild(this._ownCamera = new Camera3D());
-		// this.ManagedCamera = this.GetTree().Root.GetCamera3D();
-		// if (this.ManagedCamera == null) {
-		// 	this.ManagedCamera = new Camera3D();
-		// 	this.AddChild(this.ManagedCamera);
-		// }
+		this.AddChild(this.OwnCamera);
 		this.ReevaluateCameraSelection();
 	}
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// METHODS
+	// -----------------------------------------------------------------------------------------------------------------
 
     public void Register(VirtualCamera camera)
 	{
@@ -157,15 +150,8 @@ public partial class GDirectorServer : Node
     }
 
 	private VirtualCamera? FindHighestPriorityCameraInActiveGroup()
-		=> this.ManagedCameras.Count > 0
-			? this.ManagedCameras.Where(camera =>
-					string.IsNullOrEmpty(this.ActiveGroup)
-					|| camera.IsInGroup(this.ActiveGroup)
-				)
-				.Aggregate(
-					this.ManagedCameras.First(),
-					(cameraA, cameraB) => cameraA.Priority > cameraB.Priority ? cameraA : cameraB
-				)
+		=> this.ActiveGroupCameras.ToArray() is VirtualCamera[] cameras && cameras.Length > 0
+			? cameras.Aggregate((cameraA, cameraB) => cameraA.Priority > cameraB.Priority ? cameraA : cameraB)
 			: null;
 
 	private void SetActiveCamera(VirtualCamera? newActiveCamera)

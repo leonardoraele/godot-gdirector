@@ -4,18 +4,22 @@ importer="wavefront_obj"
 importer_version=1
 type="Mesh"
 uid="uid://cp2r6q1o7apo"
-path="res://.godot/imported/Wall_3.obj-5cf0341814618bdcf19da929d0e0e9b6.mesh"
+path="res://.godot/imported/Wall_3.obj-c9476e2339f18f334831fa496fa80adc.mesh"
 
 [deps]
 
-files=["res://.godot/imported/Wall_3.obj-5cf0341814618bdcf19da929d0e0e9b6.mesh"]
+files=["res://.godot/imported/Wall_3.obj-c9476e2339f18f334831fa496fa80adc.mesh"]
 
-source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Wall_3.obj"
-dest_files=["res://.godot/imported/Wall_3.obj-5cf0341814618bdcf19da929d0e0e9b6.mesh", "res://.godot/imported/Wall_3.obj-5cf0341814618bdcf19da929d0e0e9b6.mesh"]
+source_file="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Wall_3.obj"
+dest_files=["res://.godot/imported/Wall_3.obj-c9476e2339f18f334831fa496fa80adc.mesh", "res://.godot/imported/Wall_3.obj-c9476e2339f18f334831fa496fa80adc.mesh"]
 
 [params]
 
 generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
-optimize_mesh=true
+force_disable_mesh_compression=false

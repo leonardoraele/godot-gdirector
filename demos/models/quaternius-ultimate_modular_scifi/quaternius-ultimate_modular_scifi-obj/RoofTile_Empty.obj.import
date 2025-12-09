@@ -4,18 +4,22 @@ importer="wavefront_obj"
 importer_version=1
 type="Mesh"
 uid="uid://b0ptne8kjixg7"
-path="res://.godot/imported/RoofTile_Empty.obj-9162d2e2ec1dc9c5e76b5346fadd8e15.mesh"
+path="res://.godot/imported/RoofTile_Empty.obj-1334b5b3414998ebcb1653ec9eca97af.mesh"
 
 [deps]
 
-files=["res://.godot/imported/RoofTile_Empty.obj-9162d2e2ec1dc9c5e76b5346fadd8e15.mesh"]
+files=["res://.godot/imported/RoofTile_Empty.obj-1334b5b3414998ebcb1653ec9eca97af.mesh"]
 
-source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/RoofTile_Empty.obj"
-dest_files=["res://.godot/imported/RoofTile_Empty.obj-9162d2e2ec1dc9c5e76b5346fadd8e15.mesh", "res://.godot/imported/RoofTile_Empty.obj-9162d2e2ec1dc9c5e76b5346fadd8e15.mesh"]
+source_file="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/RoofTile_Empty.obj"
+dest_files=["res://.godot/imported/RoofTile_Empty.obj-1334b5b3414998ebcb1653ec9eca97af.mesh", "res://.godot/imported/RoofTile_Empty.obj-1334b5b3414998ebcb1653ec9eca97af.mesh"]
 
 [params]
 
 generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
-optimize_mesh=true
+force_disable_mesh_compression=false

@@ -4,18 +4,22 @@ importer="wavefront_obj"
 importer_version=1
 type="Mesh"
 uid="uid://dq3vhoygy8rnf"
-path="res://.godot/imported/Details_Vent_1.obj-87a396c958089cc0ed9fa27553716e4b.mesh"
+path="res://.godot/imported/Details_Vent_1.obj-2f1dd369ccbfc402ceccd155cb1dad91.mesh"
 
 [deps]
 
-files=["res://.godot/imported/Details_Vent_1.obj-87a396c958089cc0ed9fa27553716e4b.mesh"]
+files=["res://.godot/imported/Details_Vent_1.obj-2f1dd369ccbfc402ceccd155cb1dad91.mesh"]
 
-source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Details_Vent_1.obj"
-dest_files=["res://.godot/imported/Details_Vent_1.obj-87a396c958089cc0ed9fa27553716e4b.mesh", "res://.godot/imported/Details_Vent_1.obj-87a396c958089cc0ed9fa27553716e4b.mesh"]
+source_file="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Details_Vent_1.obj"
+dest_files=["res://.godot/imported/Details_Vent_1.obj-2f1dd369ccbfc402ceccd155cb1dad91.mesh", "res://.godot/imported/Details_Vent_1.obj-2f1dd369ccbfc402ceccd155cb1dad91.mesh"]
 
 [params]
 
 generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
-optimize_mesh=true
+force_disable_mesh_compression=false

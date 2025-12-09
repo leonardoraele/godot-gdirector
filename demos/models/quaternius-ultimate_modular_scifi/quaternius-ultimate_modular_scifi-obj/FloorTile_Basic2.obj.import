@@ -4,18 +4,22 @@ importer="wavefront_obj"
 importer_version=1
 type="Mesh"
 uid="uid://dvfeo5fpkffog"
-path="res://.godot/imported/FloorTile_Basic2.obj-cb18dd411b8688738e5d26154101bfdf.mesh"
+path="res://.godot/imported/FloorTile_Basic2.obj-45217b6b6f98cf4efc5c68b6b46ee245.mesh"
 
 [deps]
 
-files=["res://.godot/imported/FloorTile_Basic2.obj-cb18dd411b8688738e5d26154101bfdf.mesh"]
+files=["res://.godot/imported/FloorTile_Basic2.obj-45217b6b6f98cf4efc5c68b6b46ee245.mesh"]
 
-source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/FloorTile_Basic2.obj"
-dest_files=["res://.godot/imported/FloorTile_Basic2.obj-cb18dd411b8688738e5d26154101bfdf.mesh", "res://.godot/imported/FloorTile_Basic2.obj-cb18dd411b8688738e5d26154101bfdf.mesh"]
+source_file="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/FloorTile_Basic2.obj"
+dest_files=["res://.godot/imported/FloorTile_Basic2.obj-45217b6b6f98cf4efc5c68b6b46ee245.mesh", "res://.godot/imported/FloorTile_Basic2.obj-45217b6b6f98cf4efc5c68b6b46ee245.mesh"]
 
 [params]
 
 generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
-optimize_mesh=true
+force_disable_mesh_compression=false

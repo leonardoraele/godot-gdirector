@@ -4,18 +4,22 @@ importer="wavefront_obj"
 importer_version=1
 type="Mesh"
 uid="uid://c3lkjyokxcsft"
-path="res://.godot/imported/DoorSingleLong_Wall_SideA.obj-f433e05ca53a1cfe69ad17a08e1518a3.mesh"
+path="res://.godot/imported/DoorSingleLong_Wall_SideA.obj-80192007700be959d033f5ea65af0b16.mesh"
 
 [deps]
 
-files=["res://.godot/imported/DoorSingleLong_Wall_SideA.obj-f433e05ca53a1cfe69ad17a08e1518a3.mesh"]
+files=["res://.godot/imported/DoorSingleLong_Wall_SideA.obj-80192007700be959d033f5ea65af0b16.mesh"]
 
-source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/DoorSingleLong_Wall_SideA.obj"
-dest_files=["res://.godot/imported/DoorSingleLong_Wall_SideA.obj-f433e05ca53a1cfe69ad17a08e1518a3.mesh", "res://.godot/imported/DoorSingleLong_Wall_SideA.obj-f433e05ca53a1cfe69ad17a08e1518a3.mesh"]
+source_file="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/DoorSingleLong_Wall_SideA.obj"
+dest_files=["res://.godot/imported/DoorSingleLong_Wall_SideA.obj-80192007700be959d033f5ea65af0b16.mesh", "res://.godot/imported/DoorSingleLong_Wall_SideA.obj-80192007700be959d033f5ea65af0b16.mesh"]
 
 [params]
 
 generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
-optimize_mesh=true
+force_disable_mesh_compression=false

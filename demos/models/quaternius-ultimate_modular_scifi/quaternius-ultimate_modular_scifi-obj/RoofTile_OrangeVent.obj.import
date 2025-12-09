@@ -4,18 +4,22 @@ importer="wavefront_obj"
 importer_version=1
 type="Mesh"
 uid="uid://c2u38kce6pokr"
-path="res://.godot/imported/RoofTile_OrangeVent.obj-806e8396a75daa22ba20dcab60643910.mesh"
+path="res://.godot/imported/RoofTile_OrangeVent.obj-1c5f82c40adcc181f5c343236a50b15d.mesh"
 
 [deps]
 
-files=["res://.godot/imported/RoofTile_OrangeVent.obj-806e8396a75daa22ba20dcab60643910.mesh"]
+files=["res://.godot/imported/RoofTile_OrangeVent.obj-1c5f82c40adcc181f5c343236a50b15d.mesh"]
 
-source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/RoofTile_OrangeVent.obj"
-dest_files=["res://.godot/imported/RoofTile_OrangeVent.obj-806e8396a75daa22ba20dcab60643910.mesh", "res://.godot/imported/RoofTile_OrangeVent.obj-806e8396a75daa22ba20dcab60643910.mesh"]
+source_file="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/RoofTile_OrangeVent.obj"
+dest_files=["res://.godot/imported/RoofTile_OrangeVent.obj-1c5f82c40adcc181f5c343236a50b15d.mesh", "res://.godot/imported/RoofTile_OrangeVent.obj-1c5f82c40adcc181f5c343236a50b15d.mesh"]
 
 [params]
 
 generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
-optimize_mesh=true
+force_disable_mesh_compression=false

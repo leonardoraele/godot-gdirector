@@ -4,18 +4,22 @@ importer="wavefront_obj"
 importer_version=1
 type="Mesh"
 uid="uid://cbl4yoqlmelub"
-path="res://.godot/imported/FloorTile_InnerCorner.obj-e187a39042f8a7a1bb78e7da7492d5a3.mesh"
+path="res://.godot/imported/FloorTile_InnerCorner.obj-b1a73f7173df079d4e475a496e4d4cf1.mesh"
 
 [deps]
 
-files=["res://.godot/imported/FloorTile_InnerCorner.obj-e187a39042f8a7a1bb78e7da7492d5a3.mesh"]
+files=["res://.godot/imported/FloorTile_InnerCorner.obj-b1a73f7173df079d4e475a496e4d4cf1.mesh"]
 
-source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/FloorTile_InnerCorner.obj"
-dest_files=["res://.godot/imported/FloorTile_InnerCorner.obj-e187a39042f8a7a1bb78e7da7492d5a3.mesh", "res://.godot/imported/FloorTile_InnerCorner.obj-e187a39042f8a7a1bb78e7da7492d5a3.mesh"]
+source_file="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/FloorTile_InnerCorner.obj"
+dest_files=["res://.godot/imported/FloorTile_InnerCorner.obj-b1a73f7173df079d4e475a496e4d4cf1.mesh", "res://.godot/imported/FloorTile_InnerCorner.obj-b1a73f7173df079d4e475a496e4d4cf1.mesh"]
 
 [params]
 
 generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
-optimize_mesh=true
+force_disable_mesh_compression=false

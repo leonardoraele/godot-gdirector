@@ -4,18 +4,22 @@ importer="wavefront_obj"
 importer_version=1
 type="Mesh"
 uid="uid://ches86peuw1ct"
-path="res://.godot/imported/Staircase.obj-53e103e69f08f71da65d02b8a3a3a4b2.mesh"
+path="res://.godot/imported/Staircase.obj-b652ac8458d6a4a22fc965ba15f0454a.mesh"
 
 [deps]
 
-files=["res://.godot/imported/Staircase.obj-53e103e69f08f71da65d02b8a3a3a4b2.mesh"]
+files=["res://.godot/imported/Staircase.obj-b652ac8458d6a4a22fc965ba15f0454a.mesh"]
 
-source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Staircase.obj"
-dest_files=["res://.godot/imported/Staircase.obj-53e103e69f08f71da65d02b8a3a3a4b2.mesh", "res://.godot/imported/Staircase.obj-53e103e69f08f71da65d02b8a3a3a4b2.mesh"]
+source_file="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Staircase.obj"
+dest_files=["res://.godot/imported/Staircase.obj-b652ac8458d6a4a22fc965ba15f0454a.mesh", "res://.godot/imported/Staircase.obj-b652ac8458d6a4a22fc965ba15f0454a.mesh"]
 
 [params]
 
 generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
-optimize_mesh=true
+force_disable_mesh_compression=false

@@ -4,18 +4,22 @@ importer="wavefront_obj"
 importer_version=1
 type="Mesh"
 uid="uid://bdwl76rr3ny4d"
-path="res://.godot/imported/Door_Double.obj-16fcd808fa92711724d947f1d19900fa.mesh"
+path="res://.godot/imported/Door_Double.obj-9a625f2b19600a371eb96991f43d9b68.mesh"
 
 [deps]
 
-files=["res://.godot/imported/Door_Double.obj-16fcd808fa92711724d947f1d19900fa.mesh"]
+files=["res://.godot/imported/Door_Double.obj-9a625f2b19600a371eb96991f43d9b68.mesh"]
 
-source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Door_Double.obj"
-dest_files=["res://.godot/imported/Door_Double.obj-16fcd808fa92711724d947f1d19900fa.mesh", "res://.godot/imported/Door_Double.obj-16fcd808fa92711724d947f1d19900fa.mesh"]
+source_file="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Door_Double.obj"
+dest_files=["res://.godot/imported/Door_Double.obj-9a625f2b19600a371eb96991f43d9b68.mesh", "res://.godot/imported/Door_Double.obj-9a625f2b19600a371eb96991f43d9b68.mesh"]
 
 [params]
 
 generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
-optimize_mesh=true
+force_disable_mesh_compression=false

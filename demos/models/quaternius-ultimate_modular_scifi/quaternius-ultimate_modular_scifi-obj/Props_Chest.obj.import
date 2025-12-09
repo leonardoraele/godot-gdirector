@@ -4,18 +4,22 @@ importer="wavefront_obj"
 importer_version=1
 type="Mesh"
 uid="uid://x6d8j08g6nuo"
-path="res://.godot/imported/Props_Chest.obj-1fba8908cb1bfde4eb46079975dbc4af.mesh"
+path="res://.godot/imported/Props_Chest.obj-c7b052f53fe78aa5b4c81ae229c1cedc.mesh"
 
 [deps]
 
-files=["res://.godot/imported/Props_Chest.obj-1fba8908cb1bfde4eb46079975dbc4af.mesh"]
+files=["res://.godot/imported/Props_Chest.obj-c7b052f53fe78aa5b4c81ae229c1cedc.mesh"]
 
-source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Props_Chest.obj"
-dest_files=["res://.godot/imported/Props_Chest.obj-1fba8908cb1bfde4eb46079975dbc4af.mesh", "res://.godot/imported/Props_Chest.obj-1fba8908cb1bfde4eb46079975dbc4af.mesh"]
+source_file="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Props_Chest.obj"
+dest_files=["res://.godot/imported/Props_Chest.obj-c7b052f53fe78aa5b4c81ae229c1cedc.mesh", "res://.godot/imported/Props_Chest.obj-c7b052f53fe78aa5b4c81ae229c1cedc.mesh"]
 
 [params]
 
 generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
-optimize_mesh=true
+force_disable_mesh_compression=false

@@ -4,18 +4,22 @@ importer="wavefront_obj"
 importer_version=1
 type="Mesh"
 uid="uid://do47ehqm0vg3m"
-path="res://.godot/imported/Props_Shelf_Tall.obj-7c56c5314f47a5831002dab7f7c74222.mesh"
+path="res://.godot/imported/Props_Shelf_Tall.obj-4597da6b955b6228eb22d05ac21ef202.mesh"
 
 [deps]
 
-files=["res://.godot/imported/Props_Shelf_Tall.obj-7c56c5314f47a5831002dab7f7c74222.mesh"]
+files=["res://.godot/imported/Props_Shelf_Tall.obj-4597da6b955b6228eb22d05ac21ef202.mesh"]
 
-source_file="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Props_Shelf_Tall.obj"
-dest_files=["res://.godot/imported/Props_Shelf_Tall.obj-7c56c5314f47a5831002dab7f7c74222.mesh", "res://.godot/imported/Props_Shelf_Tall.obj-7c56c5314f47a5831002dab7f7c74222.mesh"]
+source_file="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Props_Shelf_Tall.obj"
+dest_files=["res://.godot/imported/Props_Shelf_Tall.obj-4597da6b955b6228eb22d05ac21ef202.mesh", "res://.godot/imported/Props_Shelf_Tall.obj-4597da6b955b6228eb22d05ac21ef202.mesh"]
 
 [params]
 
 generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
 scale_mesh=Vector3(1, 1, 1)
 offset_mesh=Vector3(0, 0, 0)
-optimize_mesh=true
+force_disable_mesh_compression=false
