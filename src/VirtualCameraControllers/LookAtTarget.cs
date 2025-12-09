@@ -1,5 +1,3 @@
-#nullable enable
-using System;
 using Godot;
 
 namespace Raele.GDirector.VirtualCameraControllers;

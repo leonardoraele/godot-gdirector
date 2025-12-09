@@ -1,4 +1,3 @@
-#nullable enable
 using Godot;
 
 public partial class CameraPreviewWindow : Window
