@@ -29,20 +29,17 @@ public partial class GDirectorServer : Node
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public IVirtualCamera? CurrentActiveCamera { get; private set; }
-	public IVirtualCamera? PreviousActiveCamera { get; private set; }
+	public IVirtualCamera? LiveCamera { get; private set; } = null;
+	private WeakReference<IVirtualCamera>? PreviousLiveCameraWeakRef = null;
 
-	public VirtualCamera2D? CurrentActiveCamera2D => this.CurrentActiveCamera as VirtualCamera2D;
-	public VirtualCamera2D? PreviousActiveCamera2D => this.PreviousActiveCamera as VirtualCamera2D;
-	public VirtualCamera3D? CurrentActiveCamera3D => this.CurrentActiveCamera as VirtualCamera3D;
-	public VirtualCamera3D? PreviousActiveCamera3D => this.PreviousActiveCamera as VirtualCamera3D;
+	private HashSet<IVirtualCamera> ManagedVirtualCameras { get; init; } = new();
 
 	/// <summary>
 	/// The active camera override. If this is set to a non-null value, this camera will be the active camera,
 	/// regardless of its priority or camera group. Set this to null to make GDirector go back to its normal camera
 	/// selection process, based on priority.
 	/// </summary>
-	public IVirtualCamera? ActiveCameraOverride {
+	public IVirtualCamera? LiveCameraOverride {
 		get => field;
 		set {
 			if (field == value) {
@@ -79,38 +76,10 @@ public partial class GDirectorServer : Node
 			// camera, so we don't need to do anything else. Otherwise, we need to reevaluate the camera selection.
 			if (
 				string.IsNullOrEmpty(field)
-				|| this.CurrentActiveCamera?.IsInGroup(field) != true
+				|| this.LiveCamera?.AsNode().IsInGroup(field) != true
 			) {
 				this.ReevaluateCameraSelection();
 			}
-		}
-	}
-
-	private HashSet<IVirtualCamera> ManagedCameras { get; init; } = new();
-
-	private Camera2D OwnCamera2D
-	{
-		get
-		{
-			if (field == default)
-			{
-				field = new Camera2D { Name = "GDirector_OwnCamera2D" };
-				this.AddChild(field);
-			}
-			return field;
-		}
-	}
-
-	private Camera3D OwnCamera3D
-	{
-		get
-		{
-			if (field == default)
-			{
-				field = new Camera3D { Name = "GDirector_OwnCamera3D" };
-				this.AddChild(field);
-			}
-			return field;
 		}
 	}
 
@@ -118,13 +87,21 @@ public partial class GDirectorServer : Node
 	// COMPUTED PROPERTIES
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public Camera2D ManagedCamera2D => this.GetTree().Root.GetCamera2D() ?? this.OwnCamera2D;
-	public Camera3D ManagedCamera3D => this.GetTree().Root.GetCamera3D() ?? this.OwnCamera3D;
+	public IVirtualCamera? PreviousLiveCamera
+		=> this.PreviousLiveCameraWeakRef?.TryGetTarget(out IVirtualCamera? cam) ?? false ? cam : null;
+
+	public Camera2D? MainCamera2D => this.GetTree().Root.GetCamera2D();
+	public Camera3D? MainCamera3D => this.GetTree().Root.GetCamera3D();
 
 	public IEnumerable<IVirtualCamera> ActiveGroupCameras
 		=> string.IsNullOrEmpty(this.ActiveGroup)
-			? this.ManagedCameras
-			: this.ManagedCameras.Where(camera => camera.IsInGroup(this.ActiveGroup));
+			? this.ManagedVirtualCameras
+			: this.ManagedVirtualCameras.Where(camera => camera.AsNode().IsInGroup(this.ActiveGroup));
+
+	[Obsolete] public VirtualCamera2D? LiveCamera2D => this.LiveCamera as VirtualCamera2D;
+	[Obsolete] public VirtualCamera2D? PreviousLiveCamera2D => this.PreviousLiveCamera as VirtualCamera2D;
+	[Obsolete] public VirtualCamera3D? LiveCamera3D => this.LiveCamera as VirtualCamera3D;
+	[Obsolete] public VirtualCamera3D? PreviousLiveCamera3D => this.PreviousLiveCamera as VirtualCamera3D;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// OVERRIDES
@@ -140,27 +117,28 @@ public partial class GDirectorServer : Node
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public void Register(IVirtualCamera camera, CancellationToken cancellationToken)
+	public void Register(IVirtualCamera camera, CancellationToken token)
 	{
-		this.ManagedCameras.Add(camera);
-		camera.ConnectPriorityChanged((_, _) => this.EvaluateCameraPriority(camera), cancellationToken);
-		cancellationToken.Register(() => this.Unregister(camera));
+		this.ManagedVirtualCameras.Add(camera);
+		Callable callable = Callable.From(() => this.EvaluateCameraPriority(camera));
+		camera.ConnectSignalPriorityChanged(callable);
+		token.Register(() =>
+		{
+			camera.DisconnectSignalPriorityChanged(callable);
+			this.Unregister(camera);
+		});
 		// Ignore registrations before READY event. When the node is ready, we evaluate all registered cameras.
 		if (this.IsNodeReady()) {
 			this.EvaluateCameraPriority(camera);
 		}
-		// camera.ExitTransitionStart += (newCamera, controllerId) => this.EmitSignal(SignalName.TransitionStart, newCamera, camera, controllerId);
-		// camera.ExitTransitionFinish += (newCamera) => this.EmitSignal(SignalName.TransitionFinish, newCamera, camera);
-		// camera.ExitTransitionCancel += (newCamera) => this.EmitSignal(SignalName.TransitionCancel, newCamera, camera);
-		// camera.ExitTransitionEnd += (newCamera) => this.EmitSignal(SignalName.TransitionEnd, newCamera, camera);
 	}
 
 	private void Unregister(IVirtualCamera camera)
 	{
-		this.ManagedCameras.Remove(camera);
-		if (camera == this.ActiveCameraOverride) {
-			this.ActiveCameraOverride = null;
-		} else if (camera == this.CurrentActiveCamera) {
+		this.ManagedVirtualCameras.Remove(camera);
+		if (camera == this.LiveCameraOverride) {
+			this.LiveCameraOverride = null;
+		} else if (camera == this.LiveCamera) {
 			this.ReevaluateCameraSelection();
 		}
 	}
@@ -168,9 +146,9 @@ public partial class GDirectorServer : Node
 	private void EvaluateCameraPriority(IVirtualCamera camera)
 	{
 		if (
-			this.ActiveCameraOverride != null
-			|| camera.Priority <= (this.CurrentActiveCamera?.Priority ?? float.NegativeInfinity)
-			|| !string.IsNullOrEmpty(this.ActiveGroup) && !camera.IsInGroup(this.ActiveGroup)
+			this.LiveCameraOverride != null
+			|| camera.Priority <= (this.LiveCamera?.Priority ?? float.NegativeInfinity)
+			|| !string.IsNullOrEmpty(this.ActiveGroup) && !camera.AsNode().IsInGroup(this.ActiveGroup)
 		) {
 			return;
 		}
@@ -179,8 +157,8 @@ public partial class GDirectorServer : Node
 
 	private void ReevaluateCameraSelection()
 	{
-		if (this.ActiveCameraOverride != null) {
-			this.SetActiveCamera(this.ActiveCameraOverride);
+		if (this.LiveCameraOverride != null) {
+			this.SetActiveCamera(this.LiveCameraOverride);
 			return;
 		}
 		this.SetActiveCamera(this.FindHighestPriorityCameraInActiveGroup());
@@ -202,12 +180,12 @@ public partial class GDirectorServer : Node
 		}
 
 		// If the new active camera is the same as the current active camera, there's no need to do anything.
-		if (newActiveCamera == this.CurrentActiveCamera) {
+		if (newActiveCamera == this.LiveCamera) {
 			return;
 		}
 
-		this.CurrentActiveCamera?.CancelTransition();
-		(this.CurrentActiveCamera, this.PreviousActiveCamera) = (newActiveCamera, this.CurrentActiveCamera);
-		this.CurrentActiveCamera?.StartTransition();
+		this.LiveCamera?.NotifyTransitionCanceled();
+		(this.LiveCamera, this.PreviousLiveCameraWeakRef) = (newActiveCamera, this.LiveCamera);
+		this.LiveCamera?.NotifyTransitionStarted();
 	}
 }

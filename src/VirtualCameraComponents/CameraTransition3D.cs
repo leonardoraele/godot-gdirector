@@ -60,13 +60,13 @@ public partial class CameraTransition3D : VirtualCameraComponent3D
 		this.CancelTransition();
 
 		// Get the previous camera
-		VirtualCamera3D? previousCamera = this.FromCamera ?? GDirectorServer.Instance.PreviousActiveCamera3D;
+		VirtualCamera3D? previousCamera = this.FromCamera ?? GDirectorServer.Instance.PreviousLiveCamera3D;
 
 		// If there is no previous camera, we can skip the transition
 		if (previousCamera == null) {
 			this.EmitSignal(SignalName.TransitionStart);
-			GDirectorServer.Instance.ManagedCamera3D.GlobalPosition = this.Camera.GlobalPosition;
-			GDirectorServer.Instance.ManagedCamera3D.GlobalRotation = this.Camera.GlobalRotation;
+			GDirectorServer.Instance.MainCamera3D.GlobalPosition = this.Camera.GlobalPosition;
+			GDirectorServer.Instance.MainCamera3D.GlobalRotation = this.Camera.GlobalRotation;
 			this.FinishTransition();
 			return;
 		}
@@ -76,9 +76,9 @@ public partial class CameraTransition3D : VirtualCameraComponent3D
 		this.Tween.TweenMethod(
 			Callable.From((float progress) => {
 				float lerpWeight = this.Curve?.Sample(progress) ?? progress;
-				GDirectorServer.Instance.ManagedCamera3D.GlobalPosition
+				GDirectorServer.Instance.MainCamera3D.GlobalPosition
 					= previousCamera.GlobalPosition.Lerp(this.Camera.GlobalPosition, lerpWeight);
-				GDirectorServer.Instance.ManagedCamera3D.GlobalRotation
+				GDirectorServer.Instance.MainCamera3D.GlobalRotation
 					= previousCamera.GlobalRotation.Lerp(this.Camera.GlobalRotation, lerpWeight);
 			}),
 			0f,
