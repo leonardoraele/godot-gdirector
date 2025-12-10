@@ -27,9 +27,6 @@ public partial class VirtualCamera2D : Node2D, IVirtualCamera
 	// -----------------------------------------------------------------------------------------------------------------
 
 	public double Priority { get; set; }
-	HashSet<BlendComponent> IVirtualCamera.Blenders { get; } = new();
-	Vector2 IVirtualCamera.Offset { get; set; } = Vector2.Zero;
-	Vector2 IVirtualCamera.Zoom { get; set; } = Vector2.One;
 
 	private CancellationTokenSource ServerRegistrationCancelSource = new();
 

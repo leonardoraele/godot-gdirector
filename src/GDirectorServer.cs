@@ -20,16 +20,13 @@ public partial class GDirectorServer : Node
 	// SIGNALS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	// [Signal] public delegate void TransitionStartEventHandler(ulong nextCameraId, ulong previousCameraId, ulong controllerId);
-	// [Signal] public delegate void TransitionFinishEventHandler(ulong nextCameraId, ulong previousCameraId);
-	// [Signal] public delegate void TransitionCancelEventHandler(ulong nextCameraId, ulong previousCameraId);
-	// [Signal] public delegate void TransitionEndEventHandler(ulong nextCameraId, ulong previousCameraId);
+	[Signal] public delegate void LiveCameraChangedEventHandler(IVirtualCamera.Wrapper newCamera, IVirtualCamera.Wrapper oldCamera);
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public IVirtualCamera? LiveCamera { get; private set; } = null;
+	public IVirtualCamera? CurrentLiveCamera { get; private set; } = null;
 	private WeakReference<IVirtualCamera>? PreviousLiveCameraWeakRef = null;
 
 	private HashSet<IVirtualCamera> ManagedVirtualCameras { get; init; } = new();
@@ -76,7 +73,7 @@ public partial class GDirectorServer : Node
 			// camera, so we don't need to do anything else. Otherwise, we need to reevaluate the camera selection.
 			if (
 				string.IsNullOrEmpty(field)
-				|| this.LiveCamera?.AsNode().IsInGroup(field) != true
+				|| this.CurrentLiveCamera?.AsNode().IsInGroup(field) != true
 			) {
 				this.ReevaluateCameraSelection();
 			}
@@ -88,7 +85,10 @@ public partial class GDirectorServer : Node
 	// -----------------------------------------------------------------------------------------------------------------
 
 	public IVirtualCamera? PreviousLiveCamera
-		=> this.PreviousLiveCameraWeakRef?.TryGetTarget(out IVirtualCamera? cam) ?? false ? cam : null;
+	{
+		get => this.PreviousLiveCameraWeakRef?.TryGetTarget(out IVirtualCamera? cam) ?? false ? cam : null;
+		set => this.PreviousLiveCameraWeakRef = value != null ? new(value) : null;
+	}
 
 	public Camera2D? MainCamera2D => this.GetTree().Root.GetCamera2D();
 	public Camera3D? MainCamera3D => this.GetTree().Root.GetCamera3D();
@@ -97,11 +97,6 @@ public partial class GDirectorServer : Node
 		=> string.IsNullOrEmpty(this.ActiveGroup)
 			? this.ManagedVirtualCameras
 			: this.ManagedVirtualCameras.Where(camera => camera.AsNode().IsInGroup(this.ActiveGroup));
-
-	[Obsolete] public VirtualCamera2D? LiveCamera2D => this.LiveCamera as VirtualCamera2D;
-	[Obsolete] public VirtualCamera2D? PreviousLiveCamera2D => this.PreviousLiveCamera as VirtualCamera2D;
-	[Obsolete] public VirtualCamera3D? LiveCamera3D => this.LiveCamera as VirtualCamera3D;
-	[Obsolete] public VirtualCamera3D? PreviousLiveCamera3D => this.PreviousLiveCamera as VirtualCamera3D;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// OVERRIDES
@@ -121,10 +116,10 @@ public partial class GDirectorServer : Node
 	{
 		this.ManagedVirtualCameras.Add(camera);
 		Callable callable = Callable.From(() => this.EvaluateCameraPriority(camera));
-		camera.ConnectSignalPriorityChanged(callable);
+		camera.AsNode().Connect(IVirtualCamera.SignalName_PriorityChanged, callable);
 		token.Register(() =>
 		{
-			camera.DisconnectSignalPriorityChanged(callable);
+			camera.AsNode().Disconnect(IVirtualCamera.SignalName_PriorityChanged, callable);
 			this.Unregister(camera);
 		});
 		// Ignore registrations before READY event. When the node is ready, we evaluate all registered cameras.
@@ -138,7 +133,7 @@ public partial class GDirectorServer : Node
 		this.ManagedVirtualCameras.Remove(camera);
 		if (camera == this.LiveCameraOverride) {
 			this.LiveCameraOverride = null;
-		} else if (camera == this.LiveCamera) {
+		} else if (camera == this.CurrentLiveCamera) {
 			this.ReevaluateCameraSelection();
 		}
 	}
@@ -147,21 +142,21 @@ public partial class GDirectorServer : Node
 	{
 		if (
 			this.LiveCameraOverride != null
-			|| camera.Priority <= (this.LiveCamera?.Priority ?? float.NegativeInfinity)
+			|| camera.Priority <= (this.CurrentLiveCamera?.Priority ?? float.NegativeInfinity)
 			|| !string.IsNullOrEmpty(this.ActiveGroup) && !camera.AsNode().IsInGroup(this.ActiveGroup)
 		) {
 			return;
 		}
-		this.SetActiveCamera(camera);
+		this.SetCameraLive(camera);
 	}
 
 	private void ReevaluateCameraSelection()
 	{
 		if (this.LiveCameraOverride != null) {
-			this.SetActiveCamera(this.LiveCameraOverride);
+			this.SetCameraLive(this.LiveCameraOverride);
 			return;
 		}
-		this.SetActiveCamera(this.FindHighestPriorityCameraInActiveGroup());
+		this.SetCameraLive(this.FindHighestPriorityCameraInActiveGroup());
 	}
 
 	private IVirtualCamera? FindHighestPriorityCameraInActiveGroup()
@@ -169,23 +164,25 @@ public partial class GDirectorServer : Node
 			? cameras.Aggregate((cameraA, cameraB) => cameraA.Priority > cameraB.Priority ? cameraA : cameraB)
 			: null;
 
-	private void SetActiveCamera(IVirtualCamera? newActiveCamera)
+	private void SetCameraLive(IVirtualCamera? camera)
 	{
-		// Won't change the active camera if the GDirectorServer is not ready because we need to access the
-		// ManagedCamera, which is set on the _Ready method.
-		// TODO Instead of just returning, we could queue the new active camera to be set when the GDirectorServer is
-		// ready so that we don't need to reevaluate all the cameras when the GDirectorServer becomes ready.
-		if (!this.IsNodeReady()) {
-			return;
-		}
+		// // Won't change the active camera if the GDirectorServer is not ready because we need to access the
+		// // ManagedCamera, which is set on the _Ready method.
+		// // TODO Instead of just returning, we could queue the new active camera to be set when the GDirectorServer is
+		// // ready so that we don't need to reevaluate all the cameras when the GDirectorServer becomes ready.
+		// if (!this.IsNodeReady()) {
+		// 	return;
+		// }
 
 		// If the new active camera is the same as the current active camera, there's no need to do anything.
-		if (newActiveCamera == this.LiveCamera) {
+		if (camera == this.CurrentLiveCamera) {
 			return;
 		}
 
-		this.LiveCamera?.NotifyTransitionCanceled();
-		(this.LiveCamera, this.PreviousLiveCameraWeakRef) = (newActiveCamera, this.LiveCamera);
-		this.LiveCamera?.NotifyTransitionStarted();
+		(this.CurrentLiveCamera, this.PreviousLiveCamera) = (camera, this.CurrentLiveCamera);
+
+		this.PreviousLiveCamera?.NotifyIsLiveChanged(isLive: false);
+		this.CurrentLiveCamera?.NotifyIsLiveChanged(isLive: true);
+		this.EmitSignalLiveCameraChanged(new(this.CurrentLiveCamera), new(this.PreviousLiveCamera));
 	}
 }
