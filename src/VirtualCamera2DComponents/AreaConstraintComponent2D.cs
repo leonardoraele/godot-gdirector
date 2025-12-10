@@ -1,8 +1,9 @@
 using Godot;
+using Raele.GDirector;
 
-namespace Raele.GDirector.VirtualCameraComponents;
+namespace Raele.GDirector.VirtualCamera2DComponents;
 
-public partial class MimicMovement : VirtualCameraComponent
+public partial class AreaConstraintComponent2D : VirtualCamera2DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
@@ -14,25 +15,16 @@ public partial class MimicMovement : VirtualCameraComponent
 	// EXPORTS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	[Export] public Node3D? Reference;
-	/// <summary>
-	/// If false, the camera will move to the exact position of the reference node at the start of the scene. If true,
-	/// the camera will preserve it's starting position.
-	/// </summary>
-	[Export] public bool PreserveDistance = true;
-
-	[ExportGroup("Smoothing")]
-	[Export(PropertyHint.Range, "0.01,1,0.01")] public float LerpWeight = 1f;
-	[Export] public float MaxDistance = 4f;
+	// [Export] public
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	private Vector3 offset;
+
 
 	// -----------------------------------------------------------------------------------------------------------------
-	// PROPERTIES
+	// COMPUTED PROPERTIES
 	// -----------------------------------------------------------------------------------------------------------------
 
 
@@ -52,7 +44,7 @@ public partial class MimicMovement : VirtualCameraComponent
 	// }
 
 	// -----------------------------------------------------------------------------------------------------------------
-	// EVENTS
+	// OVERRIDES
 	// -----------------------------------------------------------------------------------------------------------------
 
 	// public override void _EnterTree()
@@ -60,29 +52,39 @@ public partial class MimicMovement : VirtualCameraComponent
 	// 	base._EnterTree();
 	// }
 
-	public override void _Ready()
-	{
-		base._Ready();
-		this.offset = this.Reference != null ? this.Camera.GlobalPosition - this.Reference.GlobalPosition : Vector3.Zero;
-	}
+	// public override void _ExitTree()
+	// {
+	// 	base._ExitTree();
+	// }
 
-	public override void _Process(double delta)
-	{
-		base._Process(delta);
-		if (this.Reference == null) {
-			return;
-		}
-        Vector3 targetPosition = this.Reference.GlobalPosition + this.offset;
-		Vector3 candidateNewPosition = this.Camera.GlobalPosition.Lerp(targetPosition, this.LerpWeight);
-		float distanceToTarget = candidateNewPosition.DistanceTo(targetPosition);
-		this.Camera.GlobalPosition = distanceToTarget <= this.MaxDistance
-			? candidateNewPosition
-			: targetPosition.MoveToward(this.Camera.GlobalPosition, this.MaxDistance);
-	}
+	// public override void _Ready()
+	// {
+	// 	base._Ready();
+	// }
+
+	// public override void _Process(double delta)
+	// {
+	// 	base._Process(delta);
+	// }
 
 	// public override void _PhysicsProcess(double delta)
 	// {
 	// 	base._PhysicsProcess(delta);
+	// }
+
+	// public override string[] _GetConfigurationWarnings()
+	// 	=> new List<string>()
+	// 		.Concat(true ? [] : ["Some warning"])
+	// 		.ToArray();
+
+	// public override void _ValidateProperty(Godot.Collections.Dictionary property)
+	// {
+	// 	base._ValidateProperty(property);
+	// 	switch (property["name"].AsString())
+	// 	{
+	// 		case nameof():
+	// 			break;
+	// 	}
 	// }
 
 	// -----------------------------------------------------------------------------------------------------------------

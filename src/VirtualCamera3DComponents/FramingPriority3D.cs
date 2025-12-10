@@ -1,8 +1,8 @@
 using Godot;
 
-namespace Raele.GDirector.VirtualCameraComponents;
+namespace Raele.GDirector.VirtualCamera3DComponents;
 
-public partial class FramingPriority : VirtualCameraComponent
+public partial class FramingPriority3D : VirtualCamera3DComponent
 {
 	/// <summary>
 	/// The target to frame.
@@ -41,14 +41,14 @@ public partial class FramingPriority : VirtualCameraComponent
 		}
 	}
 
-    public override void _Process(double delta)
-    {
-        base._Process(delta);
+	public override void _Process(double delta)
+	{
+		base._Process(delta);
 		Vector3 forward = this.Camera.GlobalTransform.Basis.Z * -1;
 		Vector3 lineToTarget = this.FramingTargetPosition - this.Camera.GlobalPosition;
 		Vector3 directionToTarget = lineToTarget.Normalized();
 		float dot = forward.Dot(directionToTarget);
 		float priorityMultiplier = Mathf.Ease(Mathf.Clamp(dot, 0, 1), this.PriorityFallOff);
 		this.Camera.Priority += this.PriorityOnCenter * priorityMultiplier;
-    }
+	}
 }

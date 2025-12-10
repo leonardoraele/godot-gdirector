@@ -1,9 +1,10 @@
 using System;
 using Godot;
 
-namespace Raele.GDirector.VirtualCameraComponents;
+namespace Raele.GDirector.VirtualCamera3DComponents;
 
-public partial class FramingConstraint : VirtualCameraComponent
+[Tool]
+public partial class FramingComponent3D : VirtualCamera3DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
@@ -16,7 +17,8 @@ public partial class FramingConstraint : VirtualCameraComponent
 	// -----------------------------------------------------------------------------------------------------------------
 
 	[Export] public Node3D? FramingTarget;
-	[Export] public Vector3 Offset;
+	[Export] public Vector3 TargetOffset;
+	// [Export] public bool OffsetIsGlobal = false; // TODO
 	[Export(PropertyHint.Range, "0,1")] public Vector2 ScreenPosition = new Vector2(0.5f, 0.5f);
 	[Export] public MovementModeEnum MovementPlane = MovementModeEnum.Global_XZ_Plane;
 
@@ -39,14 +41,14 @@ public partial class FramingConstraint : VirtualCameraComponent
 
 	private Vector2 ScreenPositionPx => this.GetViewport().GetWindow().Size * this.ScreenPosition;
 	private Plane MovementPlaneAsPlane => this.MovementPlane switch {
-		MovementModeEnum.Global_XZ_Plane => new Plane(Vector3.Up, this.Camera.GlobalPosition),
-		MovementModeEnum.Global_XY_Plane => new Plane(Vector3.Forward, this.Camera.GlobalPosition),
-		MovementModeEnum.Global_YZ_Plane => new Plane(Vector3.Right, this.Camera.GlobalPosition),
-		MovementModeEnum.Local_XY_Plane => new Plane(this.Camera.GlobalBasis.Z * -1, this.Camera.GlobalPosition),
+		MovementModeEnum.Global_XZ_Plane => new Plane(Vector3.Up, this.Camera.As3D()!.GlobalPosition),
+		MovementModeEnum.Global_XY_Plane => new Plane(Vector3.Forward, this.Camera.As3D()!.GlobalPosition),
+		MovementModeEnum.Global_YZ_Plane => new Plane(Vector3.Right, this.Camera.As3D()!.GlobalPosition),
+		MovementModeEnum.Local_XY_Plane => new Plane(this.Camera.As3D()!.GlobalBasis.Z * -1, this.Camera.As3D()!.GlobalPosition),
 		_ => throw new NotImplementedException("VirtualCamera's FramingConstraint node is set to an invalid MovementPlane option."),
 	};
 	private Vector3 FramingTargetOffsetedPosition => this.FramingTarget != null
-		? this.FramingTarget.GlobalPosition + this.Offset * this.FramingTarget.GlobalBasis
+		? this.FramingTarget.GlobalPosition + this.TargetOffset * this.FramingTarget.GlobalBasis
 		: Vector3.Zero;
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -88,12 +90,12 @@ public partial class FramingConstraint : VirtualCameraComponent
 		}
 
 		// TODO
-        // Vector2 framingTargetScreenPosition = GDirectorServer.Instance.ManagedCamera.UnprojectPosition(this.FramingTargetOffsetedPosition) / this.GetViewport().GetWindow().Size;
+		// Vector2 framingTargetScreenPosition = GDirectorServer.Instance.ManagedCamera.UnprojectPosition(this.FramingTargetOffsetedPosition) / this.GetViewport().GetWindow().Size;
 		// if (framingTargetScreenPosition.DistanceTo(this.ScreenPosition) < this.DeadZoneRadius) {
 		// 	return;
 		// }
 
-        Vector3 screenPositionNormal = this.Camera.GlobalBasis * GDirectorServer.Instance.ManagedCamera.ProjectLocalRayNormal(this.ScreenPositionPx);
+		Vector3 screenPositionNormal = this.Camera.GlobalBasis * GDirectorServer.Instance.GodotCamera3D?.ProjectLocalRayNormal(this.ScreenPositionPx) ?? Vector3.Zero;
 		this.Camera.GlobalPosition = this.MovementPlaneAsPlane.IntersectsRay(this.FramingTargetOffsetedPosition, screenPositionNormal * -1) ?? this.Camera.GlobalPosition;
 	}
 

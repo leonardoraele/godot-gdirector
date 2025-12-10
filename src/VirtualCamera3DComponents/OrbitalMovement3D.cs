@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Raele.GDirector.VirtualCameraComponents;
+namespace Raele.GDirector.VirtualCamera3DComponents;
 
 // TODO Instead of forcing the camera to orbit around the Y axis, allow the player to select the axis around
 // which the camera should orbit.
@@ -10,7 +10,7 @@ namespace Raele.GDirector.VirtualCameraComponents;
 // Right now, the behavior is to preserve the angle of the camera from the pivot, while changing the camera's position
 // as needed. The alternative would be to make the move as little as possible while remaining in the orbit, and changing
 // the camera angle as much as needed.
-public partial class OrbitalMovement : VirtualCameraComponent
+public partial class OrbitalMovement3D : VirtualCamera3DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// EXPORTED FIELDS
@@ -104,12 +104,12 @@ public partial class OrbitalMovement : VirtualCameraComponent
 	/// The mouse's sensibility when controlling the camera's horizontal movement. This is a multiplier applied to the
 	/// mouse's horizontal movement.
 	/// </summary>
-    [Export] public float MouseSensibilityX = 1;
+	[Export] public float MouseSensibilityX = 1;
 	/// <summary>
 	/// The mouse's sensibility when controlling the camera's vertical movement. This is a multiplier applied to the
 	/// mouse's vertical movement.
 	/// </summary>
-    [Export] public float MouseSensibilityY = 1;
+	[Export] public float MouseSensibilityY = 1;
 	/// <summary>
 	/// The highest vertical angle the camera can move, in degrees the ZX plane at the pivot's position.
 	///
@@ -170,20 +170,20 @@ public partial class OrbitalMovement : VirtualCameraComponent
 	private CameraDistanceController cameraDistanceCalculation;
 	private CameraDirectionController cameraDirectionCalculation;
 
-    // -----------------------------------------------------------------------------------------------------------------
-    // METHODS
-    // -----------------------------------------------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------------------
+	// METHODS
+	// -----------------------------------------------------------------------------------------------------------------
 
-    public OrbitalMovement()
-    {
+	public OrbitalMovement3D()
+	{
 		this.pivotPositionCalculation = new(this);
-        this.cameraDistanceCalculation = new(this);
+		this.cameraDistanceCalculation = new(this);
 		this.cameraDirectionCalculation = new(this);
-    }
+	}
 
-    public override void _Ready()
-    {
-        base._Ready();
+	public override void _Ready()
+	{
+		base._Ready();
 
 		// Calculate the initial camera position
 		Vector3 pivotPosition = this.pivotPositionCalculation.InitializePivotPosition();
@@ -192,9 +192,9 @@ public partial class OrbitalMovement : VirtualCameraComponent
 
 		// Apply the initial camera position
 		this.Camera.GlobalPosition = pivotPosition + cameraDirection * cameraDistance;
-    }
+	}
 
-    public override void _Process(double delta)
+	public override void _Process(double delta)
 	{
 		base._Process(delta);
 
@@ -207,21 +207,21 @@ public partial class OrbitalMovement : VirtualCameraComponent
 		this.Camera.GlobalPosition = pivotPosition + cameraDirection * cameraDistance;
 	}
 
-    public override void _Input(InputEvent @event)
-    {
-        base._Input(@event);
+	public override void _Input(InputEvent @event)
+	{
+		base._Input(@event);
 		this.cameraDirectionCalculation.HandleInput(@event);
-    }
+	}
 
-    // -----------------------------------------------------------------------------------------------------------------
-    // CALCULATE PIVOT POSITION
-    // -----------------------------------------------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------------------
+	// CALCULATE PIVOT POSITION
+	// -----------------------------------------------------------------------------------------------------------------
 
-    /// <summary>
-    /// This class is responsible for calculating the position the camera should be orbiting around. It reads the pivot
-    /// position, applies the offset, and applies smoothing.
-    /// </summary>
-    private class PivotPositionController
+	/// <summary>
+	/// This class is responsible for calculating the position the camera should be orbiting around. It reads the pivot
+	/// position, applies the offset, and applies smoothing.
+	/// </summary>
+	private class PivotPositionController
 	{
 		/// <summary>
 		/// This is the real actual position the camera orbits around, in global space. This position is lerp'ed toward
@@ -229,8 +229,8 @@ public partial class OrbitalMovement : VirtualCameraComponent
 		/// <see cref="PivotPosition">.
 		/// </summary>
 		private Vector3 AnchorPivotPosition = Vector3.Zero;
-		private OrbitalMovement Controller;
-		public PivotPositionController(OrbitalMovement controller) => Controller = controller;
+		private OrbitalMovement3D Controller;
+		public PivotPositionController(OrbitalMovement3D controller) => Controller = controller;
 		public Vector3 InitializePivotPosition() => this.AnchorPivotPosition = this.GetTargetPivotPosition();
 		/// <summary>
 		/// Calculates the position the camera should be orbiting around in the next frame. Every time this method is
@@ -264,9 +264,9 @@ public partial class OrbitalMovement : VirtualCameraComponent
 		}
 	}
 
-    // -----------------------------------------------------------------------------------------------------------------
-    // CALCULATE CAMERA DIRECTION
-    // -----------------------------------------------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------------------
+	// CALCULATE CAMERA DIRECTION
+	// -----------------------------------------------------------------------------------------------------------------
 
 	private class CameraDirectionController
 	{
@@ -285,32 +285,32 @@ public partial class OrbitalMovement : VirtualCameraComponent
 		/// camera should start automatically rotating around the pivot again.
 		/// </summary>
 		private ulong LastOrbitalMovementPlayerInputTimestamp = 0;
-		private OrbitalMovement Controller;
-        private Vector2 MouseInput;
+		private OrbitalMovement3D Controller;
+		private Vector2 MouseInput;
 
-        private ulong TimeSinceLastOrbitalMovementPlayerInputMs
+		private ulong TimeSinceLastOrbitalMovementPlayerInputMs
 			=> Time.GetTicksMsec() - this.LastOrbitalMovementPlayerInputTimestamp;
 		private float AutomaticHorizontalMovementRadPSec => Mathf.DegToRad(this.Controller.DegreesPerSecond);
 		private float InitialAngleRad => Mathf.DegToRad(this.Controller.AngleDeg);
 		private float MinAngleRad => Mathf.DegToRad(this.Controller.MinAngleDeg);
 		private float MaxAngleRad => Mathf.DegToRad(this.Controller.MaxAngleDeg);
-        public CameraDirectionController(OrbitalMovement controller) => Controller = controller;
-        public Vector3 InitializeCameraDirection(Vector3 pivotPosition)
-        {
+		public CameraDirectionController(OrbitalMovement3D controller) => Controller = controller;
+		public Vector3 InitializeCameraDirection(Vector3 pivotPosition)
+		{
 			if (this.Controller.Camera.GlobalPosition.DistanceSquaredTo(pivotPosition) < Mathf.Epsilon) {
 				return this.TargetCameraDirection = this.AnchorCameraDirection = Vector3.Back;
 			}
-            Vector3 direction = ((this.Controller.Camera.GlobalPosition - pivotPosition) with { Y = 0}).Normalized();
+			Vector3 direction = ((this.Controller.Camera.GlobalPosition - pivotPosition) with { Y = 0}).Normalized();
 			return this.TargetCameraDirection
 				= this.AnchorCameraDirection
 				= direction.Rotated(Basis.LookingAt(direction).X, this.InitialAngleRad);
-        }
-        /// <summary>
-        /// This method calculates the direction the camera should be positioned in relation to the pivot in the next
+		}
+		/// <summary>
+		/// This method calculates the direction the camera should be positioned in relation to the pivot in the next
 		/// frame. It reads the player's input, applies smoothing, and applies automatic orbiting movement. (whichever
 		/// of these features are enabled)
-        /// </summary>
-        public Vector3 NextCameraDirection()
+		/// </summary>
+		public Vector3 NextCameraDirection()
 		{
 			Vector2 mouseInput = this.ConsumeMouseInput();
 
@@ -318,7 +318,7 @@ public partial class OrbitalMovement : VirtualCameraComponent
 			if (this.Controller.EnableMouseMotionControls && mouseInput.LengthSquared() > Mathf.Epsilon) {
 				float xAngleInputRad = Mathf.DegToRad(mouseInput.X / this.Controller.PixelsPerDegree) * this.Controller.MouseSensibilityX;
 				float yAngleInputRad = Mathf.DegToRad(mouseInput.Y / this.Controller.PixelsPerDegree) * this.Controller.MouseSensibilityY;
-				Vector3 xRotatedCamDir = !GodotUtil.CheckNormalsAreParallel(this.TargetCameraDirection, Vector3.Up)
+				Vector3 xRotatedCamDir = !GDirectorUtil.CheckNormalsAreParallel(this.TargetCameraDirection, Vector3.Up)
 					? this.TargetCameraDirection.Rotated(Vector3.Down, xAngleInputRad)
 					: Vector3.Back; // Reset the camera direction if it's looking straight up or down
 				Vector3 crossAxis = Basis.LookingAt(xRotatedCamDir).X;
@@ -350,29 +350,29 @@ public partial class OrbitalMovement : VirtualCameraComponent
 
 			return this.AnchorCameraDirection;
 		}
-        private Vector2 ConsumeMouseInput()
-        {
-            Vector2 mouseInput = this.MouseInput;
+		private Vector2 ConsumeMouseInput()
+		{
+			Vector2 mouseInput = this.MouseInput;
 			this.MouseInput = Vector2.Zero;
 			return mouseInput;
-        }
-        public void HandleInput(InputEvent @event)
-        {
+		}
+		public void HandleInput(InputEvent @event)
+		{
 			if (@event is InputEventMouseMotion mouseMotion) {
 				this.MouseInput = mouseMotion.Relative;
 			}
-        }
-    }
+		}
+	}
 
-    // -----------------------------------------------------------------------------------------------------------------
-    // CALCULATE CAMERA DISTANCE
-    // -----------------------------------------------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------------------
+	// CALCULATE CAMERA DISTANCE
+	// -----------------------------------------------------------------------------------------------------------------
 
 	/// <summary>
 	/// This class is responsible for calculating the distance the camera should be from the pivot. It reads the
 	/// player's input if player-controlled zoom is enabled, and applies the zoom with soomthing (if enabled).
 	/// </summary>
-    private class CameraDistanceController
+	private class CameraDistanceController
 	{
 		/// <summary>
 		/// The distance the camera was from the pivot the last frame. If the pivot moves, the actual distance of the camera
@@ -389,9 +389,9 @@ public partial class OrbitalMovement : VirtualCameraComponent
 		/// is smoothed toward this target distance.
 		/// </summary>
 		private float TargetCameraDistance;
-		private OrbitalMovement Controller;
-        public CameraDistanceController(OrbitalMovement controller) => Controller = controller;
-        public float InitializeCameraDistance()
+		private OrbitalMovement3D Controller;
+		public CameraDistanceController(OrbitalMovement3D controller) => Controller = controller;
+		public float InitializeCameraDistance()
 			=> this.TargetCameraDistance = this.AnchorCameraDistance = this.Controller.Distance;
 		/// <summary>
 		/// This method calculates the distance the camera should be from the pivot in the next frame. It reads the
@@ -399,7 +399,7 @@ public partial class OrbitalMovement : VirtualCameraComponent
 		/// called, the distance is smoothed toward the target distance, according to the player input.
 		/// If player-controlled zoom is disabled, this method will return the same distance every time.
 		/// </summary>
-        public float NextCameraDistance()
+		public float NextCameraDistance()
 		{
 			// Zoom in and out based on the player's input
 			if (this.Controller.EnableZoomControls) {
@@ -428,5 +428,5 @@ public partial class OrbitalMovement : VirtualCameraComponent
 
 			return this.AnchorCameraDistance;
 		}
-    }
+	}
 }

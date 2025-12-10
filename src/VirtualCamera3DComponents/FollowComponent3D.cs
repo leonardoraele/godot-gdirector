@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Raele.GDirector.VirtualCameraComponents;
+namespace Raele.GDirector.VirtualCamera3DComponents;
 
 /// <summary>
 /// This controller makes the camera move alongside a target node. It can mimic it's the follow target's position
@@ -13,7 +13,7 @@ namespace Raele.GDirector.VirtualCameraComponents;
 /// This camera controller is useful for following objects that move at high speeds, but it's not ideal for
 /// player-controlled characters in most games.
 /// </summary>
-public partial class FollowPosition : VirtualCameraComponent
+public partial class FollowComponent3D : VirtualCamera3DComponent
 {
 	/// <summary>
 	/// The node to follow.
@@ -72,11 +72,11 @@ public partial class FollowPosition : VirtualCameraComponent
 		}
 	}
 
-    public override void _Process(double delta)
+	public override void _Process(double delta)
 	{
 		base._Process(delta);
 		if (this.FollowTarget == null) {
-			GD.PushWarning(nameof(FollowPosition) + " node requires a valid FollowTarget, but it's empty.");
+			GD.PushWarning(nameof(FollowComponent3D) + " node requires a valid FollowTarget, but it's empty.");
 			return;
 		}
 

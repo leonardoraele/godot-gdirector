@@ -3,7 +3,7 @@ using Godot;
 
 namespace Raele.GDirector;
 
-public static class GodotUtil {
+public static class GDirectorUtil {
 	public static Vector3 RotateToward(Vector3 from, Vector3 to, float maxRadians, Vector3? defaultAxis = null)
 	{
 		if (maxRadians < 0) {
@@ -20,9 +20,6 @@ public static class GodotUtil {
 		return from.Slerp(to, weight);
 	}
 
-    public static bool CheckNormalsAreParallel(Vector3 a, Vector3 b)
-    {
-		float dot = a.Dot(b);
-		return Mathf.IsEqualApprox(dot, -1) || Mathf.IsEqualApprox(dot, 1);
-    }
+	public static bool CheckNormalsAreParallel(Vector3 a, Vector3 b)
+		=> Mathf.IsEqualApprox(Math.Abs(a.Dot(b)), 1);
 }

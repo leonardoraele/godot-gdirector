@@ -1,8 +1,8 @@
 using Godot;
 
-namespace Raele.GDirector.VirtualCameraComponents;
+namespace Raele.GDirector.VirtualCamera3DComponents;
 
-public partial class LookAtTarget : VirtualCameraComponent
+public partial class LookAtTarget3D : VirtualCamera3DComponent
 {
 	[Export] public Node3D? LookTarget;
 	/// <summary>
@@ -51,7 +51,7 @@ public partial class LookAtTarget : VirtualCameraComponent
 	public float OffsetRotationRadX => Mathf.DegToRad(this.OffsetRotationDeg.X);
 	public float OffsetRotationRadY => Mathf.DegToRad(this.OffsetRotationDeg.Y);
 
-    public Vector3 OffsetedLookTargetPosition {
+	public Vector3 OffsetedLookTargetPosition {
 		get {
 			if (this.LookTarget == null) {
 				return Vector3.Zero;
@@ -61,7 +61,7 @@ public partial class LookAtTarget : VirtualCameraComponent
 		}
 	}
 
-    public override void _Ready()
+	public override void _Ready()
 	{
 		base._Ready();
 		this.initialDirection = this.Camera.GlobalBasis.Z * -1;
@@ -88,11 +88,11 @@ public partial class LookAtTarget : VirtualCameraComponent
 				: this.initialDirection;
 			float angle = neutralDirection.AngleTo(lookPositionDirection);
 			if (angle > this.MaxAngleRad) {
-				lookPositionDirection = GodotUtil.RotateToward(neutralDirection, lookPositionDirection, this.MaxAngleRad);
+				lookPositionDirection = GDirectorUtil.RotateToward(neutralDirection, lookPositionDirection, this.MaxAngleRad);
 			}
 		}
 
-		Vector3 upwardAxis = GodotUtil.CheckNormalsAreParallel(lookPositionDirection, Vector3.Up)
+		Vector3 upwardAxis = GDirectorUtil.CheckNormalsAreParallel(lookPositionDirection, Vector3.Up)
 				? this.Camera.GlobalBasis.Y
 				: Vector3.Up;
 		Basis newLookPositionBasis = Basis.LookingAt(lookPositionDirection, upwardAxis);
