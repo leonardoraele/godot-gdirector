@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Godot;
 
@@ -34,27 +34,6 @@ public partial class VirtualCamera2D : Node2D, IVirtualCamera
 	// PROPERTIES
 	// -----------------------------------------------------------------------------------------------------------------
 
-	Vector2 IVirtualCamera.Position2D
-	{
-		get => this.GlobalPosition;
-		set => this.GlobalPosition = value;
-	}
-	Vector3 IVirtualCamera.Position3D
-	{
-		get => new Vector3(this.GlobalPosition.X, this.GlobalPosition.Y, 0);
-		set => this.GlobalPosition = new Vector2(value.X, value.Y);
-	}
-	float IVirtualCamera.Rotation2D
-	{
-		get => this.GlobalRotation;
-		set => this.GlobalRotation = value;
-	}
-	Vector3 IVirtualCamera.Rotation3D
-	{
-		get => new Vector3(0, 0, this.GlobalRotation);
-		set => this.GlobalRotation = value.Z;
-	}
-
 	// -----------------------------------------------------------------------------------------------------------------
 	// OVERRIDES
 	// -----------------------------------------------------------------------------------------------------------------
@@ -76,6 +55,30 @@ public partial class VirtualCamera2D : Node2D, IVirtualCamera
 	{
 		base._Process(delta);
 		this.AsInterface()._Process();
+		this.CallDeferred(MethodName.CheckPriorityChange, this.Priority);
+		this.UpdateGodotCamera2D();
+	}
+
+	private void CheckPriorityChange(double oldPriority)
+	{
+		if (this.Priority != oldPriority) {
+			this.EmitSignal(SignalName.PriorityChanged, this.Priority, oldPriority);
+		}
+	}
+
+	private void UpdateGodotCamera2D()
+	{
+		if (!this.AsInterface().IsLive || GDirectorServer.Instance.GodotCamera2D is not Camera2D rcam)
+		{
+			return;
+		}
+		rcam.GlobalPosition = this.GlobalPosition
+			- (
+				rcam.AnchorMode == Camera2D.AnchorModeEnum.DragCenter
+					? Vector2.Zero
+					: rcam.GetViewport().GetWindow().Size / 2 + rcam.Offset
+			);
+		rcam.GlobalRotation = this.GlobalRotation;
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------

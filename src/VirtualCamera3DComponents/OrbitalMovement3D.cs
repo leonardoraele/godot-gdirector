@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Raele.GDirector.VirtualCameraComponents;
+namespace Raele.GDirector.VirtualCamera3DComponents;
 
 // TODO Instead of forcing the camera to orbit around the Y axis, allow the player to select the axis around
 // which the camera should orbit.
@@ -10,7 +10,7 @@ namespace Raele.GDirector.VirtualCameraComponents;
 // Right now, the behavior is to preserve the angle of the camera from the pivot, while changing the camera's position
 // as needed. The alternative would be to make the move as little as possible while remaining in the orbit, and changing
 // the camera angle as much as needed.
-public partial class OrbitalMovement3D : VirtualCameraComponent
+public partial class OrbitalMovement3D : VirtualCamera3DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// EXPORTED FIELDS

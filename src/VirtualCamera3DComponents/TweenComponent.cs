@@ -1,8 +1,7 @@
 using System;
 using Godot;
-using Raele.Platform2D;
 
-namespace Raele.GDirector.VirtualCameraComponents;
+namespace Raele.GDirector.VirtualCamera3DComponents;
 
 // TODO Create a GroupTransitionController class that works just like this one, but that can handle transitions from
 // any camera in a node group instead of a single specific camera. We could go even further and also create a
@@ -17,7 +16,7 @@ namespace Raele.GDirector.VirtualCameraComponents;
 // but to the target positoin of the previous transition.
 // (i.e. the position the camera should be positioned if that transition had not be canceled)
 // This way the camera will smoothly blend from one transition to the next without an abrupt cut.
-public partial class TweenComponent : VirtualCameraComponent
+public partial class TweenComponent : VirtualCamera3DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
@@ -47,7 +46,7 @@ public partial class TweenComponent : VirtualCameraComponent
 	/// </summary>
 	[Export] public Curve? Curve;
 
-	[Export(PropertyHint.Flags, "Position:1,Rotation:2")] public long UpdateFields = 3;
+	// [Export(PropertyHint.Flags, "Position:1,Rotation:2")] public long UpdateFields = 3; // TODO
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
@@ -140,33 +139,27 @@ public partial class TweenComponent : VirtualCameraComponent
 		this.CancelTransition();
 
 		// Get the previous camera
-		IVirtualCamera? previousCamera = GDirectorServer.Instance.PreviousLiveCamera;
+		VirtualCamera3D? previousCamera = GDirectorServer.Instance.PreviousLiveCamera?.As3D();
 
 		// If there is no previous camera, we can skip the transition
 		if (previousCamera == null) {
 			this.EmitSignal(SignalName.TweenStarted);
-			GDirectorServer.Instance.MainCamera2D?.GlobalPosition = this.Camera.Position2D;
-			GDirectorServer.Instance.MainCamera2D?.GlobalRotation = this.Camera.Rotation2D;
-			GDirectorServer.Instance.MainCamera3D?.GlobalPosition = this.Camera.Position3D;
-			GDirectorServer.Instance.MainCamera3D?.GlobalRotation = this.Camera.Rotation3D;
+			GDirectorServer.Instance.GodotCamera3D?.GlobalPosition = this.Camera.GlobalPosition;
+			GDirectorServer.Instance.GodotCamera3D?.GlobalRotation = this.Camera.GlobalRotation;
 			this.FinishTransition();
 			return;
 		}
 
-		// Setup the transition using Tweens
+		// Setup the tween
 		this.Tween = this.CreateTween();
 		this.Tween.TweenMethod(
 			Callable.From((float progress) =>
 			{
 				float lerpWeight = this.Curve?.Sample(progress) ?? progress;
-				GDirectorServer.Instance.MainCamera2D?.GlobalPosition
-					= previousCamera.Position2D.Lerp(this.Camera.Position2D, lerpWeight);
-				GDirectorServer.Instance.MainCamera2D?.GlobalRotation
-					= Mathf.Lerp(previousCamera.Rotation2D, this.Camera.Rotation2D, lerpWeight);
-				GDirectorServer.Instance.MainCamera3D?.GlobalPosition
-					= previousCamera.Position3D.Lerp(this.Camera.Position3D, lerpWeight);
-				GDirectorServer.Instance.MainCamera3D?.GlobalRotation
-					= previousCamera.Rotation3D.Slerp(this.Camera.Rotation3D, lerpWeight);
+				GDirectorServer.Instance.GodotCamera3D?.GlobalPosition
+					= previousCamera.GlobalPosition.Lerp(this.Camera.GlobalPosition, lerpWeight);
+				GDirectorServer.Instance.GodotCamera3D?.GlobalRotation
+					= previousCamera.GlobalRotation.Slerp(this.Camera.GlobalRotation, lerpWeight);
 			}),
 			0f,
 			1f,

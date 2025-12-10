@@ -6,6 +6,7 @@ using Godot;
 
 namespace Raele.GDirector;
 
+[Tool]
 public partial class GDirectorServer : Node
 {
 	// -----------------------------------------------------------------------------------------------------------------
@@ -90,8 +91,8 @@ public partial class GDirectorServer : Node
 		set => this.PreviousLiveCameraWeakRef = value != null ? new(value) : null;
 	}
 
-	public Camera2D? MainCamera2D => this.GetTree().Root.GetCamera2D();
-	public Camera3D? MainCamera3D => this.GetTree().Root.GetCamera3D();
+	public Camera2D? GodotCamera2D => this.GetTree().Root.GetCamera2D();
+	public Camera3D? GodotCamera3D => this.GetTree().Root.GetCamera3D();
 
 	public IEnumerable<IVirtualCamera> ActiveGroupCameras
 		=> string.IsNullOrEmpty(this.ActiveGroup)
@@ -105,7 +106,10 @@ public partial class GDirectorServer : Node
 	public override void _Ready()
 	{
 		base._Ready();
-		this.ReevaluateCameraSelection();
+		if (!Engine.IsEditorHint())
+		{
+			this.ReevaluateCameraSelection();
+		}
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -116,10 +120,16 @@ public partial class GDirectorServer : Node
 	{
 		this.ManagedVirtualCameras.Add(camera);
 		Callable callable = Callable.From(() => this.EvaluateCameraPriority(camera));
-		camera.AsNode().Connect(IVirtualCamera.SignalName_PriorityChanged, callable);
+		if (!Engine.IsEditorHint())
+		{
+			camera.AsNode().Connect(IVirtualCamera.SignalName_PriorityChanged, callable);
+		}
 		token.Register(() =>
 		{
-			camera.AsNode().Disconnect(IVirtualCamera.SignalName_PriorityChanged, callable);
+			if (!Engine.IsEditorHint())
+			{
+				camera.AsNode().Disconnect(IVirtualCamera.SignalName_PriorityChanged, callable);
+			}
 			this.Unregister(camera);
 		});
 		// Ignore registrations before READY event. When the node is ready, we evaluate all registered cameras.
@@ -166,14 +176,6 @@ public partial class GDirectorServer : Node
 
 	private void SetCameraLive(IVirtualCamera? camera)
 	{
-		// // Won't change the active camera if the GDirectorServer is not ready because we need to access the
-		// // ManagedCamera, which is set on the _Ready method.
-		// // TODO Instead of just returning, we could queue the new active camera to be set when the GDirectorServer is
-		// // ready so that we don't need to reevaluate all the cameras when the GDirectorServer becomes ready.
-		// if (!this.IsNodeReady()) {
-		// 	return;
-		// }
-
 		// If the new active camera is the same as the current active camera, there's no need to do anything.
 		if (camera == this.CurrentLiveCamera) {
 			return;

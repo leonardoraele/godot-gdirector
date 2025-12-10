@@ -57,17 +57,19 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 
 		// Subscribe to transition start event. This is used to reset the camera used for reference for directional
 		// input when a camera cut happens.
-		Raele.GDirector.GDirectorServer.Instance.TransitionStart += this.OnTransitionStart;
+		// TODO
+		// Raele.GDirector.GDirectorServer.Instance.TransitionStart += this.OnTransitionStart;
 	}
 
-	private void OnTransitionStart(ulong nextCameraId, ulong previousCameraId, ulong transitionControllerId)
-	{
-		// If there is no transition controller, then it's an instantaneous camera cut. When this happens, we must save
-		// the camera direction to use for input direction.
-		if (transitionControllerId == 0 && this.CameraDirection == Vector3.Zero) {
-			this.CameraDirection = Raele.GDirector.GDirectorServer.Instance.MainCamera3D.GlobalTransform.Basis.Z with { Y = 0 };
-		}
-	}
+	// TODO
+	// private void OnTransitionStart(ulong nextCameraId, ulong previousCameraId, ulong transitionControllerId)
+	// {
+	// 	// If there is no transition controller, then it's an instantaneous camera cut. When this happens, we must save
+	// 	// the camera direction to use for input direction.
+	// 	if (transitionControllerId == 0 && this.CameraDirection == Vector3.Zero) {
+	// 		this.CameraDirection = Raele.GDirector.GDirectorServer.Instance.MainCamera3D.GlobalTransform.Basis.Z with { Y = 0 };
+	// 	}
+	// }
 
 	public override void _Process(double delta)
 	{
@@ -141,7 +143,7 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 		Vector3 cameraDirection = (
 				this.CameraDirection != Vector3.Zero
 					? this.CameraDirection
-					: Raele.GDirector.GDirectorServer.Instance.MainCamera3D.Basis.Z with { Y = 0 }
+					: Raele.GDirector.GDirectorServer.Instance.GodotCamera3D.Basis.Z with { Y = 0 }
 			)
 			.Normalized()
 			* -1;
@@ -169,7 +171,7 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 
 		// Update facing direction
 		Vector3 lookDirection = this.AimingDownSights
-			? (Raele.GDirector.GDirectorServer.Instance.MainCamera3D.GlobalTransform.Basis.Z with { Y = 0} * -1).Normalized()
+			? (Raele.GDirector.GDirectorServer.Instance.GodotCamera3D.GlobalTransform.Basis.Z with { Y = 0} * -1).Normalized()
 			: newHDirection;
 		this.LookAt(this.GlobalPosition + lookDirection, Vector3.Up);
 	}

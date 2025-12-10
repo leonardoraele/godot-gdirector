@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading;
 using Godot;
 
@@ -34,27 +33,6 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	// PROPERTIES
 	// -----------------------------------------------------------------------------------------------------------------
 
-	Vector2 IVirtualCamera.Position2D
-	{
-		get => new Vector2(this.GlobalPosition.X, this.GlobalPosition.Y);
-		set => this.GlobalPosition = new Vector3(value.X, value.Y, this.GlobalPosition.Z);
-	}
-	Vector3 IVirtualCamera.Position3D
-	{
-		get => this.GlobalPosition;
-		set => this.GlobalPosition = value;
-	}
-	float IVirtualCamera.Rotation2D
-	{
-		get => this.GlobalRotation.Z;
-		set => this.GlobalRotation = this.GlobalRotation with { Z = value };
-	}
-	Vector3 IVirtualCamera.Rotation3D
-	{
-		get => this.GlobalRotation;
-		set => this.GlobalRotation = value;
-	}
-
 	// -----------------------------------------------------------------------------------------------------------------
 	// OVERRIDES
 	// -----------------------------------------------------------------------------------------------------------------
@@ -76,6 +54,14 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	{
 		base._Process(delta);
 		this.AsInterface()._Process();
+		this.CallDeferred(MethodName.CheckPriorityChange, this.Priority);
+	}
+
+	private void CheckPriorityChange(double oldPriority)
+	{
+		if (this.Priority != oldPriority) {
+			this.EmitSignal(SignalName.PriorityChanged, this.Priority, oldPriority);
+		}
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------

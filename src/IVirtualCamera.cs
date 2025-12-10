@@ -20,17 +20,6 @@ public interface IVirtualCamera
 	}
 
 	// -------------------------------------------------------------------------
-	// Blendable camera properties
-	// -------------------------------------------------------------------------
-
-	public Vector2 Position2D { get; set; }
-	public Vector3 Position3D { get; set; }
-	public float Rotation2D { get; set; }
-	public Vector3 Rotation3D { get; set; }
-	// public Transform2D Transform2D { get; set; }
-	// public Transform3D Transform3D { get; set; }
-
-	// -------------------------------------------------------------------------
 	// GDirector properties
 	// -------------------------------------------------------------------------
 
@@ -75,15 +64,7 @@ public interface IVirtualCamera
 			this.AsNode().SetProcess(false);
 			return;
 		}
-		this.AsNode().CallDeferred(nameof(CheckPriorityChange), this.Priority);
 		this.Priority = this.BasePriority;
-	}
-
-	private void CheckPriorityChange(double oldPriority)
-	{
-		if (this.Priority != oldPriority) {
-			this.AsNode().EmitSignal(SignalName_PriorityChanged, this.Priority, oldPriority);
-		}
 	}
 
 	public Node AsNode() => (Node) this;
