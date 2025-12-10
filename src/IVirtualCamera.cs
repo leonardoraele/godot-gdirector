@@ -27,6 +27,8 @@ public interface IVirtualCamera
 	public Vector3 Position3D { get; set; }
 	public float Rotation2D { get; set; }
 	public Vector3 Rotation3D { get; set; }
+	// public Transform2D Transform2D { get; set; }
+	// public Transform3D Transform3D { get; set; }
 
 	// -------------------------------------------------------------------------
 	// GDirector properties
@@ -34,6 +36,13 @@ public interface IVirtualCamera
 
 	protected double BasePriority { get; }
 	public double Priority { get; set; }
+
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
+
+	public VirtualCamera2D? As2D() => null;
+	public VirtualCamera3D? As3D() => null;
 
 	// -------------------------------------------------------------------------
 	// Implementations
@@ -78,6 +87,8 @@ public interface IVirtualCamera
 	}
 
 	public Node AsNode() => (Node) this;
+	public bool Is2D() => this.As2D() != null;
+	public bool Is3D() => this.As3D() != null;
 
 	public void NotifyIsLiveChanged(bool isLive) => this.AsNode().EmitSignal(SignalName_IsLiveChanged, isLive);
 }

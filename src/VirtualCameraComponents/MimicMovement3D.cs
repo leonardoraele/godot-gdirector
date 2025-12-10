@@ -2,7 +2,7 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCameraComponents;
 
-public partial class MimicMovement3D : VirtualCameraComponent3D
+public partial class MimicMovement3D : VirtualCameraComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS

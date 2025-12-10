@@ -3,7 +3,7 @@ using Godot;
 
 namespace Raele.GDirector;
 
-public static class GodotUtil {
+public static class GDirectorUtil {
 	public static Vector3 RotateToward(Vector3 from, Vector3 to, float maxRadians, Vector3? defaultAxis = null)
 	{
 		if (maxRadians < 0) {

@@ -150,7 +150,7 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 			: currentHDirection;
 		Vector3 newHDirection = this.AimingDownSights ? targetHDirection
 			: currentHSpeed < Mathf.Epsilon ? targetHDirection
-			: Raele.GDirector.GodotUtil.RotateToward(currentHDirection, targetHDirection, this.TurnSpeedRadPSec * (float) delta);
+			: Raele.GDirector.GDirectorUtil.RotateToward(currentHDirection, targetHDirection, this.TurnSpeedRadPSec * (float) delta);
 
 		// Calculate vertical speed
 		float newVSpeed;

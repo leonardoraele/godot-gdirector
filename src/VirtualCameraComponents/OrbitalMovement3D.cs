@@ -10,7 +10,7 @@ namespace Raele.GDirector.VirtualCameraComponents;
 // Right now, the behavior is to preserve the angle of the camera from the pivot, while changing the camera's position
 // as needed. The alternative would be to make the move as little as possible while remaining in the orbit, and changing
 // the camera angle as much as needed.
-public partial class OrbitalMovement3D : VirtualCameraComponent3D
+public partial class OrbitalMovement3D : VirtualCameraComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// EXPORTED FIELDS
@@ -318,7 +318,7 @@ public partial class OrbitalMovement3D : VirtualCameraComponent3D
 			if (this.Controller.EnableMouseMotionControls && mouseInput.LengthSquared() > Mathf.Epsilon) {
 				float xAngleInputRad = Mathf.DegToRad(mouseInput.X / this.Controller.PixelsPerDegree) * this.Controller.MouseSensibilityX;
 				float yAngleInputRad = Mathf.DegToRad(mouseInput.Y / this.Controller.PixelsPerDegree) * this.Controller.MouseSensibilityY;
-				Vector3 xRotatedCamDir = !GodotUtil.CheckNormalsAreParallel(this.TargetCameraDirection, Vector3.Up)
+				Vector3 xRotatedCamDir = !GDirectorUtil.CheckNormalsAreParallel(this.TargetCameraDirection, Vector3.Up)
 					? this.TargetCameraDirection.Rotated(Vector3.Down, xAngleInputRad)
 					: Vector3.Back; // Reset the camera direction if it's looking straight up or down
 				Vector3 crossAxis = Basis.LookingAt(xRotatedCamDir).X;

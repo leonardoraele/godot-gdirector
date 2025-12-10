@@ -2,7 +2,7 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCameraComponents;
 
-public partial class LookAtTarget3D : VirtualCameraComponent3D
+public partial class LookAtTarget3D : VirtualCameraComponent
 {
 	[Export] public Node3D? LookTarget;
 	/// <summary>
@@ -88,11 +88,11 @@ public partial class LookAtTarget3D : VirtualCameraComponent3D
 				: this.initialDirection;
 			float angle = neutralDirection.AngleTo(lookPositionDirection);
 			if (angle > this.MaxAngleRad) {
-				lookPositionDirection = GodotUtil.RotateToward(neutralDirection, lookPositionDirection, this.MaxAngleRad);
+				lookPositionDirection = GDirectorUtil.RotateToward(neutralDirection, lookPositionDirection, this.MaxAngleRad);
 			}
 		}
 
-		Vector3 upwardAxis = GodotUtil.CheckNormalsAreParallel(lookPositionDirection, Vector3.Up)
+		Vector3 upwardAxis = GDirectorUtil.CheckNormalsAreParallel(lookPositionDirection, Vector3.Up)
 				? this.Camera.GlobalBasis.Y
 				: Vector3.Up;
 		Basis newLookPositionBasis = Basis.LookingAt(lookPositionDirection, upwardAxis);

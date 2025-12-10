@@ -33,7 +33,7 @@ public partial class GDirectorPlugin : EditorPlugin
 		this.AddCustomType(nameof(FramingPriority3D), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(FramingPriority3D)}.cs"), vcamPriIcon);
 		this.AddCustomType(nameof(LineOfSightPriority3D), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(LineOfSightPriority3D)}.cs"), vcamPriIcon);
 		this.AddCustomType(nameof(ProximityPriority3D), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(ProximityPriority3D)}.cs"), vcamPriIcon);
-		this.AddCustomType(nameof(CameraTransition3D), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(CameraTransition3D)}.cs"), vcamTraIcon);
+		this.AddCustomType(nameof(TweenComponent), nameof(Node), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCameraComponents)}/{nameof(TweenComponent)}.cs"), vcamTraIcon);
 
 		// Camera Preview Window
 		// this.SetupCameraPreviewWindow();

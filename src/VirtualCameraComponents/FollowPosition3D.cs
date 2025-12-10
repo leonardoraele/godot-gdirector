@@ -13,7 +13,7 @@ namespace Raele.GDirector.VirtualCameraComponents;
 /// This camera controller is useful for following objects that move at high speeds, but it's not ideal for
 /// player-controlled characters in most games.
 /// </summary>
-public partial class FollowPosition3D : VirtualCameraComponent3D
+public partial class FollowPosition3D : VirtualCameraComponent
 {
 	/// <summary>
 	/// The node to follow.
@@ -84,24 +84,38 @@ public partial class FollowPosition3D : VirtualCameraComponent3D
 		Vector3 followTargetPosition = this.FollowTargetPosition; // Read FollowTargetPosition only once bc it has some computational cost
 
 		// Calculate the distance between the camera and the follow target
-		float currentDistance = this.Camera.GlobalPosition.DistanceTo(followTargetPosition);
+		float currentDistance = this.Camera.Position3D.DistanceTo(followTargetPosition);
 
 		// Calculate the direction from the camera to the follow target
 		Vector3 cameraDirection = currentDistance > Mathf.Epsilon
-			? (this.Camera.GlobalPosition - followTargetPosition).Normalized()
+			? (this.Camera.Position3D - followTargetPosition).Normalized()
 			: this.Camera.GlobalTransform.Basis.Z;
 
 		// Move the camera according to it's position relative to the follow target
 		if (currentDistance > this.MaxDistance) {
-			this.Camera.GlobalPosition = followTargetPosition + cameraDirection * this.MaxDistance;
+			this.Camera.Position3D = followTargetPosition + cameraDirection * this.MaxDistance;
 		} else if (currentDistance > this.DeadZoneFartherLimit) {
 			Vector3 targetPosition = followTargetPosition + cameraDirection * this.DeadZoneFartherLimit;
-			this.Camera.GlobalPosition = this.Camera.GlobalPosition.Lerp(targetPosition, this.LerpWeight);
+			this.Camera.Position3D = this.Camera.Position3D.Lerp(targetPosition, this.LerpWeight);
 		} else if (currentDistance < this.MinDistance) {
-			this.Camera.GlobalPosition = followTargetPosition + cameraDirection * this.MinDistance;
+			this.Camera.Position3D = followTargetPosition + cameraDirection * this.MinDistance;
 		} else if (currentDistance < this.DeadZoneCloserLimit) {
 			Vector3 targetPosition = followTargetPosition + cameraDirection * this.DeadZoneCloserLimit;
-			this.Camera.GlobalPosition = this.Camera.GlobalPosition.Lerp(targetPosition, this.LerpWeight);
+			this.Camera.Position3D = this.Camera.Position3D.Lerp(targetPosition, this.LerpWeight);
 		}
+	}
+
+	protected override void _ProcessIsLive(Camera2D main, double delta)
+	{
+		base._ProcessIsLive(main, delta);
+		main.GlobalPosition = this.Camera.Position2D;
+		main.GlobalRotation = this.Camera.Rotation2D;
+	}
+
+	protected override void _ProcessIsLive(Camera3D main, double delta)
+	{
+		base._ProcessIsLive(main, delta);
+		main.GlobalPosition = this.Camera.Position3D;
+		main.GlobalRotation = this.Camera.Rotation3D;
 	}
 }

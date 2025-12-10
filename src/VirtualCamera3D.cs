@@ -83,4 +83,5 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	// -----------------------------------------------------------------------------------------------------------------
 
 	public IVirtualCamera AsInterface() => this;
+	public VirtualCamera3D As3D() => this;
 }
