@@ -1,5 +1,3 @@
-using System.Data.SqlTypes;
-using System.Linq;
 using Godot;
 
 namespace Raele.GDirector.VirtualCamera2DComponents;
@@ -50,6 +48,14 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 		{ get => field; set { field = value; this.QueueRedraw(); } }
 		= 0.15f;
 
+	[ExportGroup("Debug", "Debug")]
+	[Export(PropertyHint.Flags, "InEditor:1,InRuntime:2")] public byte DebugShowFramingGuides
+		{ get => field; set { field = value; this.QueueRedraw(); } }
+		= 1;
+	[Export(PropertyHint.Range, "0,1")] public float DebugGuideOpacity
+		{ get => field; set { field = value; this.QueueRedraw(); } }
+		= 0.25f;
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
@@ -83,7 +89,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 	/// </summary>
 	public Rect2 GlobalDeadZoneRect => new Rect2(
 			this.GlobalFocusPointPosition - this.DeadZoneSize * 0.5f * GDirectorServer.Instance.ScreenSize,
-			this.DeadZoneSize * GDirectorServer.Instance.ScreenSize
+			this.DeadZoneSize * GDirectorServer.Instance.ScreenSize * 2
 		)
 		.Intersection(this.GlobalScreenRect);
 	public Rect2 GlobalHardLimitRect => new Rect2()
@@ -211,7 +217,11 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 	{
 		base._Draw();
 
-		if (!Engine.IsEditorHint())
+		if (
+			Engine.IsEditorHint() && (this.DebugShowFramingGuides & 1) == 0
+			|| !Engine.IsEditorHint() && (this.DebugShowFramingGuides & 2) == 0
+			|| OS.HasFeature("release")
+		)
 		{
 			return;
 		}
@@ -230,7 +240,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 		);
 
 		// Draw hard limit stroke
-		this.DrawRect(hardLimitRect, Colors.Red with { A = 0.5f }, filled: false, 8f);
+		this.DrawRect(hardLimitRect, Colors.Red with { A = this.DebugGuideOpacity * 2 }, filled: false, 8f);
 		// Draw hard limit area (top)
 		this.DrawColoredPolygon(
 			[
@@ -239,7 +249,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 				new Vector2(hardLimitRect.End.X, hardLimitRect.Position.Y),
 				new Vector2(hardLimitRect.Position.X, hardLimitRect.Position.Y)
 			],
-			Colors.Red with { A = 0.25f }
+			Colors.Red with { A = this.DebugGuideOpacity }
 		);
 		// Draw hard limit area (right)
 		this.DrawColoredPolygon(
@@ -249,7 +259,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 				new Vector2(screenRect.End.X, screenRect.End.Y),
 				new Vector2(hardLimitRect.End.X, hardLimitRect.End.Y)
 			],
-			Colors.Red with { A = 0.25f }
+			Colors.Red with { A = this.DebugGuideOpacity }
 		);
 		// Draw hard limit area (bottom)
 		this.DrawColoredPolygon(
@@ -259,7 +269,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 				new Vector2(screenRect.End.X, screenRect.End.Y),
 				new Vector2(screenRect.Position.X, screenRect.End.Y)
 			],
-			Colors.Red with { A = 0.25f }
+			Colors.Red with { A = this.DebugGuideOpacity }
 		);
 		// Draw hard limit area (left)
 		this.DrawColoredPolygon(
@@ -269,11 +279,11 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 				new Vector2(hardLimitRect.Position.X, hardLimitRect.End.Y),
 				new Vector2(screenRect.Position.X, screenRect.End.Y)
 			],
-			Colors.Red with { A = 0.25f }
+			Colors.Red with { A = this.DebugGuideOpacity }
 		);
 
 		// Draw soft zone stroke
-		this.DrawRect(deadZoneRect, Colors.Blue with { A = 0.5f }, filled: false, 8f);
+		this.DrawRect(deadZoneRect, Colors.Blue with { A = this.DebugGuideOpacity * 2 }, filled: false, 8f);
 		// Draw soft zone area (top)
 		this.DrawColoredPolygon(
 			[
@@ -282,7 +292,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 				new Vector2(deadZoneRect.End.X, deadZoneRect.Position.Y),
 				new Vector2(deadZoneRect.Position.X, deadZoneRect.Position.Y)
 			],
-			Colors.Blue with { A = 0.25f }
+			Colors.Blue with { A = this.DebugGuideOpacity }
 		);
 		// Draw soft zone area (right)
 		this.DrawColoredPolygon(
@@ -292,7 +302,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 				new Vector2(hardLimitRect.End.X, hardLimitRect.End.Y),
 				new Vector2(deadZoneRect.End.X, deadZoneRect.End.Y)
 			],
-			Colors.Blue with { A = 0.25f }
+			Colors.Blue with { A = this.DebugGuideOpacity }
 		);
 		// Draw soft zone area (bottom)
 		this.DrawColoredPolygon(
@@ -302,7 +312,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 				new Vector2(hardLimitRect.End.X, hardLimitRect.End.Y),
 				new Vector2(hardLimitRect.Position.X, hardLimitRect.End.Y)
 			],
-			Colors.Blue with { A = 0.25f }
+			Colors.Blue with { A = this.DebugGuideOpacity }
 		);
 		// Draw soft zone area (left)
 		this.DrawColoredPolygon(
@@ -312,7 +322,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 				new Vector2(deadZoneRect.Position.X, deadZoneRect.End.Y),
 				new Vector2(hardLimitRect.Position.X, hardLimitRect.End.Y)
 			],
-			Colors.Blue with { A = 0.25f }
+			Colors.Blue with { A = this.DebugGuideOpacity }
 		);
 
 		// Draw focus point
