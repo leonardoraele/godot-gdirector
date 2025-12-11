@@ -1,3 +1,4 @@
+using System.Data.SqlTypes;
 using System.Linq;
 using Godot;
 
@@ -17,7 +18,9 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 	// -----------------------------------------------------------------------------------------------------------------
 
 	[Export] public Node2D? FramingTarget;
-	[Export(PropertyHint.Range, "0,1")] public Vector2 ScreenPosition = new Vector2(0.5f, 0.5f);
+	[Export(PropertyHint.Range, "0,1")] public Vector2 ScreenPosition
+		{ get => field; set { field = value; this.QueueRedraw(); } }
+		= new Vector2(0.5f, 0.5f);
 
 	[ExportGroup("Target Offset")]
 	[Export] public Vector2 TargetOffset;
@@ -74,14 +77,15 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 	/// The global position that is in <see cref="ScreenPosition"/> at this time.
 	/// </summary>
 	public Vector2 GlobalFocusPointPosition => this.Camera.GlobalPosition
-		- (this.ScreenPosition - new Vector2(0.5f, 0.5f)) * GDirectorServer.Instance.ScreenSize;
+		+ (this.ScreenPosition - new Vector2(0.5f, 0.5f)) * GDirectorServer.Instance.ScreenSize;
 	/// <summary>
 	/// The dead zone rectangle in world coordinates.
 	/// </summary>
 	public Rect2 GlobalDeadZoneRect => new Rect2(
-		this.GlobalFocusPointPosition - this.DeadZoneSize * 0.5f * GDirectorServer.Instance.ScreenSize,
-		this.DeadZoneSize * GDirectorServer.Instance.ScreenSize
-	);
+			this.GlobalFocusPointPosition - this.DeadZoneSize * 0.5f * GDirectorServer.Instance.ScreenSize,
+			this.DeadZoneSize * GDirectorServer.Instance.ScreenSize
+		)
+		.Intersection(this.GlobalScreenRect);
 	public Rect2 GlobalHardLimitRect => new Rect2()
 		{
 			Position = this.GlobalDeadZoneRect.Position
@@ -90,7 +94,12 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 			End = this.GlobalDeadZoneRect.End
 				+ new Vector2(this.SoftZoneRightMargin, this.SoftZoneBottomMargin)
 				* GDirectorServer.Instance.ScreenSize
-		};
+		}
+		.Intersection(this.GlobalScreenRect);
+	private Rect2 GlobalScreenRect => new Rect2(
+			this.Camera.GlobalPosition - GDirectorServer.Instance.ScreenSize / 2,
+			GDirectorServer.Instance.ScreenSize
+		);
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
@@ -207,44 +216,110 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 			return;
 		}
 
-		Vector2[] screenPolygon = [
-			this.ToLocal(new Vector2(-GDirectorServer.Instance.ScreenSize.X / 2, -GDirectorServer.Instance.ScreenSize.Y / 2)),
-			this.ToLocal(new Vector2(GDirectorServer.Instance.ScreenSize.X / 2, -GDirectorServer.Instance.ScreenSize.Y / 2)),
-			this.ToLocal(new Vector2(GDirectorServer.Instance.ScreenSize.X / 2, GDirectorServer.Instance.ScreenSize.Y / 2)),
-			this.ToLocal(new Vector2(-GDirectorServer.Instance.ScreenSize.X / 2, GDirectorServer.Instance.ScreenSize.Y / 2))
-		];
-		Vector2[] hardLimitPolygon = [
+		Rect2 screenRect = new Rect2(
+			GDirectorServer.Instance.ScreenSize / -2,
+			GDirectorServer.Instance.ScreenSize
+		);
+		Rect2 hardLimitRect = new Rect2(
 			this.ToLocal(this.GlobalHardLimitRect.Position),
-			this.ToLocal(new Vector2(this.GlobalHardLimitRect.End.X, this.GlobalHardLimitRect.Position.Y)),
-			this.ToLocal(this.GlobalHardLimitRect.End),
-			this.ToLocal(new Vector2(this.GlobalHardLimitRect.Position.X, this.GlobalHardLimitRect.End.Y))
-		];
-		Vector2[] deadZonePolygon = [
+			this.GlobalHardLimitRect.Size.Max(Vector2.One)
+		);
+		Rect2 deadZoneRect = new Rect2(
 			this.ToLocal(this.GlobalDeadZoneRect.Position),
-			this.ToLocal(new Vector2(this.GlobalDeadZoneRect.End.X, this.GlobalDeadZoneRect.Position.Y)),
-			this.ToLocal(this.GlobalDeadZoneRect.End),
-			this.ToLocal(new Vector2(this.GlobalDeadZoneRect.Position.X, this.GlobalDeadZoneRect.End.Y))
-		];
+			this.GlobalDeadZoneRect.Size.Max(Vector2.One)
+		);
 
-		// Draw hard limit area
-		Geometry2D.ClipPolygons(screenPolygon, hardLimitPolygon)
-			.ToList()
-			.ForEach(polygon => this.DrawColoredPolygon(polygon, Colors.Red with { A = 0.25f }));
+		// Draw hard limit stroke
+		this.DrawRect(hardLimitRect, Colors.Red with { A = 0.5f }, filled: false, 8f);
+		// Draw hard limit area (top)
+		this.DrawColoredPolygon(
+			[
+				new Vector2(screenRect.Position.X, screenRect.Position.Y),
+				new Vector2(screenRect.End.X, screenRect.Position.Y),
+				new Vector2(hardLimitRect.End.X, hardLimitRect.Position.Y),
+				new Vector2(hardLimitRect.Position.X, hardLimitRect.Position.Y)
+			],
+			Colors.Red with { A = 0.25f }
+		);
+		// Draw hard limit area (right)
+		this.DrawColoredPolygon(
+			[
+				new Vector2(hardLimitRect.End.X, hardLimitRect.Position.Y),
+				new Vector2(screenRect.End.X, screenRect.Position.Y),
+				new Vector2(screenRect.End.X, screenRect.End.Y),
+				new Vector2(hardLimitRect.End.X, hardLimitRect.End.Y)
+			],
+			Colors.Red with { A = 0.25f }
+		);
+		// Draw hard limit area (bottom)
+		this.DrawColoredPolygon(
+			[
+				new Vector2(hardLimitRect.Position.X, hardLimitRect.End.Y),
+				new Vector2(hardLimitRect.End.X, hardLimitRect.End.Y),
+				new Vector2(screenRect.End.X, screenRect.End.Y),
+				new Vector2(screenRect.Position.X, screenRect.End.Y)
+			],
+			Colors.Red with { A = 0.25f }
+		);
+		// Draw hard limit area (left)
+		this.DrawColoredPolygon(
+			[
+				new Vector2(screenRect.Position.X, screenRect.Position.Y),
+				new Vector2(hardLimitRect.Position.X, hardLimitRect.Position.Y),
+				new Vector2(hardLimitRect.Position.X, hardLimitRect.End.Y),
+				new Vector2(screenRect.Position.X, screenRect.End.Y)
+			],
+			Colors.Red with { A = 0.25f }
+		);
 
-		// Draw soft zone area
-		Geometry2D.ClipPolygons(hardLimitPolygon, deadZonePolygon)
-			.ToList()
-			.ForEach(polygon => this.DrawColoredPolygon(polygon, Colors.Blue with { A = 0.25f }));
+		// Draw soft zone stroke
+		this.DrawRect(deadZoneRect, Colors.Blue with { A = 0.5f }, filled: false, 8f);
+		// Draw soft zone area (top)
+		this.DrawColoredPolygon(
+			[
+				new Vector2(hardLimitRect.Position.X, hardLimitRect.Position.Y),
+				new Vector2(hardLimitRect.End.X, hardLimitRect.Position.Y),
+				new Vector2(deadZoneRect.End.X, deadZoneRect.Position.Y),
+				new Vector2(deadZoneRect.Position.X, deadZoneRect.Position.Y)
+			],
+			Colors.Blue with { A = 0.25f }
+		);
+		// Draw soft zone area (right)
+		this.DrawColoredPolygon(
+			[
+				new Vector2(deadZoneRect.End.X, deadZoneRect.Position.Y),
+				new Vector2(hardLimitRect.End.X, hardLimitRect.Position.Y),
+				new Vector2(hardLimitRect.End.X, hardLimitRect.End.Y),
+				new Vector2(deadZoneRect.End.X, deadZoneRect.End.Y)
+			],
+			Colors.Blue with { A = 0.25f }
+		);
+		// Draw soft zone area (bottom)
+		this.DrawColoredPolygon(
+			[
+				new Vector2(deadZoneRect.Position.X, deadZoneRect.End.Y),
+				new Vector2(deadZoneRect.End.X, deadZoneRect.End.Y),
+				new Vector2(hardLimitRect.End.X, hardLimitRect.End.Y),
+				new Vector2(hardLimitRect.Position.X, hardLimitRect.End.Y)
+			],
+			Colors.Blue with { A = 0.25f }
+		);
+		// Draw soft zone area (left)
+		this.DrawColoredPolygon(
+			[
+				new Vector2(hardLimitRect.Position.X, hardLimitRect.Position.Y),
+				new Vector2(deadZoneRect.Position.X, deadZoneRect.Position.Y),
+				new Vector2(deadZoneRect.Position.X, deadZoneRect.End.Y),
+				new Vector2(hardLimitRect.Position.X, hardLimitRect.End.Y)
+			],
+			Colors.Blue with { A = 0.25f }
+		);
 
 		// Draw focus point
-		float focusPointSize = 4f;
-		this.DrawRect(
-			new Rect2(
-				this.ToLocal(this.GlobalFocusPointPosition) - Vector2.One * focusPointSize / 2,
-				Vector2.One * focusPointSize
-			),
-			Colors.White,
-			filled: true
-		);
+		Vector2 focusPoint = this.ToLocal(this.GlobalFocusPointPosition);
+		float crosshairSize = 32f;
+		float crosshairWidth = 4f;
+		this.DrawLine(focusPoint + Vector2.Left * crosshairSize / 2, focusPoint + Vector2.Right * crosshairSize / 2, Colors.White, crosshairWidth);
+		this.DrawLine(focusPoint + Vector2.Up * crosshairSize / 2, focusPoint + Vector2.Down * crosshairSize / 2, Colors.White, crosshairWidth);
 	}
 }
