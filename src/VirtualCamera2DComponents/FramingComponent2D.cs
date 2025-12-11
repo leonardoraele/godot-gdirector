@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 namespace Raele.GDirector.VirtualCamera2DComponents;
@@ -83,28 +85,28 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 	/// The global position that is in <see cref="ScreenPosition"/> at this time.
 	/// </summary>
 	public Vector2 GlobalFocusPointPosition => this.Camera.GlobalPosition
-		+ (this.ScreenPosition - new Vector2(0.5f, 0.5f)) * GDirectorServer.Instance.ScreenSize;
+		+ (this.ScreenPosition - new Vector2(0.5f, 0.5f)) * this.Camera.ScreenSize;
 	/// <summary>
 	/// The dead zone rectangle in world coordinates.
 	/// </summary>
 	public Rect2 GlobalDeadZoneRect => new Rect2(
-			this.GlobalFocusPointPosition - this.DeadZoneSize * 0.5f * GDirectorServer.Instance.ScreenSize,
-			this.DeadZoneSize * GDirectorServer.Instance.ScreenSize * 2
+			this.GlobalFocusPointPosition - this.DeadZoneSize * 0.5f * this.Camera.ScreenSize,
+			this.DeadZoneSize * this.Camera.ScreenSize
 		)
 		.Intersection(this.GlobalScreenRect);
 	public Rect2 GlobalHardLimitRect => new Rect2()
 		{
 			Position = this.GlobalDeadZoneRect.Position
 				- new Vector2(this.SoftZoneLeftMargin, this.SoftZoneTopMargin)
-				* GDirectorServer.Instance.ScreenSize,
+				* this.Camera.ScreenSize,
 			End = this.GlobalDeadZoneRect.End
 				+ new Vector2(this.SoftZoneRightMargin, this.SoftZoneBottomMargin)
-				* GDirectorServer.Instance.ScreenSize
+				* this.Camera.ScreenSize
 		}
 		.Intersection(this.GlobalScreenRect);
 	private Rect2 GlobalScreenRect => new Rect2(
-			this.Camera.GlobalPosition - GDirectorServer.Instance.ScreenSize / 2,
-			GDirectorServer.Instance.ScreenSize
+			this.Camera.GlobalPosition - this.Camera.ScreenSize / 2,
+			this.Camera.ScreenSize
 		);
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -175,6 +177,11 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 	// 	base._PhysicsProcess(delta);
 	// }
 
+	public override string[] _GetConfigurationWarnings()
+		=> new List<string>()
+			.Concat(this.FramingTarget == null ? [$"{nameof(FramingTarget)} field is null."] : [])
+			.ToArray();
+
 	// public override void _ValidateProperty(Godot.Collections.Dictionary property)
 	// {
 	// 	base._ValidateProperty(property);
@@ -205,7 +212,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 		if (this.CenterOnActivation)
 		{
 			this.Camera.GlobalPosition = this.OffesetFramingTargetGlobalPosition
-				- (this.ScreenPosition - new Vector2(0.5f, 0.5f)) * GDirectorServer.Instance.ScreenSize;
+				- (this.ScreenPosition - new Vector2(0.5f, 0.5f)) * this.Camera.ScreenSize;
 		}
 	}
 
@@ -226,10 +233,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 			return;
 		}
 
-		Rect2 screenRect = new Rect2(
-			GDirectorServer.Instance.ScreenSize / -2,
-			GDirectorServer.Instance.ScreenSize
-		);
+		Rect2 screenRect = new Rect2(this.Camera.ScreenSize / -2, this.Camera.ScreenSize);
 		Rect2 hardLimitRect = new Rect2(
 			this.ToLocal(this.GlobalHardLimitRect.Position),
 			this.GlobalHardLimitRect.Size.Max(Vector2.One)

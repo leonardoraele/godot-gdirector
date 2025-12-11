@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Threading;
 using Godot;
 
@@ -13,8 +11,15 @@ public partial class VirtualCamera2D : Node2D, IVirtualCamera
 	// -----------------------------------------------------------------------------------------------------------------
 
 	[ExportToolButton("Force Go Live/Release")] public Callable ToogleIsLiveOverrideToolButton
-		=> Callable.From(() => this.AsInterface().ForceGoLive = !this.AsInterface().ForceGoLive);
+		=> Callable.From(() =>
+		{
+			if (Engine.IsEditorHint()) return;
+			this.AsInterface().ForceGoLive = !this.AsInterface().ForceGoLive;
+		});
 	[Export] public double BasePriority { get; private set; } = 0;
+	[Export(PropertyHint.Link)] public Vector2 Zoom
+		{ get => field; set { field = value; this.QueueRedraw(); } }
+		= Vector2.One;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
@@ -35,6 +40,9 @@ public partial class VirtualCamera2D : Node2D, IVirtualCamera
 	// PROPERTIES
 	// -----------------------------------------------------------------------------------------------------------------
 
+	public Vector2 ScreenSize => GDirectorServer.Instance.ScreenSize / this.Zoom;
+	public Rect2 ScreenRect => new Rect2(this.GlobalPosition - this.ScreenSize / 2, this.ScreenSize);
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// OVERRIDES
 	// -----------------------------------------------------------------------------------------------------------------
@@ -43,6 +51,7 @@ public partial class VirtualCamera2D : Node2D, IVirtualCamera
 	{
 		base._EnterTree();
 		this.AsInterface()._EnterTree(this.ServerRegistrationCancelSource.Token);
+		this.TopLevel = true;
 	}
 
 	public override void _ExitTree()
@@ -68,11 +77,13 @@ public partial class VirtualCamera2D : Node2D, IVirtualCamera
 	public override void _Draw()
 	{
 		base._Draw();
+
 		if (!Engine.IsEditorHint())
 		{
 			return;
 		}
-		Vector2 screenSize = GDirectorServer.Instance.ScreenSize;
+
+		Vector2 screenSize = GDirectorServer.Instance.ScreenSize / this.Zoom;
 		this.DrawRect(new Rect2(screenSize / -2, screenSize), Colors.Blue with { A = 0.5f }, false);
 	}
 

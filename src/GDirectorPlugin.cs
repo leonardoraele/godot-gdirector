@@ -27,7 +27,8 @@ public partial class GDirectorPlugin : EditorPlugin
 		this.AddCustomType(nameof(VirtualCamera3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3D)}.cs"), vcamIcon);
 
 		// 2D Camera Components
-		this.AddCustomType(nameof(VirtualCamera2DComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponent)}.cs"), vcamIcon);
+		this.AddCustomType(nameof(AreaConstraintComponent2D), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera2DComponents)}/{nameof(AreaConstraintComponent2D)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(AreaPriorityComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera2DComponents)}/{nameof(AreaPriorityComponent)}.cs"), vcamPosIcon);
 		this.AddCustomType(nameof(FramingComponent2D), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera2DComponents)}/{nameof(FramingComponent2D)}.cs"), vcamPosIcon);
 		this.AddCustomType(nameof(TweenComponent2D), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera2DComponents)}/{nameof(VirtualCamera2DComponents.TweenComponent2D)}.cs"), vcamTraIcon);
 
@@ -60,7 +61,8 @@ public partial class GDirectorPlugin : EditorPlugin
 		this.RemoveCustomType(nameof(VirtualCamera3D));
 
 		// 2D Camera Components
-		this.RemoveCustomType(nameof(VirtualCamera2DComponent));
+		this.RemoveCustomType(nameof(AreaConstraintComponent2D));
+		this.RemoveCustomType(nameof(AreaPriorityComponent));
 		this.RemoveCustomType(nameof(FramingComponent2D));
 		this.RemoveCustomType(nameof(TweenComponent2D));
 
@@ -78,6 +80,7 @@ public partial class GDirectorPlugin : EditorPlugin
 		this.RemoveCustomType(nameof(TweenComponent3D));
 	}
 
+	// TODO Alternatively, maybe override _Handles(), _MakeVisible(), and/or _Edit() to implement camera preview
 	// private void SetupCameraPreviewWindow()
 	// {
 	//	 CameraPreviewWindow preview = new CameraPreviewWindow();

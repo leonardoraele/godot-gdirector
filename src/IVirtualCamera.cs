@@ -57,7 +57,6 @@ public interface IVirtualCamera
 	public void _EnterTree(CancellationToken token)
 	{
 		GDirectorServer.Instance.Register(this, token);
-		this.AsNode().SetMeta("_edit_group_", true);
 	}
 	public void _ExitTree() {}
 
