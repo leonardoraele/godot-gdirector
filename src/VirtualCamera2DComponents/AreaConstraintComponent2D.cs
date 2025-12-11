@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Godot;
 
 namespace Raele.GDirector.VirtualCamera2DComponents;
@@ -21,18 +23,18 @@ public partial class AreaConstraintComponent2D : VirtualCamera2DComponent
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
-
+	private int CurrentActiveControlPointIndex = -1;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// COMPUTED PROPERTIES
 	// -----------------------------------------------------------------------------------------------------------------
 
-	// public Rect2 PositionConstraintRect => this.Area == null
-	// 	? new Rect2(
-	// 		new Vector2(float.NegativeInfinity, float.NegativeInfinity),
-	// 		new Vector2(float.PositiveInfinity, float.PositiveInfinity)
-	// 	)
-	// 	: this.Area.Coll
+	public Vector2[] ControlPoints => [
+		this.Region.Position,
+		new Vector2(this.Region.End.X, this.Region.Position.Y),
+		this.Region.End,
+		new Vector2(this.Region.Position.X, this.Region.End.Y),
+	];
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
@@ -135,24 +137,93 @@ public partial class AreaConstraintComponent2D : VirtualCamera2DComponent
 			return;
 		}
 
-		Rect2 regionRect = new Rect2(this.ToLocal(this.Region.Position), this.Region.Size);
-		Vector2[] points = [
-			regionRect.Position,
-			new Vector2(regionRect.End.X, regionRect.Position.Y),
-			regionRect.End,
-			new Vector2(regionRect.Position.X, regionRect.End.Y),
-		];
+		Vector2[] drawPoints = this.ControlPoints.Select(this.ToLocal).ToArray();
 		float width = 8f;
 		float gap = 12f;
-		this.DrawDashedLine(points[0], points[1], Colors.Red, width, gap);
-		this.DrawDashedLine(points[1], points[2], Colors.Red, width, gap);
-		this.DrawDashedLine(points[2], points[3], Colors.Red, width, gap);
-		this.DrawDashedLine(points[3], points[0], Colors.Red, width, gap);
+		float handleSize = 12f;
+		this.DrawDashedLine(drawPoints[0], drawPoints[1], Colors.Red, width, gap);
+		this.DrawDashedLine(drawPoints[1], drawPoints[2], Colors.Red, width, gap);
+		this.DrawDashedLine(drawPoints[2], drawPoints[3], Colors.Red, width, gap);
+		this.DrawDashedLine(drawPoints[3], drawPoints[0], Colors.Red, width, gap);
+		this.DrawRect(new Rect2(drawPoints[0], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+		this.DrawRect(new Rect2(drawPoints[0], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
+		this.DrawRect(new Rect2(drawPoints[1], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+		this.DrawRect(new Rect2(drawPoints[1], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
+		this.DrawRect(new Rect2(drawPoints[2], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+		this.DrawRect(new Rect2(drawPoints[2], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
+		this.DrawRect(new Rect2(drawPoints[3], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+		this.DrawRect(new Rect2(drawPoints[3], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
 	}
+
+	// public override void _Input(InputEvent @event)
+	// {
+	// 	base._Input(@event);
+	// 	if (@event is InputEventMouse)
+	// 	{
+	// 		Vector2[] controlPoints = this.ControlPoints;
+	// 		float controlDistanceSqr = 12f * 12f;
+	// 		if (@event is InputEventMouseMotion mouseMotion)
+	// 		{
+	// 			switch (this.CurrentActiveControlPointIndex)
+	// 			{
+	// 				case 0:
+	// 					this.Region.Position += mouseMotion.Relative;
+	// 					this.Region.Size -= mouseMotion.Relative;
+	// 					break;
+	// 				case 1:
+	// 					this.Region.Position += new Vector2(0, mouseMotion.Relative.Y);
+	// 					this.Region.Size += new Vector2(mouseMotion.Relative.X, -mouseMotion.Relative.Y);
+	// 					break;
+	// 				case 2:
+	// 					this.Region.Size += mouseMotion.Relative;
+	// 					break;
+	// 				case 3:
+	// 					this.Region.Position += new Vector2(mouseMotion.Relative.X, 0);
+	// 					this.Region.Size += new Vector2(-mouseMotion.Relative.X, mouseMotion.Relative.Y);
+	// 					break;
+	// 				default:
+	// 					if (
+	// 						this.GetGlobalMousePosition().DistanceSquaredTo(controlPoints[0]) <= controlDistanceSqr
+	// 						|| this.GetGlobalMousePosition().DistanceSquaredTo(controlPoints[2]) <= controlDistanceSqr
+	// 					)
+	// 					{
+	// 						Input.SetDefaultCursorShape(Input.CursorShape.Bdiagsize);
+	// 					}
+	// 					else if (
+	// 						this.GetGlobalMousePosition().DistanceSquaredTo(controlPoints[1]) <= controlDistanceSqr
+	// 						|| this.GetGlobalMousePosition().DistanceSquaredTo(controlPoints[3]) <= controlDistanceSqr
+	// 					)
+	// 					{
+	// 						Input.SetDefaultCursorShape(Input.CursorShape.Fdiagsize);
+	// 					}
+	// 					else
+	// 					{
+	// 						Input.SetDefaultCursorShape(Input.CursorShape.Arrow);
+	// 					}
+	// 					break;
+	// 			}
+	// 		}
+	// 		else if (@event is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == MouseButton.Left)
+	// 		{
+	// 			this.CurrentActiveControlPointIndex = -1;
+	// 			if (mouseButton.Pressed)
+	// 			{
+	// 				for (int i = 0; i < controlPoints.Length; i++)
+	// 				{
+	// 					if (this.GetGlobalMousePosition().DistanceSquaredTo(controlPoints[i]) <= controlDistanceSqr)
+	// 					{
+	// 						this.CurrentActiveControlPointIndex = i;
+	// 						this.GetViewport().SetInputAsHandled();
+	// 						break;
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
-
 
 }

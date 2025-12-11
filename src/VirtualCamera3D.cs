@@ -18,7 +18,7 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	// SIGNALS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	[Signal] public delegate void PriorityChangedEventHandler(double newPriority, double oldPriority);
+	[Signal] public delegate void PriorityChangedEventHandler(double oldPriority);
 	[Signal] public delegate void IsLiveChangedEventHandler(bool isLive);
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -26,8 +26,6 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	// -----------------------------------------------------------------------------------------------------------------
 
 	public double Priority { get; set; }
-
-	private CancellationTokenSource ServerRegistrationCancelSource = new();
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// PROPERTIES
@@ -40,14 +38,13 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	public override void _EnterTree()
 	{
 		base._EnterTree();
-		this.AsInterface()._EnterTree(this.ServerRegistrationCancelSource.Token);
+		this.AsInterface().NotifyEnteredTree();
 	}
 
 	public override void _ExitTree()
 	{
 		base._ExitTree();
-		this.AsInterface()._ExitTree();
-		this.ServerRegistrationCancelSource.Cancel();
+		this.AsInterface().NotifyExitedTree();
 	}
 
 	public override void _Process(double delta)
@@ -58,16 +55,8 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 			this.SetProcess(false);
 			return;
 		}
-		this.AsInterface()._Process();
-		this.CallDeferred(MethodName.CheckPriorityChange, this.Priority);
+		this.AsInterface().NotifyProcessing();
 		this.UpdateGodotCamera3D();
-	}
-
-	private void CheckPriorityChange(double oldPriority)
-	{
-		if (this.Priority != oldPriority) {
-			this.EmitSignal(SignalName.PriorityChanged, this.Priority, oldPriority);
-		}
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------

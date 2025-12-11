@@ -17,7 +17,9 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 	// EXPORTS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	[Export] public Node2D? FramingTarget;
+	[Export] public Node2D? FramingTarget
+		{ get => field; set { field = value; this.NotifyPropertyListChanged(); }}
+		= null;
 	[Export(PropertyHint.Range, "0,1")] public Vector2 ScreenPosition
 		{ get => field; set { field = value; this.QueueRedraw(); } }
 		= new Vector2(0.5f, 0.5f);

@@ -1,4 +1,3 @@
-using System.Threading;
 using Godot;
 
 namespace Raele.GDirector;
@@ -54,13 +53,28 @@ public interface IVirtualCamera
 		}
 	}
 
-	public void _EnterTree(CancellationToken token)
+	public void NotifyEnteredTree()
 	{
-		GDirectorServer.Instance.Register(this, token);
+		GDirectorServer.Instance.Register(this);
+		this.Priority = this.BasePriority;
 	}
-	public void _ExitTree() {}
+	public void NotifyExitedTree()
+	{
+		GDirectorServer.Instance.Unregister(this);
+	}
+	public void NotifyProcessing()
+	{
+		double lastFramePriority = this.Priority;
+		this.Priority = this.BasePriority;
+		Callable.From(() => this.CheckPriorityChange(lastFramePriority)).CallDeferred();
+	}
 
-	public void _Process() => this.Priority = this.BasePriority;
+	private void CheckPriorityChange(double oldPriority)
+	{
+		if (this.Priority != oldPriority) {
+			this.AsNode().EmitSignal(IVirtualCamera.SignalName_PriorityChanged, oldPriority);
+		}
+	}
 
 	public Node AsNode() => (Node) this;
 	public bool Is2D() => this.As2D() != null;

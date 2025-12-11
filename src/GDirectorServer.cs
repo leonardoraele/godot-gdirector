@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Godot;
 
 namespace Raele.GDirector;
@@ -29,6 +28,7 @@ public partial class GDirectorServer : Node
 
 	public IVirtualCamera? CurrentLiveCamera { get; private set; } = null;
 	private WeakReference<IVirtualCamera>? PreviousLiveCameraWeakRef = null;
+	private IVirtualCamera? SecondHighestPriorityCamera = null;
 
 	private HashSet<IVirtualCamera> ManagedVirtualCameras { get; init; } = new();
 
@@ -125,33 +125,23 @@ public partial class GDirectorServer : Node
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public void Register(IVirtualCamera camera, CancellationToken token)
+	public void Register(IVirtualCamera camera/*, CancellationToken token*/)
 	{
 		if (Engine.IsEditorHint())
 		{
 			return;
 		}
 		this.ManagedVirtualCameras.Add(camera);
-		Callable callable = Callable.From(() => this.EvaluateCameraPriority(camera));
-		if (!Engine.IsEditorHint())
-		{
-			camera.AsNode().Connect(IVirtualCamera.SignalName_PriorityChanged, callable);
-		}
-		token.Register(() =>
-		{
-			if (!Engine.IsEditorHint())
-			{
-				camera.AsNode().Disconnect(IVirtualCamera.SignalName_PriorityChanged, callable);
-			}
-			this.Unregister(camera);
-		});
-		// Ignore registrations before READY event. When the node is ready, we evaluate all registered cameras.
+		camera.AsNode().Connect(
+			IVirtualCamera.SignalName_PriorityChanged,
+			Callable.From((double oldPriority) => this.EvaluateCameraPriority(camera, oldPriority))
+		);
 		if (this.IsNodeReady()) {
 			this.EvaluateCameraPriority(camera);
 		}
 	}
 
-	private void Unregister(IVirtualCamera camera)
+	public void Unregister(IVirtualCamera camera)
 	{
 		if (Engine.IsEditorHint())
 		{
@@ -165,8 +155,15 @@ public partial class GDirectorServer : Node
 		}
 	}
 
-	private void EvaluateCameraPriority(IVirtualCamera camera)
+	private void EvaluateCameraPriority(IVirtualCamera camera, double oldPriority = double.NegativeInfinity)
 	{
+		// TODO We should not reevaluate all cameras every time the current camera reduces priority. Instead, we should
+		// keep a reference to the next best camera.
+		if (camera == this.CurrentLiveCamera && camera.Priority < oldPriority - Mathf.Epsilon)
+		{
+			this.ReevaluateCameraSelection();
+			return;
+		}
 		if (
 			this.LiveCameraOverride != null
 			|| camera.Priority <= (this.CurrentLiveCamera?.Priority ?? float.NegativeInfinity)
