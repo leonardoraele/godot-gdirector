@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using Godot;
@@ -54,10 +55,33 @@ public partial class VirtualCamera2D : Node2D, IVirtualCamera
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
+		if (Engine.IsEditorHint())
+		{
+			this.SetProcess(false);
+			return;
+		}
 		this.AsInterface()._Process();
 		this.CallDeferred(MethodName.CheckPriorityChange, this.Priority);
 		this.UpdateGodotCamera2D();
 	}
+
+	public override void _Draw()
+	{
+		base._Draw();
+		if (!Engine.IsEditorHint())
+		{
+			return;
+		}
+		Vector2 screenSize = GDirectorServer.Instance.ScreenSize;
+		this.DrawRect(new Rect2(screenSize / -2, screenSize), Colors.Blue with { A = 0.5f }, false);
+	}
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// METHODS
+	// -----------------------------------------------------------------------------------------------------------------
+
+	public IVirtualCamera AsInterface() => this;
+	public VirtualCamera2D As2D() => this;
 
 	private void CheckPriorityChange(double oldPriority)
 	{
@@ -80,11 +104,4 @@ public partial class VirtualCamera2D : Node2D, IVirtualCamera
 			);
 		rcam.GlobalRotation = this.GlobalRotation;
 	}
-
-	// -----------------------------------------------------------------------------------------------------------------
-	// METHODS
-	// -----------------------------------------------------------------------------------------------------------------
-
-	public IVirtualCamera AsInterface() => this;
-	public VirtualCamera2D As2D() => this;
 }

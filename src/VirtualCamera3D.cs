@@ -53,8 +53,14 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
+		if (Engine.IsEditorHint())
+		{
+			this.SetProcess(false);
+			return;
+		}
 		this.AsInterface()._Process();
 		this.CallDeferred(MethodName.CheckPriorityChange, this.Priority);
+		this.UpdateGodotCamera3D();
 	}
 
 	private void CheckPriorityChange(double oldPriority)
@@ -70,4 +76,14 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 
 	public IVirtualCamera AsInterface() => this;
 	public VirtualCamera3D As3D() => this;
+
+	private void UpdateGodotCamera3D()
+	{
+		if (!this.AsInterface().IsLive || GDirectorServer.Instance.GodotCamera3D is not Camera3D rcam)
+		{
+			return;
+		}
+		rcam.GlobalPosition = this.GlobalPosition;
+		rcam.GlobalRotation = this.GlobalRotation;
+	}
 }

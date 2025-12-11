@@ -86,18 +86,29 @@ public partial class VirtualCamera2DComponent : Node2D
 	public override void _EnterTree()
 	{
 		base._EnterTree();
+		if (Engine.IsEditorHint()) {
+			this.SetMeta("_edit_lock_", true);
+			return;
+		}
 		this.Camera.IsLiveChanged += this.OnIsLiveChanged;
 	}
 
 	public override void _ExitTree()
 	{
 		base._ExitTree();
+		if (Engine.IsEditorHint()) {
+			return;
+		}
 		this.Camera.IsLiveChanged -= this.OnIsLiveChanged;
 	}
 
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
+		if (Engine.IsEditorHint())
+		{
+			return;
+		}
 		if (this.IsLive && GDirectorServer.Instance.GodotCamera2D is Camera2D rcam)
 		{
 			this._ProcessIsLive(rcam, delta);

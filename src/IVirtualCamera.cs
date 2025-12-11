@@ -54,18 +54,14 @@ public interface IVirtualCamera
 		}
 	}
 
-	public void _EnterTree(CancellationToken token) => GDirectorServer.Instance.Register(this, token);
+	public void _EnterTree(CancellationToken token)
+	{
+		GDirectorServer.Instance.Register(this, token);
+		this.AsNode().SetMeta("_edit_group_", true);
+	}
 	public void _ExitTree() {}
 
-	public void _Process()
-	{
-		if (Engine.IsEditorHint())
-		{
-			this.AsNode().SetProcess(false);
-			return;
-		}
-		this.Priority = this.BasePriority;
-	}
+	public void _Process() => this.Priority = this.BasePriority;
 
 	public Node AsNode() => (Node) this;
 	public bool Is2D() => this.As2D() != null;

@@ -29,7 +29,7 @@ public partial class GDirectorPlugin : EditorPlugin
 		// 2D Camera Components
 		this.AddCustomType(nameof(VirtualCamera2DComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponent)}.cs"), vcamIcon);
 		this.AddCustomType(nameof(FramingComponent2D), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera2DComponents)}/{nameof(FramingComponent2D)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(VirtualCamera2DComponents.TweenComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera2DComponents)}/{nameof(VirtualCamera2DComponents.TweenComponent)}.cs"), vcamTraIcon);
+		this.AddCustomType(nameof(TweenComponent2D), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera2DComponents)}/{nameof(VirtualCamera2DComponents.TweenComponent2D)}.cs"), vcamTraIcon);
 
 		// 3D Camera Components
 		this.AddCustomType(nameof(VirtualCamera3DComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponent)}.cs"), vcamIcon);
@@ -42,7 +42,7 @@ public partial class GDirectorPlugin : EditorPlugin
 		this.AddCustomType(nameof(MimicRotation3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(MimicRotation3D)}.cs"), vcamRotIcon);
 		this.AddCustomType(nameof(OrbitalMovement3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(OrbitalMovement3D)}.cs"), vcamPosIcon);
 		this.AddCustomType(nameof(ProximityPriority3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(ProximityPriority3D)}.cs"), vcamPriIcon);
-		this.AddCustomType(nameof(VirtualCamera3DComponents.TweenComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(VirtualCamera3DComponents.TweenComponent)}.cs"), vcamTraIcon);
+		this.AddCustomType(nameof(TweenComponent3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(VirtualCamera3DComponents.TweenComponent3D)}.cs"), vcamTraIcon);
 
 		// Camera Preview Window
 		// this.SetupCameraPreviewWindow();
@@ -62,7 +62,7 @@ public partial class GDirectorPlugin : EditorPlugin
 		// 2D Camera Components
 		this.RemoveCustomType(nameof(VirtualCamera2DComponent));
 		this.RemoveCustomType(nameof(FramingComponent2D));
-		this.RemoveCustomType(nameof(VirtualCamera2DComponents.TweenComponent));
+		this.RemoveCustomType(nameof(TweenComponent2D));
 
 		// 3D Camera Components
 		this.RemoveCustomType(nameof(VirtualCamera3DComponent));
@@ -75,7 +75,7 @@ public partial class GDirectorPlugin : EditorPlugin
 		this.RemoveCustomType(nameof(MimicRotation3D));
 		this.RemoveCustomType(nameof(OrbitalMovement3D));
 		this.RemoveCustomType(nameof(ProximityPriority3D));
-		this.RemoveCustomType(nameof(VirtualCamera3DComponents.TweenComponent));
+		this.RemoveCustomType(nameof(TweenComponent3D));
 	}
 
 	// private void SetupCameraPreviewWindow()

@@ -16,7 +16,7 @@ namespace Raele.GDirector.VirtualCamera3DComponents;
 // but to the target positoin of the previous transition.
 // (i.e. the position the camera should be positioned if that transition had not be canceled)
 // This way the camera will smoothly blend from one transition to the next without an abrupt cut.
-public partial class TweenComponent : VirtualCamera3DComponent
+public partial class TweenComponent3D : VirtualCamera3DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS

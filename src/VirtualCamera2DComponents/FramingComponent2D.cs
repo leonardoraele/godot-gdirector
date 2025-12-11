@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot;
 
 namespace Raele.GDirector.VirtualCamera2DComponents;
@@ -24,15 +25,27 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 
 	[ExportGroup("Dead Zone")]
 	// [Export] public DeadZoneTypeEnum DeadZoneType = DeadZoneTypeEnum.Rectangle;
-	[Export(PropertyHint.Range, "0,1")] public Vector2 DeadZoneSize = Vector2.Zero;
+	[Export(PropertyHint.Range, "0,1")] public Vector2 DeadZoneSize
+		{ get => field; set { field = value; this.QueueRedraw(); } }
+		= Vector2.Zero;
 	[Export] public bool CenterOnActivation = false;
 
 	[ExportGroup("Damping")]
-	[Export(PropertyHint.Range, "0,1")] public float SoftZoneTopMargin = 0f;
-	[Export(PropertyHint.Range, "0,1")] public float SoftZoneRightMargin = 0f;
-	[Export(PropertyHint.Range, "0,1")] public float SoftZoneBottomMargin = 0f;
-	[Export(PropertyHint.Range, "0,1")] public float SoftZoneLeftMargin = 0f;
-	[Export(PropertyHint.Range, "0.001,1")] public float LerpWeight = 0.15f;
+	[Export(PropertyHint.Range, "0,1")] public float SoftZoneTopMargin
+		{ get => field; set { field = value; this.QueueRedraw(); } }
+		= 0f;
+	[Export(PropertyHint.Range, "0,1")] public float SoftZoneRightMargin
+		{ get => field; set { field = value; this.QueueRedraw(); } }
+		= 0f;
+	[Export(PropertyHint.Range, "0,1")] public float SoftZoneBottomMargin
+		{ get => field; set { field = value; this.QueueRedraw(); } }
+		= 0f;
+	[Export(PropertyHint.Range, "0,1")] public float SoftZoneLeftMargin
+		{ get => field; set { field = value; this.QueueRedraw(); } }
+		= 0f;
+	[Export(PropertyHint.Range, "0.001,1")] public float LerpWeight
+		{ get => field; set { field = value; this.QueueRedraw(); } }
+		= 0.15f;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
@@ -61,22 +74,22 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 	/// The global position that is in <see cref="ScreenPosition"/> at this time.
 	/// </summary>
 	public Vector2 GlobalFocusPointPosition => this.Camera.GlobalPosition
-		- (this.ScreenPosition - new Vector2(0.5f, 0.5f)) * this.Camera.GetViewportRect().Size;
+		- (this.ScreenPosition - new Vector2(0.5f, 0.5f)) * GDirectorServer.Instance.ScreenSize;
 	/// <summary>
 	/// The dead zone rectangle in world coordinates.
 	/// </summary>
 	public Rect2 GlobalDeadZoneRect => new Rect2(
-		this.GlobalFocusPointPosition - this.DeadZoneSize * 0.5f * this.Camera.GetViewportRect().Size,
-		this.DeadZoneSize * this.Camera.GetViewportRect().Size
+		this.GlobalFocusPointPosition - this.DeadZoneSize * 0.5f * GDirectorServer.Instance.ScreenSize,
+		this.DeadZoneSize * GDirectorServer.Instance.ScreenSize
 	);
 	public Rect2 GlobalHardLimitRect => new Rect2()
 		{
 			Position = this.GlobalDeadZoneRect.Position
 				- new Vector2(this.SoftZoneLeftMargin, this.SoftZoneTopMargin)
-				* this.Camera.GetViewportRect().Size,
+				* GDirectorServer.Instance.ScreenSize,
 			End = this.GlobalDeadZoneRect.End
 				+ new Vector2(this.SoftZoneRightMargin, this.SoftZoneBottomMargin)
-				* this.Camera.GetViewportRect().Size
+				* GDirectorServer.Instance.ScreenSize
 		};
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -177,7 +190,7 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 		if (this.CenterOnActivation)
 		{
 			this.Camera.GlobalPosition = this.OffesetFramingTargetGlobalPosition
-				- (this.ScreenPosition - new Vector2(0.5f, 0.5f)) * this.Camera.GetViewportRect().Size;
+				- (this.ScreenPosition - new Vector2(0.5f, 0.5f)) * GDirectorServer.Instance.ScreenSize;
 		}
 	}
 
@@ -185,5 +198,53 @@ public partial class FramingComponent2D : VirtualCamera2DComponent
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
 
+	public override void _Draw()
+	{
+		base._Draw();
 
+		if (!Engine.IsEditorHint())
+		{
+			return;
+		}
+
+		Vector2[] screenPolygon = [
+			this.ToLocal(new Vector2(-GDirectorServer.Instance.ScreenSize.X / 2, -GDirectorServer.Instance.ScreenSize.Y / 2)),
+			this.ToLocal(new Vector2(GDirectorServer.Instance.ScreenSize.X / 2, -GDirectorServer.Instance.ScreenSize.Y / 2)),
+			this.ToLocal(new Vector2(GDirectorServer.Instance.ScreenSize.X / 2, GDirectorServer.Instance.ScreenSize.Y / 2)),
+			this.ToLocal(new Vector2(-GDirectorServer.Instance.ScreenSize.X / 2, GDirectorServer.Instance.ScreenSize.Y / 2))
+		];
+		Vector2[] hardLimitPolygon = [
+			this.ToLocal(this.GlobalHardLimitRect.Position),
+			this.ToLocal(new Vector2(this.GlobalHardLimitRect.End.X, this.GlobalHardLimitRect.Position.Y)),
+			this.ToLocal(this.GlobalHardLimitRect.End),
+			this.ToLocal(new Vector2(this.GlobalHardLimitRect.Position.X, this.GlobalHardLimitRect.End.Y))
+		];
+		Vector2[] deadZonePolygon = [
+			this.ToLocal(this.GlobalDeadZoneRect.Position),
+			this.ToLocal(new Vector2(this.GlobalDeadZoneRect.End.X, this.GlobalDeadZoneRect.Position.Y)),
+			this.ToLocal(this.GlobalDeadZoneRect.End),
+			this.ToLocal(new Vector2(this.GlobalDeadZoneRect.Position.X, this.GlobalDeadZoneRect.End.Y))
+		];
+
+		// Draw hard limit area
+		Geometry2D.ClipPolygons(screenPolygon, hardLimitPolygon)
+			.ToList()
+			.ForEach(polygon => this.DrawColoredPolygon(polygon, Colors.Red with { A = 0.25f }));
+
+		// Draw soft zone area
+		Geometry2D.ClipPolygons(hardLimitPolygon, deadZonePolygon)
+			.ToList()
+			.ForEach(polygon => this.DrawColoredPolygon(polygon, Colors.Blue with { A = 0.25f }));
+
+		// Draw focus point
+		float focusPointSize = 4f;
+		this.DrawRect(
+			new Rect2(
+				this.ToLocal(this.GlobalFocusPointPosition) - Vector2.One * focusPointSize / 2,
+				Vector2.One * focusPointSize
+			),
+			Colors.White,
+			filled: true
+		);
+	}
 }

@@ -99,6 +99,14 @@ public partial class GDirectorServer : Node
 			? this.ManagedVirtualCameras
 			: this.ManagedVirtualCameras.Where(camera => camera.AsNode().IsInGroup(this.ActiveGroup));
 
+	public Vector2 ScreenSize
+		=> Engine.IsEditorHint()
+			? new Vector2(
+				ProjectSettings.GetSetting("display/window/size/viewport_width").AsInt32(),
+				ProjectSettings.GetSetting("display/window/size/viewport_height").AsInt32()
+			)
+			: this.GetViewport().GetVisibleRect().Size;
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// OVERRIDES
 	// -----------------------------------------------------------------------------------------------------------------
@@ -106,10 +114,11 @@ public partial class GDirectorServer : Node
 	public override void _Ready()
 	{
 		base._Ready();
-		if (!Engine.IsEditorHint())
+		if (Engine.IsEditorHint())
 		{
-			this.ReevaluateCameraSelection();
+			return;
 		}
+		this.ReevaluateCameraSelection();
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -118,6 +127,10 @@ public partial class GDirectorServer : Node
 
 	public void Register(IVirtualCamera camera, CancellationToken token)
 	{
+		if (Engine.IsEditorHint())
+		{
+			return;
+		}
 		this.ManagedVirtualCameras.Add(camera);
 		Callable callable = Callable.From(() => this.EvaluateCameraPriority(camera));
 		if (!Engine.IsEditorHint())
@@ -140,6 +153,10 @@ public partial class GDirectorServer : Node
 
 	private void Unregister(IVirtualCamera camera)
 	{
+		if (Engine.IsEditorHint())
+		{
+			return;
+		}
 		this.ManagedVirtualCameras.Remove(camera);
 		if (camera == this.LiveCameraOverride) {
 			this.LiveCameraOverride = null;
@@ -162,6 +179,10 @@ public partial class GDirectorServer : Node
 
 	private void ReevaluateCameraSelection()
 	{
+		if (Engine.IsEditorHint())
+		{
+			return;
+		}
 		if (this.LiveCameraOverride != null) {
 			this.SetCameraLive(this.LiveCameraOverride);
 			return;
