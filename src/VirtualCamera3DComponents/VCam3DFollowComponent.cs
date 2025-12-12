@@ -13,7 +13,7 @@ namespace Raele.GDirector.VirtualCamera3DComponents;
 /// This camera controller is useful for following objects that move at high speeds, but it's not ideal for
 /// player-controlled characters in most games.
 /// </summary>
-public partial class FollowComponent3D : VirtualCamera3DComponent
+public partial class VCam3DFollowComponent : VirtualCamera3DComponent
 {
 	/// <summary>
 	/// The node to follow.
@@ -76,7 +76,7 @@ public partial class FollowComponent3D : VirtualCamera3DComponent
 	{
 		base._Process(delta);
 		if (this.FollowTarget == null) {
-			GD.PushWarning(nameof(FollowComponent3D) + " node requires a valid FollowTarget, but it's empty.");
+			GD.PushWarning(nameof(VCam3DFollowComponent) + " node requires a valid FollowTarget, but it's empty.");
 			return;
 		}
 

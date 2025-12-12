@@ -1,12 +1,9 @@
-using System;
-using System.Linq;
 using Godot;
-using Microsoft.VisualBasic;
 
 namespace Raele.GDirector.VirtualCamera2DComponents;
 
 [Tool]
-public partial class AreaConstraintComponent2D : VirtualCamera2DComponent
+public partial class VCam2DAreaConstraintComponent : VirtualCamera2DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS

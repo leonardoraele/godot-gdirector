@@ -1,9 +1,8 @@
-using System.Linq;
 using Godot;
 
-namespace Raele.GDirector.VirtualCamera2DComponents;
+namespace Raele.GDirector;
 
-public partial class AreaPriorityComponent : VirtualCamera2DComponent
+public partial class ProcessComponent : VirtualCameraComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
@@ -15,12 +14,7 @@ public partial class AreaPriorityComponent : VirtualCamera2DComponent
 	// EXPORTS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	[Export] public Area2D? Area = null;
-	[Export] public float PriorityAdd = 1f;
-	[Export] public bool AddPriorityPerBodyInArea = false;
-
-	[ExportGroup("Filter")]
-	[Export] public string MonitoredNodeGroup = "";
+	[Export] public Node[]? Nodes;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
@@ -67,35 +61,10 @@ public partial class AreaPriorityComponent : VirtualCamera2DComponent
 	// 	base._Ready();
 	// }
 
-	public override void _Process(double delta)
-	{
-		base._Process(delta);
-
-		if (this.Area == null)
-		{
-			return;
-		}
-
-		if (this.AddPriorityPerBodyInArea)
-		{
-			this.Camera.Priority += this.PriorityAdd
-				* this.Area.GetOverlappingBodies()
-					.Where(
-						string.IsNullOrWhiteSpace(this.MonitoredNodeGroup)
-							? _ => true
-							: body => body.IsInGroup(this.MonitoredNodeGroup)
-					)
-					.Count();
-		}
-		else if (
-			string.IsNullOrWhiteSpace(this.MonitoredNodeGroup)
-				? this.Area.HasOverlappingBodies() == true
-				: this.Area.GetOverlappingBodies().Any(body => body.IsInGroup(this.MonitoredNodeGroup))
-		)
-		{
-			this.Camera.Priority += this.PriorityAdd;
-		}
-	}
+	// public override void _Process(double delta)
+	// {
+	// 	base._Process(delta);
+	// }
 
 	// public override void _PhysicsProcess(double delta)
 	// {
@@ -104,7 +73,7 @@ public partial class AreaPriorityComponent : VirtualCamera2DComponent
 
 	// public override string[] _GetConfigurationWarnings()
 	// 	=> new List<string>()
-	// 		.Concat(true ? [] : ["Some warning"])
+	// 		.Concat(true ? ["Some warning"] : [])
 	// 		.ToArray();
 
 	// public override void _ValidateProperty(Godot.Collections.Dictionary property)
@@ -120,5 +89,6 @@ public partial class AreaPriorityComponent : VirtualCamera2DComponent
 	// -----------------------------------------------------------------------------------------------------------------
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
+
 
 }

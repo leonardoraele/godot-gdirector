@@ -10,7 +10,7 @@ namespace Raele.GDirector.VirtualCamera3DComponents;
 // Right now, the behavior is to preserve the angle of the camera from the pivot, while changing the camera's position
 // as needed. The alternative would be to make the move as little as possible while remaining in the orbit, and changing
 // the camera angle as much as needed.
-public partial class OrbitalMovement3D : VirtualCamera3DComponent
+public partial class VCam3DOrbitComponent : VirtualCamera3DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// EXPORTED FIELDS
@@ -174,7 +174,7 @@ public partial class OrbitalMovement3D : VirtualCamera3DComponent
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public OrbitalMovement3D()
+	public VCam3DOrbitComponent()
 	{
 		this.pivotPositionCalculation = new(this);
 		this.cameraDistanceCalculation = new(this);
@@ -229,8 +229,8 @@ public partial class OrbitalMovement3D : VirtualCamera3DComponent
 		/// <see cref="PivotPosition">.
 		/// </summary>
 		private Vector3 AnchorPivotPosition = Vector3.Zero;
-		private OrbitalMovement3D Controller;
-		public PivotPositionController(OrbitalMovement3D controller) => Controller = controller;
+		private VCam3DOrbitComponent Controller;
+		public PivotPositionController(VCam3DOrbitComponent controller) => Controller = controller;
 		public Vector3 InitializePivotPosition() => this.AnchorPivotPosition = this.GetTargetPivotPosition();
 		/// <summary>
 		/// Calculates the position the camera should be orbiting around in the next frame. Every time this method is
@@ -285,7 +285,7 @@ public partial class OrbitalMovement3D : VirtualCamera3DComponent
 		/// camera should start automatically rotating around the pivot again.
 		/// </summary>
 		private ulong LastOrbitalMovementPlayerInputTimestamp = 0;
-		private OrbitalMovement3D Controller;
+		private VCam3DOrbitComponent Controller;
 		private Vector2 MouseInput;
 
 		private ulong TimeSinceLastOrbitalMovementPlayerInputMs
@@ -294,7 +294,7 @@ public partial class OrbitalMovement3D : VirtualCamera3DComponent
 		private float InitialAngleRad => Mathf.DegToRad(this.Controller.AngleDeg);
 		private float MinAngleRad => Mathf.DegToRad(this.Controller.MinAngleDeg);
 		private float MaxAngleRad => Mathf.DegToRad(this.Controller.MaxAngleDeg);
-		public CameraDirectionController(OrbitalMovement3D controller) => Controller = controller;
+		public CameraDirectionController(VCam3DOrbitComponent controller) => Controller = controller;
 		public Vector3 InitializeCameraDirection(Vector3 pivotPosition)
 		{
 			if (this.Controller.Camera.GlobalPosition.DistanceSquaredTo(pivotPosition) < Mathf.Epsilon) {
@@ -389,8 +389,8 @@ public partial class OrbitalMovement3D : VirtualCamera3DComponent
 		/// is smoothed toward this target distance.
 		/// </summary>
 		private float TargetCameraDistance;
-		private OrbitalMovement3D Controller;
-		public CameraDistanceController(OrbitalMovement3D controller) => Controller = controller;
+		private VCam3DOrbitComponent Controller;
+		public CameraDistanceController(VCam3DOrbitComponent controller) => Controller = controller;
 		public float InitializeCameraDistance()
 			=> this.TargetCameraDistance = this.AnchorCameraDistance = this.Controller.Distance;
 		/// <summary>

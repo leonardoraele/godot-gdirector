@@ -1,9 +1,9 @@
+using System.Linq;
 using Godot;
-using Raele.GDirector;
 
 namespace Raele.GDirector.VirtualCamera2DComponents;
 
-public partial class ShakeComponent2D : VirtualCamera2DComponent
+public partial class VCam2DAreaPriorityComponent : VirtualCamera2DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
@@ -15,7 +15,12 @@ public partial class ShakeComponent2D : VirtualCamera2DComponent
 	// EXPORTS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	// [Export] public
+	[Export] public Area2D? Area = null;
+	[Export] public float PriorityAdd = 1f;
+	[Export] public bool AddPriorityPerBodyInArea = false;
+
+	[ExportGroup("Filter")]
+	[Export] public string MonitoredNodeGroup = "";
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
@@ -62,10 +67,35 @@ public partial class ShakeComponent2D : VirtualCamera2DComponent
 	// 	base._Ready();
 	// }
 
-	// public override void _Process(double delta)
-	// {
-	// 	base._Process(delta);
-	// }
+	public override void _Process(double delta)
+	{
+		base._Process(delta);
+
+		if (this.Area == null)
+		{
+			return;
+		}
+
+		if (this.AddPriorityPerBodyInArea)
+		{
+			this.Camera.Priority += this.PriorityAdd
+				* this.Area.GetOverlappingBodies()
+					.Where(
+						string.IsNullOrWhiteSpace(this.MonitoredNodeGroup)
+							? _ => true
+							: body => body.IsInGroup(this.MonitoredNodeGroup)
+					)
+					.Count();
+		}
+		else if (
+			string.IsNullOrWhiteSpace(this.MonitoredNodeGroup)
+				? this.Area.HasOverlappingBodies() == true
+				: this.Area.GetOverlappingBodies().Any(body => body.IsInGroup(this.MonitoredNodeGroup))
+		)
+		{
+			this.Camera.Priority += this.PriorityAdd;
+		}
+	}
 
 	// public override void _PhysicsProcess(double delta)
 	// {
@@ -90,6 +120,5 @@ public partial class ShakeComponent2D : VirtualCamera2DComponent
 	// -----------------------------------------------------------------------------------------------------------------
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
-
 
 }

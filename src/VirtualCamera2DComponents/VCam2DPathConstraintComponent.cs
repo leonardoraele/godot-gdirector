@@ -1,9 +1,9 @@
 using Godot;
-using Raele.GDirector.VirtualCamera2DComponents;
+using Raele.GDirector;
 
-namespace Raele.GDirector.Editor;
+namespace Raele.GDirector.VirtualCamera2DComponents;
 
-public partial class AreaConstraintEditor : ResizeableRect
+public partial class VCam2DPathConstraintComponent : VirtualCamera2DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
@@ -21,15 +21,7 @@ public partial class AreaConstraintEditor : ResizeableRect
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public VCam2DAreaConstraintComponent? EditTarget
-	{
-		get => field;
-		set
-		{
-			field = value;
-			this.Visible = field != null;
-		}
-	} = null;
+
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// COMPUTED PROPERTIES
@@ -41,7 +33,7 @@ public partial class AreaConstraintEditor : ResizeableRect
 	// SIGNALS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	// [Signal] public delegate void EventHandler();
+	// [Signal] public delegate void EventHandler()
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// INTERNAL TYPES
@@ -55,35 +47,25 @@ public partial class AreaConstraintEditor : ResizeableRect
 	// OVERRIDES
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public override void _EnterTree()
-	{
-		base._EnterTree();
-		this.TargetResized += this.OnTargetResized;
-	}
+	// public override void _EnterTree()
+	// {
+	// 	base._EnterTree();
+	// }
 
-	public override void _ExitTree()
-	{
-		base._ExitTree();
-		this.TargetResized -= this.OnTargetResized;
-	}
+	// public override void _ExitTree()
+	// {
+	// 	base._ExitTree();
+	// }
 
 	// public override void _Ready()
 	// {
 	// 	base._Ready();
 	// }
 
-	public override void _Process(double delta)
-	{
-		base._Process(delta);
-
-		if (this.EditTarget == null)
-		{
-			return;
-		}
-
-		this.Position = this.EditTarget.GetViewportTransform() * this.EditTarget.Region.Position;
-		this.Size = this.EditTarget.GetViewportTransform() * this.EditTarget.Region.End - this.Position;
-	}
+	// public override void _Process(double delta)
+	// {
+	// 	base._Process(delta);
+	// }
 
 	// public override void _PhysicsProcess(double delta)
 	// {
@@ -92,7 +74,7 @@ public partial class AreaConstraintEditor : ResizeableRect
 
 	// public override string[] _GetConfigurationWarnings()
 	// 	=> new List<string>()
-	// 		.Concat(true ? ["Some warning"] : [])
+	// 		.Concat(true ? [] : ["Some warning"])
 	// 		.ToArray();
 
 	// public override void _ValidateProperty(Godot.Collections.Dictionary property)
@@ -109,13 +91,5 @@ public partial class AreaConstraintEditor : ResizeableRect
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	private void OnTargetResized()
-	{
-		this.EditTarget?.Region.Position = this.EditTarget.GetViewport().GetScreenTransform().AffineInverse()
-			* this.GetViewport().GetScreenTransform()
-			* this.GlobalPosition;
-		this.EditTarget?.Region.End = this.EditTarget.GetViewport().GetScreenTransform().AffineInverse()
-			* this.GetViewport().GetScreenTransform()
-			* (this.GlobalPosition + this.Size);
-	}
+
 }

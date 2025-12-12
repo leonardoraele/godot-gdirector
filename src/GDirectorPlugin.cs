@@ -9,13 +9,13 @@ namespace Raele.GDirector;
 [Tool]
 public partial class GDirectorPlugin : EditorPlugin
 {
-	private AreaConstraintComponent2D? AreaEditTarget = null;
+	private VCam2DAreaConstraintComponent? AreaEditTarget = null;
 	private AreaConstraintEditor AreaEditor = new();
-	public override bool _Handles(GodotObject @object) => @object is AreaConstraintComponent2D;
+	public override bool _Handles(GodotObject @object) => @object is VCam2DAreaConstraintComponent;
 	public override void _Edit(GodotObject @object)
 	{
 		base._Edit(@object);
-		this.AreaEditor.Component = this.AreaEditTarget = @object as AreaConstraintComponent2D;
+		this.AreaEditor.EditTarget = this.AreaEditTarget = @object as VCam2DAreaConstraintComponent;
 	}
 	public override void _ForwardCanvasDrawOverViewport(Control viewportControl)
 	{
@@ -43,23 +43,22 @@ public partial class GDirectorPlugin : EditorPlugin
 		this.AddCustomType(nameof(VirtualCamera3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3D)}.cs"), vcamIcon);
 
 		// 2D Camera Components
-		this.AddCustomType(nameof(AreaConstraintComponent2D), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera2DComponents)}/{nameof(AreaConstraintComponent2D)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(AreaPriorityComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera2DComponents)}/{nameof(AreaPriorityComponent)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(FramingComponent2D), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera2DComponents)}/{nameof(FramingComponent2D)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(TweenComponent2D), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera2DComponents)}/{nameof(VirtualCamera2DComponents.TweenComponent2D)}.cs"), vcamTraIcon);
+		this.AddCustomType(nameof(VCam2DAreaConstraintComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DAreaConstraintComponent)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(VCam2DAreaPriorityComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DAreaPriorityComponent)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(VCam2DFramingComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DFramingComponent)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(VCam2DTweenComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DTweenComponent)}.cs"), vcamTraIcon);
 
 		// 3D Camera Components
-		this.AddCustomType(nameof(VirtualCamera3DComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponent)}.cs"), vcamIcon);
-		this.AddCustomType(nameof(FollowComponent3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(FollowComponent3D)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(FramingComponent3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(FramingComponent3D)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(FramingPriority3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(FramingPriority3D)}.cs"), vcamPriIcon);
-		this.AddCustomType(nameof(LineOfSightPriority3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(LineOfSightPriority3D)}.cs"), vcamPriIcon);
-		this.AddCustomType(nameof(LookAtTarget3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(LookAtTarget3D)}.cs"), vcamRotIcon);
-		this.AddCustomType(nameof(MimicMovement3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(MimicMovement3D)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(MimicRotation3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(MimicRotation3D)}.cs"), vcamRotIcon);
-		this.AddCustomType(nameof(OrbitalMovement3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(OrbitalMovement3D)}.cs"), vcamPosIcon);
-		this.AddCustomType(nameof(ProximityPriority3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(ProximityPriority3D)}.cs"), vcamPriIcon);
-		this.AddCustomType(nameof(TweenComponent3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(Raele.GDirector)}/src/{nameof(GDirector.VirtualCamera3DComponents)}/{nameof(VirtualCamera3DComponents.TweenComponent3D)}.cs"), vcamTraIcon);
+		this.AddCustomType(nameof(VCam3DFollowComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponents)}/{nameof(VCam3DFollowComponent)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(VCam3DFramingComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponents)}/{nameof(VCam3DFramingComponent)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(VCam3DFramingPriorityComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponents)}/{nameof(VCam3DFramingPriorityComponent)}.cs"), vcamPriIcon);
+		this.AddCustomType(nameof(VCam3DLineOfSightPriorityComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponents)}/{nameof(VCam3DLineOfSightPriorityComponent)}.cs"), vcamPriIcon);
+		this.AddCustomType(nameof(VCam3DLookAtTargetComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponents)}/{nameof(VCam3DLookAtTargetComponent)}.cs"), vcamRotIcon);
+		this.AddCustomType(nameof(VCam3DMimicMovementComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponents)}/{nameof(VCam3DMimicMovementComponent)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(VCam3DMimicRotationComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponents)}/{nameof(VCam3DMimicRotationComponent)}.cs"), vcamRotIcon);
+		this.AddCustomType(nameof(VCam3DOrbitComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponents)}/{nameof(VCam3DOrbitComponent)}.cs"), vcamPosIcon);
+		this.AddCustomType(nameof(VCam3DProximityPriorityComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponents)}/{nameof(VCam3DProximityPriorityComponent)}.cs"), vcamPriIcon);
+		this.AddCustomType(nameof(VCam3DTweenComponent), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3DComponents)}/{nameof(VCam3DTweenComponent)}.cs"), vcamTraIcon);
 
 		// Camera Preview Window
 		// this.SetupCameraPreviewWindow();
@@ -77,23 +76,22 @@ public partial class GDirectorPlugin : EditorPlugin
 		this.RemoveCustomType(nameof(VirtualCamera3D));
 
 		// 2D Camera Components
-		this.RemoveCustomType(nameof(AreaConstraintComponent2D));
-		this.RemoveCustomType(nameof(AreaPriorityComponent));
-		this.RemoveCustomType(nameof(FramingComponent2D));
-		this.RemoveCustomType(nameof(TweenComponent2D));
+		this.RemoveCustomType(nameof(VCam2DAreaConstraintComponent));
+		this.RemoveCustomType(nameof(VCam2DAreaPriorityComponent));
+		this.RemoveCustomType(nameof(VCam2DFramingComponent));
+		this.RemoveCustomType(nameof(VCam2DTweenComponent));
 
 		// 3D Camera Components
-		this.RemoveCustomType(nameof(VirtualCamera3DComponent));
-		this.RemoveCustomType(nameof(FollowComponent3D));
-		this.RemoveCustomType(nameof(FramingComponent3D));
-		this.RemoveCustomType(nameof(FramingPriority3D));
-		this.RemoveCustomType(nameof(LineOfSightPriority3D));
-		this.RemoveCustomType(nameof(LookAtTarget3D));
-		this.RemoveCustomType(nameof(MimicMovement3D));
-		this.RemoveCustomType(nameof(MimicRotation3D));
-		this.RemoveCustomType(nameof(OrbitalMovement3D));
-		this.RemoveCustomType(nameof(ProximityPriority3D));
-		this.RemoveCustomType(nameof(TweenComponent3D));
+		this.RemoveCustomType(nameof(VCam3DFollowComponent));
+		this.RemoveCustomType(nameof(VCam3DFramingComponent));
+		this.RemoveCustomType(nameof(VCam3DFramingPriorityComponent));
+		this.RemoveCustomType(nameof(VCam3DLineOfSightPriorityComponent));
+		this.RemoveCustomType(nameof(VCam3DLookAtTargetComponent));
+		this.RemoveCustomType(nameof(VCam3DMimicMovementComponent));
+		this.RemoveCustomType(nameof(VCam3DMimicRotationComponent));
+		this.RemoveCustomType(nameof(VCam3DOrbitComponent));
+		this.RemoveCustomType(nameof(VCam3DProximityPriorityComponent));
+		this.RemoveCustomType(nameof(VCam3DTweenComponent));
 	}
 
 	// TODO Alternatively, maybe override _Handles(), _MakeVisible(), and/or _Edit() to implement camera preview

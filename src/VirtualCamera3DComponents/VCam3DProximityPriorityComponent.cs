@@ -2,7 +2,7 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCamera3DComponents;
 
-public partial class ProximityPriority3D : VirtualCamera3DComponent
+public partial class VCam3DProximityPriorityComponent : VirtualCamera3DComponent
 {
 	[Export] public Node3D? ProximityTarget;
 	[Export] public Vector3 ProximityTargetOffset;

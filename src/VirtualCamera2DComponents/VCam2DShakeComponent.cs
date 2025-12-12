@@ -3,7 +3,7 @@ using Raele.GDirector;
 
 namespace Raele.GDirector.VirtualCamera2DComponents;
 
-public partial class PathConstraintComponent2D : VirtualCamera2DComponent
+public partial class VCam2DShakeComponent : VirtualCamera2DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS

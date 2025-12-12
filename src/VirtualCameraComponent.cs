@@ -1,8 +1,9 @@
 using Godot;
 
-namespace Raele.GDirector.VirtualCamera3DComponents;
+namespace Raele.GDirector;
 
-public partial class MimicMovement3D : VirtualCamera3DComponent
+[Tool]
+public partial class VirtualCameraComponent : Node2D
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
@@ -14,28 +15,20 @@ public partial class MimicMovement3D : VirtualCamera3DComponent
 	// EXPORTS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	[Export] public Node3D? Reference;
-	/// <summary>
-	/// If false, the camera will move to the exact position of the reference node at the start of the scene. If true,
-	/// the camera will preserve it's starting position.
-	/// </summary>
-	[Export] public bool PreserveDistance = true;
-
-	[ExportGroup("Smoothing")]
-	[Export(PropertyHint.Range, "0.01,1,0.01")] public float LerpWeight = 1f;
-	[Export] public float MaxDistance = 4f;
+	// TODO
+	// [Export] public bool ProcessWhenNotLive = false;
+	// [Export] public bool ProcessInEditor = false;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	private Vector3 offset;
-
 	// -----------------------------------------------------------------------------------------------------------------
-	// PROPERTIES
+	// COMPUTED PROPERTIES
 	// -----------------------------------------------------------------------------------------------------------------
 
-
+	public IVirtualCamera Camera => this.GetParent<IVirtualCamera>();
+	public bool IsLive => this.Camera.IsLive;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
@@ -47,12 +40,12 @@ public partial class MimicMovement3D : VirtualCamera3DComponent
 	// INTERNAL TYPES
 	// -----------------------------------------------------------------------------------------------------------------
 
-	// private enum Type {
-	// 	Value1,
+	// private enum ExampleEnum
+	// {
 	// }
 
 	// -----------------------------------------------------------------------------------------------------------------
-	// EVENTS
+	// VIRTUALS & OVERRIDES
 	// -----------------------------------------------------------------------------------------------------------------
 
 	// public override void _EnterTree()
@@ -60,34 +53,85 @@ public partial class MimicMovement3D : VirtualCamera3DComponent
 	// 	base._EnterTree();
 	// }
 
-	public override void _Ready()
-	{
-		base._Ready();
-		this.offset = this.Reference != null ? this.Camera.GlobalPosition - this.Reference.GlobalPosition : Vector3.Zero;
-	}
+	// public override void _ExitTree()
+	// {
+	// 	base._ExitTree();
+	// }
 
-	public override void _Process(double delta)
-	{
-		base._Process(delta);
-		if (this.Reference == null) {
-			return;
-		}
-		Vector3 targetPosition = this.Reference.GlobalPosition + this.offset;
-		Vector3 candidateNewPosition = this.Camera.GlobalPosition.Lerp(targetPosition, this.LerpWeight);
-		float distanceToTarget = candidateNewPosition.DistanceTo(targetPosition);
-		this.Camera.GlobalPosition = distanceToTarget <= this.MaxDistance
-			? candidateNewPosition
-			: targetPosition.MoveToward(this.Camera.GlobalPosition, this.MaxDistance);
-	}
+	// public override void _Ready()
+	// {
+	// 	base._Ready();
+	// }
+
+	// public override void _Process(double delta)
+	// {
+	// 	base._Process(delta);
+	// }
 
 	// public override void _PhysicsProcess(double delta)
 	// {
 	// 	base._PhysicsProcess(delta);
 	// }
 
+	// public override string[] _GetConfigurationWarnings()
+	// 	=> new List<string>()
+	// 		.Concat(true ? [] : ["Some warning"])
+	// 		.ToArray();
+
+	// public override void _ValidateProperty(Godot.Collections.Dictionary property)
+	// {
+	// 	base._ValidateProperty(property);
+	// }
+
+	public override void _EnterTree()
+	{
+		base._EnterTree();
+		if (Engine.IsEditorHint()) {
+			this.SetMeta("_edit_lock_", true);
+			return;
+		}
+		this.Camera.AsNode().Connect(IVirtualCamera.SignalName_IsLiveChanged, new Callable(this, nameof(OnIsLiveChanged)));
+	}
+
+	public override void _ExitTree()
+	{
+		base._ExitTree();
+		if (Engine.IsEditorHint()) {
+			return;
+		}
+		this.Camera.AsNode().Disconnect(IVirtualCamera.SignalName_IsLiveChanged, new Callable(this, nameof(OnIsLiveChanged)));
+	}
+
+	public override void _Process(double delta)
+	{
+		base._Process(delta);
+		if (Engine.IsEditorHint())
+		{
+			return;
+		}
+		if (this.IsLive && GDirectorServer.Instance.GodotCamera2D is Camera2D rcam)
+		{
+			this._ProcessIsLive(rcam, delta);
+		}
+	}
+
+	protected virtual void _IsLiveEnter() {}
+	protected virtual void _IsLiveExit() {}
+	protected virtual void _ProcessIsLive(Camera2D rcam, double delta) {}
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
 
-
+	private void OnIsLiveChanged(bool isLive)
+	{
+		if (isLive)
+		{
+			this._IsLiveEnter();
+		}
+		else
+		{
+			this._IsLiveExit();
+		}
+	}
 }
