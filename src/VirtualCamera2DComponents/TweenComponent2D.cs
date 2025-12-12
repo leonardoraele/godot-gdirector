@@ -160,6 +160,8 @@ public partial class TweenComponent2D : VirtualCamera2DComponent
 					= previousCamera.GlobalPosition.Lerp(this.Camera.GlobalPosition, lerpWeight);
 				GDirectorServer.Instance.GodotCamera2D?.GlobalRotation
 					= Mathf.Lerp(previousCamera.GlobalRotation, this.Camera.GlobalRotation, lerpWeight);
+				GDirectorServer.Instance.GodotCamera2D?.Zoom
+					= previousCamera.Zoom.Lerp(this.Camera.Zoom, lerpWeight);
 			}),
 			0f,
 			1f,
@@ -190,7 +192,7 @@ public partial class TweenComponent2D : VirtualCamera2DComponent
 		if (this.Tween == null) {
 			return;
 		}
-		this.Tween.CustomStep(float.PositiveInfinity);
+		this.Tween.CallDeferred(Tween.MethodName.CustomStep, float.PositiveInfinity);
 		this.EmitSignal(SignalName.TweenFinished);
 		this.EmitSignal(SignalName.TweenEnded);
 	}
