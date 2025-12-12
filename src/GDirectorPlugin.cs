@@ -1,4 +1,5 @@
 #if TOOLS
+using System;
 using Godot;
 using Raele.GDirector.VirtualCamera2DComponents;
 using Raele.GDirector.VirtualCamera3DComponents;
@@ -8,7 +9,88 @@ namespace Raele.GDirector;
 [Tool]
 public partial class GDirectorPlugin : EditorPlugin
 {
-	[Signal] public delegate void SelectionChangedEventHandler(long cameraId);
+	private int CurrentActiveControlPointIndex = -1;
+	private AreaConstraintComponent2D? areaEditTarget = null;
+	public override bool _Handles(GodotObject @object) => @object is AreaConstraintComponent2D;
+	public override void _Edit(GodotObject @object)
+	{
+		base._Edit(@object);
+		this.areaEditTarget = @object as AreaConstraintComponent2D;
+	}
+	public override void _ForwardCanvasDrawOverViewport(Control viewportControl)
+	{
+		base._ForwardCanvasDrawOverViewport(viewportControl);
+		this.areaEditTarget?.DrawOverViewport(viewportControl);
+	}
+	public override bool _ForwardCanvasGuiInput(InputEvent @event)
+	{
+		if (this.areaEditTarget == null)
+		{
+			return base._ForwardCanvasGuiInput(@event);
+		}
+		Vector2[] controlPoints = this.areaEditTarget.ControlPoints;
+		float minControlDistanceSquared = 900f;
+		Vector2 mousePos = this.areaEditTarget.GetGlobalMousePosition();
+		if (@event is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == MouseButton.Left)
+		{
+			this.CurrentActiveControlPointIndex = -1;
+			if (mouseButton.Pressed)
+			{
+				for (int i = 0; i < controlPoints.Length; i++)
+				{
+					if (mousePos.DistanceSquaredTo(controlPoints[i]) <= minControlDistanceSquared)
+					{
+						this.CurrentActiveControlPointIndex = i;
+						return true;
+					}
+				}
+			}
+		}
+		else if (@event is InputEventMouseMotion mouseMotion)
+		{
+			if (this.CurrentActiveControlPointIndex != -1)
+			{
+				switch (this.CurrentActiveControlPointIndex)
+				{
+					case 0:
+						this.areaEditTarget.Region.Position += mouseMotion.Relative;
+						this.areaEditTarget.Region.Size -= mouseMotion.Relative;
+						break;
+					case 1:
+						this.areaEditTarget.Region.Position += new Vector2(0, mouseMotion.Relative.Y);
+						this.areaEditTarget.Region.Size += new Vector2(mouseMotion.Relative.X, -mouseMotion.Relative.Y);
+						break;
+					case 2:
+						this.areaEditTarget.Region.Size += mouseMotion.Relative;
+						break;
+					case 3:
+						this.areaEditTarget.Region.Position += new Vector2(mouseMotion.Relative.X, 0);
+						this.areaEditTarget.Region.Size += new Vector2(-mouseMotion.Relative.X, mouseMotion.Relative.Y);
+						break;
+				}
+				return true;
+			}
+			if (
+				mousePos.DistanceSquaredTo(controlPoints[0]) <= minControlDistanceSquared
+				|| mousePos.DistanceSquaredTo(controlPoints[2]) <= minControlDistanceSquared
+			)
+			{
+				Input.SetDefaultCursorShape(Input.CursorShape.Bdiagsize);
+			}
+			else if (
+				mousePos.DistanceSquaredTo(controlPoints[1]) <= minControlDistanceSquared
+				|| mousePos.DistanceSquaredTo(controlPoints[3]) <= minControlDistanceSquared
+			)
+			{
+				Input.SetDefaultCursorShape(Input.CursorShape.Fdiagsize);
+			}
+			else
+			{
+				Input.SetDefaultCursorShape(Input.CursorShape.Arrow);
+			}
+		}
+		return false;
+	}
 
 	public override void _EnterTree()
 	{

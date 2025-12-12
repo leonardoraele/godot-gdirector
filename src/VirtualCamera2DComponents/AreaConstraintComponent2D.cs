@@ -1,6 +1,6 @@
-using System;
 using System.Linq;
 using Godot;
+using Microsoft.VisualBasic;
 
 namespace Raele.GDirector.VirtualCamera2DComponents;
 
@@ -22,8 +22,6 @@ public partial class AreaConstraintComponent2D : VirtualCamera2DComponent
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
-
-	private int CurrentActiveControlPointIndex = -1;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// COMPUTED PROPERTIES
@@ -128,31 +126,52 @@ public partial class AreaConstraintComponent2D : VirtualCamera2DComponent
 	// 	}
 	// }
 
-	public override void _Draw()
+	// public override void _Draw()
+	// {
+	// 	base._Draw();
+
+	// 	if (!Engine.IsEditorHint())
+	// 	{
+	// 		return;
+	// 	}
+
+	// 	Vector2[] drawPoints = this.ControlPoints.Select(this.ToLocal).ToArray();
+	// 	float width = 8f;
+	// 	float gap = 12f;
+	// 	float handleSize = 12f;
+	// 	this.DrawDashedLine(drawPoints[0], drawPoints[1], Colors.Red, width, gap);
+	// 	this.DrawDashedLine(drawPoints[1], drawPoints[2], Colors.Red, width, gap);
+	// 	this.DrawDashedLine(drawPoints[2], drawPoints[3], Colors.Red, width, gap);
+	// 	this.DrawDashedLine(drawPoints[3], drawPoints[0], Colors.Red, width, gap);
+	// 	this.DrawRect(new Rect2(drawPoints[0], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+	// 	this.DrawRect(new Rect2(drawPoints[0], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
+	// 	this.DrawRect(new Rect2(drawPoints[1], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+	// 	this.DrawRect(new Rect2(drawPoints[1], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
+	// 	this.DrawRect(new Rect2(drawPoints[2], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+	// 	this.DrawRect(new Rect2(drawPoints[2], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
+	// 	this.DrawRect(new Rect2(drawPoints[3], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+	// 	this.DrawRect(new Rect2(drawPoints[3], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
+	// }
+
+	public void DrawOverViewport(Control viewport)
 	{
-		base._Draw();
-
-		if (!Engine.IsEditorHint())
-		{
-			return;
-		}
-
-		Vector2[] drawPoints = this.ControlPoints.Select(this.ToLocal).ToArray();
-		float width = 8f;
-		float gap = 12f;
-		float handleSize = 12f;
-		this.DrawDashedLine(drawPoints[0], drawPoints[1], Colors.Red, width, gap);
-		this.DrawDashedLine(drawPoints[1], drawPoints[2], Colors.Red, width, gap);
-		this.DrawDashedLine(drawPoints[2], drawPoints[3], Colors.Red, width, gap);
-		this.DrawDashedLine(drawPoints[3], drawPoints[0], Colors.Red, width, gap);
-		this.DrawRect(new Rect2(drawPoints[0], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
-		this.DrawRect(new Rect2(drawPoints[0], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
-		this.DrawRect(new Rect2(drawPoints[1], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
-		this.DrawRect(new Rect2(drawPoints[1], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
-		this.DrawRect(new Rect2(drawPoints[2], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
-		this.DrawRect(new Rect2(drawPoints[2], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
-		this.DrawRect(new Rect2(drawPoints[3], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
-		this.DrawRect(new Rect2(drawPoints[3], Vector2.Zero).Grow(handleSize), Colors.Black, filled: false);
+		Transform2D transform = this.GetViewport().GetFinalTransform();
+		Vector2[] drawPoints = this.ControlPoints.Select(point => transform * point).ToArray();
+		float width = 3f;
+		float gap = 6f;
+		float handleSize = 6f;
+		viewport.DrawDashedLine(drawPoints[0], drawPoints[1], Colors.Red, width, gap);
+		viewport.DrawDashedLine(drawPoints[1], drawPoints[2], Colors.Red, width, gap);
+		viewport.DrawDashedLine(drawPoints[2], drawPoints[3], Colors.Red, width, gap);
+		viewport.DrawDashedLine(drawPoints[3], drawPoints[0], Colors.Red, width, gap);
+		viewport.DrawRect(new Rect2(drawPoints[0], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+		viewport.DrawRect(new Rect2(drawPoints[0], Vector2.Zero).Grow(handleSize), Colors.Black, width: 2f, filled: false);
+		viewport.DrawRect(new Rect2(drawPoints[1], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+		viewport.DrawRect(new Rect2(drawPoints[1], Vector2.Zero).Grow(handleSize), Colors.Black, width: 2f, filled: false);
+		viewport.DrawRect(new Rect2(drawPoints[2], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+		viewport.DrawRect(new Rect2(drawPoints[2], Vector2.Zero).Grow(handleSize), Colors.Black, width: 2f, filled: false);
+		viewport.DrawRect(new Rect2(drawPoints[3], Vector2.Zero).Grow(handleSize), Colors.White, filled: true);
+		viewport.DrawRect(new Rect2(drawPoints[3], Vector2.Zero).Grow(handleSize), Colors.Black, width: 2f, filled: false);
 	}
 
 	// public override void _Input(InputEvent @event)
