@@ -3,7 +3,7 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCamera2DComponents;
 
-public partial class VCam2DAreaPriorityComponent : VirtualCamera2DComponent
+public partial class VCam2DObjectDetectionComponent : VirtualCamera2DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
@@ -17,10 +17,10 @@ public partial class VCam2DAreaPriorityComponent : VirtualCamera2DComponent
 
 	[Export] public Area2D? Area = null;
 	[Export] public float PriorityAdd = 1f;
-	[Export] public bool AddPriorityPerBodyInArea = false;
+	[Export] public bool MultiplyByObjectCountInArea = false;
 
-	[ExportGroup("Filter")]
-	[Export] public string MonitoredNodeGroup = "";
+	[ExportGroup("Filter", "Filter")]
+	[Export] public string FilterByNodeGroup = "";
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
@@ -76,21 +76,21 @@ public partial class VCam2DAreaPriorityComponent : VirtualCamera2DComponent
 			return;
 		}
 
-		if (this.AddPriorityPerBodyInArea)
+		if (this.MultiplyByObjectCountInArea)
 		{
 			this.Camera.Priority += this.PriorityAdd
 				* this.Area.GetOverlappingBodies()
 					.Where(
-						string.IsNullOrWhiteSpace(this.MonitoredNodeGroup)
+						string.IsNullOrWhiteSpace(this.FilterByNodeGroup)
 							? _ => true
-							: body => body.IsInGroup(this.MonitoredNodeGroup)
+							: body => body.IsInGroup(this.FilterByNodeGroup)
 					)
 					.Count();
 		}
 		else if (
-			string.IsNullOrWhiteSpace(this.MonitoredNodeGroup)
+			string.IsNullOrWhiteSpace(this.FilterByNodeGroup)
 				? this.Area.HasOverlappingBodies() == true
-				: this.Area.GetOverlappingBodies().Any(body => body.IsInGroup(this.MonitoredNodeGroup))
+				: this.Area.GetOverlappingBodies().Any(body => body.IsInGroup(this.FilterByNodeGroup))
 		)
 		{
 			this.Camera.Priority += this.PriorityAdd;
