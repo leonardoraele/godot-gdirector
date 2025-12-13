@@ -28,7 +28,7 @@ public partial class GDirectorServer : Node
 
 	public IVirtualCamera? CurrentLiveCamera { get; private set; } = null;
 	private WeakReference<IVirtualCamera>? PreviousLiveCameraWeakRef = null;
-	private IVirtualCamera? SecondHighestPriorityCamera = null;
+	// private IVirtualCamera? SecondHighestPriorityCamera = null; // TODO
 
 	private HashSet<IVirtualCamera> ManagedVirtualCameras { get; init; } = new();
 

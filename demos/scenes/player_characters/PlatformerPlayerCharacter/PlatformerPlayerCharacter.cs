@@ -141,7 +141,7 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 		// Calculate horizontal direction
 		Vector3 currentHDirection = this.GlobalTransform.Basis.Z * -1;
 		Vector3 cameraDirection = (
-				this.CameraDirection != Vector3.Zero
+				this.CameraDirection != Vector3.Zero || Raele.GDirector.GDirectorServer.Instance.GodotCamera3D == null
 					? this.CameraDirection
 					: Raele.GDirector.GDirectorServer.Instance.GodotCamera3D.Basis.Z with { Y = 0 }
 			)
@@ -170,7 +170,7 @@ public partial class PlatformerPlayerCharacter : CharacterBody3D
 		this.MoveAndSlide();
 
 		// Update facing direction
-		Vector3 lookDirection = this.AimingDownSights
+		Vector3 lookDirection = this.AimingDownSights && Raele.GDirector.GDirectorServer.Instance.GodotCamera3D != null
 			? (Raele.GDirector.GDirectorServer.Instance.GodotCamera3D.GlobalTransform.Basis.Z with { Y = 0} * -1).Normalized()
 			: newHDirection;
 		this.LookAt(this.GlobalPosition + lookDirection, Vector3.Up);
