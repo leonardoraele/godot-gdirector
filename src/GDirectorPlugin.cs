@@ -51,8 +51,8 @@ public partial class GDirectorPlugin : EditorPlugin
 
 		// 2D Camera Components
 		this.AddCustomType(nameof(VCam2DAreaConstraintComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DAreaConstraintComponent)}.cs"), cam_2d_area_constraint);
-		this.AddCustomType(nameof(VCam2DObjectDetectionComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DObjectDetectionComponent)}.cs"), cam_2d_priority);
 		this.AddCustomType(nameof(VCam2DFramingComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DFramingComponent)}.cs"), cam_2d_framing);
+		this.AddCustomType(nameof(VCam2DObjectDetectionComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DObjectDetectionComponent)}.cs"), cam_2d_priority);
 		this.AddCustomType(nameof(VCam2DTweenComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DTweenComponent)}.cs"), cam_2d_tween);
 
 		// 3D Camera Components

@@ -22,7 +22,8 @@ public interface IVirtualCamera
 	// GDirector properties
 	// -------------------------------------------------------------------------
 
-	protected double BasePriority { get; }
+	protected double BaseStandbyPriority { get; }
+	protected double BaseLivePriority { get; }
 	public double Priority { get; set; }
 
 	// -------------------------------------------------------------------------
@@ -56,7 +57,7 @@ public interface IVirtualCamera
 	public void NotifyEnteredTree()
 	{
 		GDirectorServer.Instance.Register(this);
-		this.Priority = this.BasePriority;
+		this.Priority = this.BaseStandbyPriority;
 	}
 	public void NotifyExitedTree()
 	{
@@ -65,7 +66,7 @@ public interface IVirtualCamera
 	public void NotifyProcessing()
 	{
 		double lastFramePriority = this.Priority;
-		this.Priority = this.BasePriority;
+		this.Priority = this.IsLive ? this.BaseLivePriority : this.BaseStandbyPriority;
 		Callable.From(() => this.CheckPriorityChange(lastFramePriority)).CallDeferred();
 	}
 

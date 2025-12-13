@@ -12,7 +12,8 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 
 	[ExportToolButton("Force Go Live/Release")] public Callable ToogleIsLiveOverrideToolButton
 		=> Callable.From(() => this.AsInterface().ForceGoLive = !this.AsInterface().ForceGoLive);
-	[Export] public double BasePriority { get; private set; } = 0;
+	[Export] public double BaseStandbyPriority { get; private set; } = 0;
+	[Export] public double BaseLivePriority { get; private set; } = 0;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
