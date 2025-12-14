@@ -3,7 +3,7 @@ using Raele.GDirector.VirtualCamera2DComponents;
 
 namespace Raele.GDirector.Editor;
 
-public partial class AreaConstraintEditor : ResizeableRect
+public partial class ConfiningRegionEditor : ResizeableRect
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
@@ -21,21 +21,26 @@ public partial class AreaConstraintEditor : ResizeableRect
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public VCam2DAreaConstraintComponent? EditTarget
+	public VCam2DConfinementComponent? EditTarget
 	{
 		get => field;
 		set
 		{
 			field = value;
 			this.Visible = field != null;
+			this.Refresh();
 		}
 	} = null;
+	public EditorUndoRedoManager? UndoRedo;
+
+	private UndoRedo.MergeMode MergeMode = Godot.UndoRedo.MergeMode.Disable;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// COMPUTED PROPERTIES
 	// -----------------------------------------------------------------------------------------------------------------
 
-
+	private Transform2D OverlayToWorld => (this.EditTarget?.GetViewport().GetScreenTransform().AffineInverse() ?? Transform2D.Identity)
+		* (this.GetViewport()?.GetScreenTransform() ?? Transform2D.Identity);
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
@@ -58,13 +63,15 @@ public partial class AreaConstraintEditor : ResizeableRect
 	public override void _EnterTree()
 	{
 		base._EnterTree();
-		this.TargetResized += this.OnTargetResized;
+		this.RectResizing += this.OnRectResizing;
+		this.RectResized += this.OnRectResized;
 	}
 
 	public override void _ExitTree()
 	{
 		base._ExitTree();
-		this.TargetResized -= this.OnTargetResized;
+		this.RectResizing -= this.OnRectResizing;
+		this.RectResized -= this.OnRectResized;
 	}
 
 	// public override void _Ready()
@@ -75,14 +82,7 @@ public partial class AreaConstraintEditor : ResizeableRect
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
-
-		if (this.EditTarget == null)
-		{
-			return;
-		}
-
-		this.Position = this.EditTarget.GetViewportTransform() * this.EditTarget.Region.Position;
-		this.Size = this.EditTarget.GetViewportTransform() * this.EditTarget.Region.End - this.Position;
+		this.Refresh();
 	}
 
 	// public override void _PhysicsProcess(double delta)
@@ -109,13 +109,38 @@ public partial class AreaConstraintEditor : ResizeableRect
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	private void OnTargetResized()
+	private void Refresh()
 	{
-		this.EditTarget?.Region.Position = this.EditTarget.GetViewport().GetScreenTransform().AffineInverse()
-			* this.GetViewport().GetScreenTransform()
-			* this.GlobalPosition;
-		this.EditTarget?.Region.End = this.EditTarget.GetViewport().GetScreenTransform().AffineInverse()
-			* this.GetViewport().GetScreenTransform()
-			* (this.GlobalPosition + this.Size);
+		if (this.EditTarget == null)
+		{
+			return;
+		}
+
+		this.GlobalPosition = this.OverlayToWorld.AffineInverse() * this.EditTarget.Region.Position;
+		this.Size = this.OverlayToWorld.AffineInverse() * this.EditTarget.Region.End - this.GlobalPosition;
 	}
+
+	private void OnRectResizing(Rect2 newRect, Rect2 oldRect)
+	{
+		if (this.EditTarget == null)
+		{
+			return;
+		}
+
+		Rect2 newRegion = this.OverlayToWorld * newRect;
+		Rect2 oldRegion = this.OverlayToWorld * oldRect;
+
+		this.UndoRedo?.CreateAction(
+			$"Resize region of \"{this.EditTarget.Name}\" node ({nameof(VCam2DConfinementComponent)})",
+			this.MergeMode,
+			customContext: this.EditTarget
+		);
+		this.UndoRedo?.AddDoProperty(this.EditTarget, VCam2DConfinementComponent.PropertyName.Region, newRegion);
+		this.UndoRedo?.AddUndoProperty(this.EditTarget, VCam2DConfinementComponent.PropertyName.Region, oldRegion);
+		this.UndoRedo?.CommitAction();
+		this.MergeMode = Godot.UndoRedo.MergeMode.Ends; // subsequent changes will be merged
+	}
+
+	private void OnRectResized(Rect2 newRect, Rect2 oldRect)
+		=> this.MergeMode = Godot.UndoRedo.MergeMode.Disable; // stops merging changes; next change will be a new history item
 }

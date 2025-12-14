@@ -3,7 +3,7 @@ using Godot;
 namespace Raele.GDirector.VirtualCamera2DComponents;
 
 [Tool]
-public partial class VCam2DAreaConstraintComponent : VirtualCamera2DComponent
+public partial class VCam2DConfinementComponent : VirtualCamera2DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS

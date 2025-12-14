@@ -9,13 +9,14 @@ namespace Raele.GDirector;
 [Tool]
 public partial class GDirectorPlugin : EditorPlugin
 {
-	private VCam2DAreaConstraintComponent? AreaEditTarget = null;
-	private AreaConstraintEditor AreaEditor = new();
-	public override bool _Handles(GodotObject @object) => @object is VCam2DAreaConstraintComponent;
+	private VCam2DConfinementComponent? AreaEditTarget = null;
+	private ConfiningRegionEditor AreaEditor = new();
+	public override bool _Handles(GodotObject @object) => @object is VCam2DConfinementComponent;
 	public override void _Edit(GodotObject @object)
 	{
 		base._Edit(@object);
-		this.AreaEditor.EditTarget = this.AreaEditTarget = @object as VCam2DAreaConstraintComponent;
+		this.AreaEditor.EditTarget = this.AreaEditTarget = @object as VCam2DConfinementComponent;
+		this.AreaEditor.UndoRedo = this.GetUndoRedo();
 	}
 	public override void _ForwardCanvasDrawOverViewport(Control viewportControl)
 	{
@@ -37,7 +38,7 @@ public partial class GDirectorPlugin : EditorPlugin
 		Texture2D vcamTraIcon = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/vcam_tra_white.svg");
 
 		Texture2D vcam2d = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/{nameof(vcam2d)}.png");
-		Texture2D cam_2d_area_constraint = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/{nameof(cam_2d_area_constraint)}.png");
+		Texture2D cam_2d_confinement = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/{nameof(cam_2d_confinement)}.png");
 		Texture2D cam_2d_framing = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/{nameof(cam_2d_framing)}.png");
 		Texture2D cam_2d_tween = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/{nameof(cam_2d_tween)}.png");
 		Texture2D cam_2d_priority = GD.Load<Texture2D>($"res://addons/{nameof(GDirector)}/icons/{nameof(cam_2d_priority)}.png");
@@ -50,7 +51,7 @@ public partial class GDirectorPlugin : EditorPlugin
 		this.AddCustomType(nameof(VirtualCamera3D), nameof(Node3D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera3D)}.cs"), vcamIcon);
 
 		// 2D Camera Components
-		this.AddCustomType(nameof(VCam2DAreaConstraintComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DAreaConstraintComponent)}.cs"), cam_2d_area_constraint);
+		this.AddCustomType(nameof(VCam2DConfinementComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DConfinementComponent)}.cs"), cam_2d_confinement);
 		this.AddCustomType(nameof(VCam2DFramingComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DFramingComponent)}.cs"), cam_2d_framing);
 		this.AddCustomType(nameof(VCam2DObjectDetectionComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DObjectDetectionComponent)}.cs"), cam_2d_priority);
 		this.AddCustomType(nameof(VCam2DTweenComponent), nameof(Node2D), GD.Load<Script>($"res://addons/{nameof(GDirector)}/src/{nameof(VirtualCamera2DComponents)}/{nameof(VCam2DTweenComponent)}.cs"), cam_2d_tween);
@@ -83,7 +84,7 @@ public partial class GDirectorPlugin : EditorPlugin
 		this.RemoveCustomType(nameof(VirtualCamera3D));
 
 		// 2D Camera Components
-		this.RemoveCustomType(nameof(VCam2DAreaConstraintComponent));
+		this.RemoveCustomType(nameof(VCam2DConfinementComponent));
 		this.RemoveCustomType(nameof(VCam2DObjectDetectionComponent));
 		this.RemoveCustomType(nameof(VCam2DFramingComponent));
 		this.RemoveCustomType(nameof(VCam2DTweenComponent));

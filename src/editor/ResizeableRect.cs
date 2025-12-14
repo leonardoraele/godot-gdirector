@@ -31,12 +31,15 @@ public partial class ResizeableRect : Control
 	// COMPUTED PROPERTIES
 	// -----------------------------------------------------------------------------------------------------------------
 
+	private Rect2 Rect => new Rect2(this.GlobalPosition, this.Size);
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	[Signal] public delegate void TargetResizedEventHandler();
+	[Signal] public delegate void RectResizingEventHandler(Rect2 newRect, Rect2 oldRect);
+	[Signal] public delegate void RectResizedEventHandler(Rect2 newRect, Rect2 oldRect);
+	[Signal] public delegate void RectResizeCanceledEventHandler(Rect2 currentRect, Rect2 canceledRect);
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// INTERNAL TYPES
@@ -68,28 +71,111 @@ public partial class ResizeableRect : Control
 		this.AddChild(this.TopRightHandle);
 		this.AddChild(this.BottomLeftHandle);
 		this.AddChild(this.BottomRightHandle);
+
+		// ---------------------------------------------------------------------
+		// Configure TopLeftHandle
+		// ---------------------------------------------------------------------
+
 		this.TopLeftHandle.HandleMoved += (Vector2 rawResize) =>
 		{
+			Rect2 oldRect = this.Rect;
 			this.Position += rawResize;
 			this.Size -= rawResize;
-			this.EmitSignalTargetResized();
+			this.EmitSignalRectResizing(newRect: this.Rect, oldRect);
 		};
+		this.TopLeftHandle.HandleMoveFinished += (Vector2 accumulatedResize) =>
+		{
+			Rect2 oldRect = new Rect2(
+				position: this.GlobalPosition - accumulatedResize,
+				size: this.Size + accumulatedResize
+			);
+			this.EmitSignalRectResized(newRect: this.Rect, oldRect);
+		};
+		this.TopLeftHandle.HandleMoveCanceled += (Vector2 accumulatedResize) =>
+		{
+			Rect2 canceledRect = this.Rect;
+			this.Position -= accumulatedResize;
+			this.Size += accumulatedResize;
+			this.EmitSignalRectResizeCanceled(currentRect: this.Rect, canceledRect);
+		};
+
+		// ---------------------------------------------------------------------
+		// Configure TopRightHandle
+		// ---------------------------------------------------------------------
+
 		this.TopRightHandle.HandleMoved += (Vector2 rawResize) =>
 		{
+			Rect2 oldRect = this.Rect;
 			this.Position = new Vector2(this.Position.X, this.Position.Y + rawResize.Y);
 			this.Size = new Vector2(this.Size.X + rawResize.X, this.Size.Y - rawResize.Y);
-			this.EmitSignalTargetResized();
+			this.EmitSignalRectResizing(newRect: this.Rect, oldRect);
 		};
+		this.TopRightHandle.HandleMoveFinished += (Vector2 accumulatedResize) =>
+		{
+			Rect2 oldRect = new Rect2(
+				position: new Vector2(this.GlobalPosition.X, this.GlobalPosition.Y - accumulatedResize.Y),
+				size: new Vector2(this.Size.X - accumulatedResize.X, this.Size.Y + accumulatedResize.Y)
+			);
+			this.EmitSignalRectResized(newRect: this.Rect, oldRect);
+		};
+		this.TopRightHandle.HandleMoveCanceled += (Vector2 accumulatedResize) =>
+		{
+			Rect2 canceledRect = this.Rect;
+			this.Position = new Vector2(this.Position.X, this.Position.Y - accumulatedResize.Y);
+			this.Size = new Vector2(this.Size.X - accumulatedResize.X, this.Size.Y + accumulatedResize.Y);
+			this.EmitSignalRectResizeCanceled(currentRect: this.Rect, canceledRect);;
+		};
+
+		// ---------------------------------------------------------------------
+		// Configure BottomLeftHandle
+		// ---------------------------------------------------------------------
+
 		this.BottomLeftHandle.HandleMoved += (Vector2 rawResize) =>
 		{
+			Rect2 oldRect = this.Rect;
 			this.Position = new Vector2(this.Position.X + rawResize.X, this.Position.Y);
 			this.Size = new Vector2(this.Size.X - rawResize.X, this.Size.Y + rawResize.Y);
-			this.EmitSignalTargetResized();
+			this.EmitSignalRectResizing(newRect: this.Rect, oldRect);
 		};
+		this.BottomLeftHandle.HandleMoveFinished += (Vector2 accumulatedResize) =>
+		{
+			Rect2 oldRect = new Rect2(
+				position: new Vector2(this.GlobalPosition.X - accumulatedResize.X, this.GlobalPosition.Y),
+				size: new Vector2(this.Size.X + accumulatedResize.X, this.Size.Y - accumulatedResize.Y)
+			);
+			this.EmitSignalRectResized(newRect: this.Rect, oldRect);
+		};
+		this.BottomLeftHandle.HandleMoveCanceled += (Vector2 accumulatedResize) =>
+		{
+			Rect2 canceledRect = this.Rect;
+			this.Position = new Vector2(this.Position.X - accumulatedResize.X, this.Position.Y);
+			this.Size = new Vector2(this.Size.X + accumulatedResize.X, this.Size.Y - accumulatedResize.Y);
+			this.EmitSignalRectResizeCanceled(currentRect: this.Rect, canceledRect);
+		};
+
+		// ---------------------------------------------------------------------
+		// Configure BottomRightHandle
+		// ---------------------------------------------------------------------
+
 		this.BottomRightHandle.HandleMoved += (Vector2 rawResize) =>
 		{
+			Rect2 oldRect = this.Rect;
 			this.Size += rawResize;
-			this.EmitSignalTargetResized();
+			this.EmitSignalRectResizing(newRect: this.Rect, oldRect);
+		};
+		this.BottomRightHandle.HandleMoveFinished += (Vector2 accumulatedResize) =>
+		{
+			Rect2 oldRect = new Rect2(
+				position: this.GlobalPosition,
+				size: this.Size - accumulatedResize
+			);
+			this.EmitSignalRectResized(newRect: this.Rect, oldRect);
+		};
+		this.BottomRightHandle.HandleMoveCanceled += (Vector2 accumulatedResize) =>
+		{
+			Rect2 canceledRect = this.Rect;
+			this.Size -= accumulatedResize;
+			this.EmitSignalRectResizeCanceled(currentRect: this.Rect, canceledRect);
 		};
 	}
 

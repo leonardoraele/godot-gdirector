@@ -20,7 +20,8 @@ public partial class ResizeHandle : Control
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	private bool Active = false;
+	private bool ResizeActive = false;
+	Vector2 AccumulatedMouseMovement;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// COMPUTED PROPERTIES
@@ -32,7 +33,10 @@ public partial class ResizeHandle : Control
 	// SIGNALS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	[Signal] public delegate void HandleMovedEventHandler(Vector2 screenResize);
+	[Signal] public delegate void HandleMoveStartedEventHandler();
+	[Signal] public delegate void HandleMovedEventHandler(Vector2 relativeResize);
+	[Signal] public delegate void HandleMoveFinishedEventHandler(Vector2 accumulatedResize);
+	[Signal] public delegate void HandleMoveCanceledEventHandler(Vector2 accumulatedResize);
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// INTERNAL TYPES
@@ -97,16 +101,29 @@ public partial class ResizeHandle : Control
 	public override void _GuiInput(InputEvent @event)
 	{
 		base._GuiInput(@event);
-		if (@event is InputEventMouseButton mouseButton)
+		if (@event is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == MouseButton.Left)
 		{
-			this.Active = mouseButton.Pressed;
-		}
-		else if (@event is InputEventMouseMotion mouseMotion)
-		{
-			if (this.Active)
+			if (mouseButton.Pressed && !this.ResizeActive)
 			{
-				this.EmitSignalHandleMoved(mouseMotion.Relative);
+				this.ResizeActive = true;
+				this.AccumulatedMouseMovement = Vector2.Zero;
+				this.EmitSignalHandleMoveStarted();
 			}
+			else if (!mouseButton.Pressed && this.ResizeActive)
+			{
+				this.ResizeActive = false;
+				this.EmitSignalHandleMoveFinished(this.AccumulatedMouseMovement);
+			}
+		}
+		else if (@event is InputEventMouseMotion mouseMotion && this.ResizeActive)
+		{
+			this.AccumulatedMouseMovement += mouseMotion.Relative;
+			this.EmitSignalHandleMoved(mouseMotion.Relative);
+		}
+		else if (@event is InputEventKey keyEvent && keyEvent.Keycode == Key.Escape && keyEvent.Pressed && this.ResizeActive)
+		{
+			this.ResizeActive = false;
+			this.EmitSignalHandleMoveCanceled(this.AccumulatedMouseMovement);
 		}
 	}
 

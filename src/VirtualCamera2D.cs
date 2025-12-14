@@ -15,8 +15,8 @@ public partial class VirtualCamera2D : Node2D, IVirtualCamera
 			if (Engine.IsEditorHint()) return;
 			this.AsInterface().ForceGoLive = !this.AsInterface().ForceGoLive;
 		});
-	[Export] public double BaseStandbyPriority { get; private set; } = 0;
-	[Export] public double BaseLivePriority { get; private set; } = 0;
+	[Export] public double BasePriority { get; private set; } = 0;
+	[Export] public double AdditionalLivePriority { get; private set; } = 0;
 	[Export(PropertyHint.Link)] public Vector2 Zoom
 		{ get => field; set { field = value; this.QueueRedraw(); } }
 		= Vector2.One;
