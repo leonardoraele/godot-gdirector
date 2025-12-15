@@ -2,6 +2,7 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCamera3DComponents;
 
+// TODO Add option to prevent Z rotation
 public partial class VCam3DMimicRotationComponent : VirtualCamera3DComponent
 {
 	[Export] public Node3D? RotationReference;
