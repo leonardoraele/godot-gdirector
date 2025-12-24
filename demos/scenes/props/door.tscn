@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://b01sge5bktxns"]
 
-[ext_resource type="Script" path="res://demos/scenes/props/door.gd" id="1_0k047"]
-[ext_resource type="ArrayMesh" uid="uid://dmkrbomu680fo" path="res://demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Door_Single.obj" id="2_pem1o"]
+[ext_resource type="Script" uid="uid://b88ehjy61fjp5" path="res://addons/GDirector/demos/scenes/props/door.gd" id="1_0k047"]
+[ext_resource type="ArrayMesh" uid="uid://dmkrbomu680fo" path="res://addons/GDirector/demos/models/quaternius-ultimate_modular_scifi/quaternius-ultimate_modular_scifi-obj/Door_Single.obj" id="2_pem1o"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tyhrr"]
 size = Vector3(1.51483, 2.82558, 0.528973)

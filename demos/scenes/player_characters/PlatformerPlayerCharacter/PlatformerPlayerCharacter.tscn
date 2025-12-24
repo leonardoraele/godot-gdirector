@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://ba67v0sr3y5h"]
 
-[ext_resource type="Script" path="res://demos/scenes/player_characters/PlatformerPlayerCharacter/PlatformerPlayerCharacter.cs" id="1_ej2jp"]
-[ext_resource type="PackedScene" uid="uid://3ne6rhpywbwc" path="res://demos/models/quaternius-ultimate_modular_men_pack/Spacesuit.gltf" id="2_hqhfp"]
+[ext_resource type="Script" uid="uid://cc7lfk2i4kpuw" path="res://addons/GDirector/demos/scenes/player_characters/PlatformerPlayerCharacter/PlatformerPlayerCharacter.cs" id="1_ej2jp"]
+[ext_resource type="PackedScene" uid="uid://3ne6rhpywbwc" path="res://addons/GDirector/demos/models/quaternius-ultimate_modular_men_pack/Spacesuit.gltf" id="2_hqhfp"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_e6fhp"]
 radius = 0.25

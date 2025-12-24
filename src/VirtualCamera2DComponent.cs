@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 namespace Raele.GDirector;
@@ -73,10 +75,10 @@ public partial class VirtualCamera2DComponent : Node2D
 	// 	base._PhysicsProcess(delta);
 	// }
 
-	// public override string[] _GetConfigurationWarnings()
-	// 	=> new List<string>()
-	// 		.Concat(true ? [] : ["Some warning"])
-	// 		.ToArray();
+	public override string[] _GetConfigurationWarnings()
+		=> new List<string>()
+			.Concat(this.GetParentOrNull<VirtualCamera2D>() == null ? [$"This node should be a child of a {nameof(VirtualCamera2D)} node."] : [])
+			.ToArray();
 
 	// public override void _ValidateProperty(Godot.Collections.Dictionary property)
 	// {
