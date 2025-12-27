@@ -5,4 +5,8 @@
     <RootNamespace>Raele.GDirector</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- <PackageReference Include="RaeleGodotUtilsCSharp" Version="0.1.0" /> -->
+    <ProjectReference Include="../RaeleGodotUtilsCSharp/RaeleGodotUtilsCSharp.csproj" />
+  </ItemGroup>
 </Project>

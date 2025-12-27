@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Raele.GodotUtils.Extensions;
 
 namespace Raele.GDirector;
 
@@ -12,9 +13,9 @@ public partial class GDirectorServer : Node
 	// STATIC STUFF
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public static GDirectorServer Instance => field ??= Engine.GetMainLoop() is SceneTree tree
-		? tree.Root.GetNode<GDirectorServer>(nameof(GDirectorServer))
-		: throw new System.Exception($"Autoload singleton {nameof(GDirectorServer)} not found. Make sure it is enabled in Project Settings → Globals.");
+	public static GDirectorServer Instance
+		=> field ??= Engine.GetSceneTree().Root.GetNodeOrNull<GDirectorServer>(nameof(GDirectorServer))
+			?? throw new Exception($"Autoload singleton {nameof(GDirectorServer)} not found. Make sure it is enabled in Project Settings → Globals.");
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
