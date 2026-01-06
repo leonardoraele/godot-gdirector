@@ -21,7 +21,7 @@ public partial class ConfiningRegionEditor : ResizeableRect
 	// FIELDS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public VCam2DConfinementComponent? EditTarget
+	public ConfinementComponent? EditTarget
 	{
 		get => field;
 		set
@@ -131,12 +131,12 @@ public partial class ConfiningRegionEditor : ResizeableRect
 		Rect2 oldRegion = this.OverlayToWorld * oldRect;
 
 		this.UndoRedo?.CreateAction(
-			$"Resize region of \"{this.EditTarget.Name}\" node ({nameof(VCam2DConfinementComponent)})",
+			$"Resize region of \"{this.EditTarget.Name}\" node ({nameof(ConfinementComponent)})",
 			this.MergeMode,
 			customContext: this.EditTarget
 		);
-		this.UndoRedo?.AddDoProperty(this.EditTarget, VCam2DConfinementComponent.PropertyName.Region, newRegion);
-		this.UndoRedo?.AddUndoProperty(this.EditTarget, VCam2DConfinementComponent.PropertyName.Region, oldRegion);
+		this.UndoRedo?.AddDoProperty(this.EditTarget, ConfinementComponent.PropertyName.Region, newRegion);
+		this.UndoRedo?.AddUndoProperty(this.EditTarget, ConfinementComponent.PropertyName.Region, oldRegion);
 		this.UndoRedo?.CommitAction();
 		this.MergeMode = Godot.UndoRedo.MergeMode.Ends; // subsequent changes will be merged
 	}

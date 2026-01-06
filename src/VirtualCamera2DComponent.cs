@@ -4,8 +4,8 @@ using Godot;
 
 namespace Raele.GDirector;
 
-[Tool]
-public partial class VirtualCamera2DComponent : Node2D
+[Tool][GlobalClass]
+public abstract partial class VirtualCamera2DComponent : Node2D
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS

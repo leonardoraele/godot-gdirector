@@ -1,9 +1,10 @@
+using System.Linq;
 using Godot;
-using Raele.GDirector;
 
 namespace Raele.GDirector.VirtualCamera2DComponents;
 
-public partial class VCam2DShakeComponent : VirtualCamera2DComponent
+[GlobalClass]
+public partial class ObjectDetectionComponent : VirtualCamera2DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
@@ -15,7 +16,12 @@ public partial class VCam2DShakeComponent : VirtualCamera2DComponent
 	// EXPORTS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	// [Export] public
+	[Export] public Area2D? Area = null;
+	[Export] public float PriorityAdd = 1f;
+	[Export] public bool MultiplyByObjectCountInArea = false;
+
+	[ExportGroup("Filter", "Filter")]
+	[Export] public string FilterByNodeGroup = "";
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// FIELDS
@@ -62,10 +68,35 @@ public partial class VCam2DShakeComponent : VirtualCamera2DComponent
 	// 	base._Ready();
 	// }
 
-	// public override void _Process(double delta)
-	// {
-	// 	base._Process(delta);
-	// }
+	public override void _Process(double delta)
+	{
+		base._Process(delta);
+
+		if (this.Area == null)
+		{
+			return;
+		}
+
+		if (this.MultiplyByObjectCountInArea)
+		{
+			this.Camera.Priority += this.PriorityAdd
+				* this.Area.GetOverlappingBodies()
+					.Where(
+						string.IsNullOrWhiteSpace(this.FilterByNodeGroup)
+							? _ => true
+							: body => body.IsInGroup(this.FilterByNodeGroup)
+					)
+					.Count();
+		}
+		else if (
+			string.IsNullOrWhiteSpace(this.FilterByNodeGroup)
+				? this.Area.HasOverlappingBodies() == true
+				: this.Area.GetOverlappingBodies().Any(body => body.IsInGroup(this.FilterByNodeGroup))
+		)
+		{
+			this.Camera.Priority += this.PriorityAdd;
+		}
+	}
 
 	// public override void _PhysicsProcess(double delta)
 	// {
@@ -90,6 +121,5 @@ public partial class VCam2DShakeComponent : VirtualCamera2DComponent
 	// -----------------------------------------------------------------------------------------------------------------
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
-
 
 }

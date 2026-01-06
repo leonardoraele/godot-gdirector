@@ -2,8 +2,8 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCamera2DComponents;
 
-[Tool]
-public partial class VCam2DConfinementComponent : VirtualCamera2DComponent
+[Tool][GlobalClass]
+public partial class ConfinementComponent : VirtualCamera2DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
