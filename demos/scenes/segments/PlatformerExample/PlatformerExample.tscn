@@ -3,8 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://djybuwr2lsdq6" path="res://addons/GDirector/demos/scenes/levels/scifi_base.tscn" id="1_5im5p"]
 [ext_resource type="PackedScene" uid="uid://ba67v0sr3y5h" path="res://addons/GDirector/demos/scenes/player_characters/PlatformerPlayerCharacter/PlatformerPlayerCharacter.tscn" id="2_4iipx"]
 [ext_resource type="Script" uid="uid://754w6rg2ogo0" path="res://addons/GDirector/src/VirtualCamera3D.cs" id="3_m5j5b"]
-[ext_resource type="Script" uid="uid://d1rmnwhvivdg4" path="res://addons/GDirector/src/VirtualCamera3DComponents/VCam3DOrbitComponent.cs" id="4_qnrs0"]
-[ext_resource type="Script" uid="uid://c1tk8yok7uco2" path="res://addons/GDirector/src/VirtualCamera3DComponents/VCam3DLookAtTargetComponent.cs" id="5_613yy"]
+[ext_resource type="Script" uid="uid://d1rmnwhvivdg4" path="res://addons/GDirector/src/VirtualCamera3DComponents/OrbitComponent.cs" id="4_qnrs0"]
+[ext_resource type="Script" uid="uid://c1tk8yok7uco2" path="res://addons/GDirector/src/VirtualCamera3DComponents/LookAtTargetComponent.cs" id="5_613yy"]
 
 [node name="PlatformerExample" type="Node3D"]
 

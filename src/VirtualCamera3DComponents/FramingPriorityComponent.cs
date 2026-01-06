@@ -2,7 +2,8 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCamera3DComponents;
 
-public partial class VCam3DFramingPriorityComponent : VirtualCamera3DComponent
+[GlobalClass]
+public partial class FramingPriorityComponent : VirtualCamera3DComponent
 {
 	/// <summary>
 	/// The target to frame.

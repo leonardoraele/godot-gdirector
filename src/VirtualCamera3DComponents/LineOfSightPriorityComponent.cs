@@ -14,7 +14,8 @@ namespace Raele.GDirector.VirtualCamera3DComponents;
 /// an optional offset). If the target has a mesh (e.g. a character) this controller might determine the target is out
 /// of sight even though parts of it's body other than it's origin position might still be visible.
 /// </summary>
-public partial class VCam3DLineOfSightPriorityComponent : VirtualCamera3DComponent
+[GlobalClass]
+public partial class LineOfSightPriorityComponent : VirtualCamera3DComponent
 {
 	[Export] public Node3D? LineOfSightTarget;
 	[Export] public Vector3 LineOfSightTargetOffset;

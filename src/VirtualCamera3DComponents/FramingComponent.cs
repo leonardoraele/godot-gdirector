@@ -3,8 +3,8 @@ using Godot;
 
 namespace Raele.GDirector.VirtualCamera3DComponents;
 
-[Tool]
-public partial class VCam3DFramingComponent : VirtualCamera3DComponent
+[Tool][GlobalClass]
+public partial class FramingComponent : VirtualCamera3DComponent
 {
 	// -----------------------------------------------------------------------------------------------------------------
 	// STATICS
