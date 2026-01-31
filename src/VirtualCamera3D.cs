@@ -1,4 +1,3 @@
-using System.Threading;
 using Godot;
 
 namespace Raele.GDirector;
@@ -11,7 +10,7 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	// -----------------------------------------------------------------------------------------------------------------
 
 	[ExportToolButton("Force Go Live/Release")] public Callable ToogleIsLiveOverrideToolButton
-		=> Callable.From(() => this.AsInterface().ForceGoLive = !this.AsInterface().ForceGoLive);
+		=> Callable.From(() => this.AsVirtualCamera().ForceGoLive = !this.AsVirtualCamera().ForceGoLive);
 	[Export] public double BasePriority { get; private set; } = 0;
 	[Export] public double AdditionalLivePriority { get; private set; } = 0;
 
@@ -39,13 +38,13 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	public override void _EnterTree()
 	{
 		base._EnterTree();
-		this.AsInterface().NotifyEnteredTree();
+		this.AsVirtualCamera().NotifyEnteredTree();
 	}
 
 	public override void _ExitTree()
 	{
 		base._ExitTree();
-		this.AsInterface().NotifyExitedTree();
+		this.AsVirtualCamera().NotifyExitedTree();
 	}
 
 	public override void _Process(double delta)
@@ -56,7 +55,7 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 			this.SetProcess(false);
 			return;
 		}
-		this.AsInterface().NotifyProcessing();
+		this.AsVirtualCamera().NotifyProcessing();
 		this.UpdateGodotCamera3D();
 	}
 
@@ -64,15 +63,10 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	// METHODS
 	// -----------------------------------------------------------------------------------------------------------------
 
-	public IVirtualCamera AsInterface() => this;
-	public VirtualCamera3D As3D() => this;
-
 	private void UpdateGodotCamera3D()
 	{
-		if (!this.AsInterface().IsLive || GDirectorServer.Instance.GodotCamera3D is not Camera3D rcam)
-		{
+		if (!this.AsVirtualCamera().IsLive || GDirectorServer.Instance.GodotCamera3D is not Camera3D rcam)
 			return;
-		}
 		rcam.GlobalPosition = this.GlobalPosition;
 		rcam.GlobalRotation = this.GlobalRotation;
 	}

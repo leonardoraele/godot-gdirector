@@ -30,8 +30,8 @@ public interface IVirtualCamera
 	// Methods
 	// -------------------------------------------------------------------------
 
-	public VirtualCamera2D? As2D() => null;
-	public VirtualCamera3D? As3D() => null;
+	public VirtualCamera2D? As2D() => this as VirtualCamera2D;
+	public VirtualCamera3D? As3D() => this as VirtualCamera3D;
 
 	// -------------------------------------------------------------------------
 	// Implementations
@@ -82,4 +82,12 @@ public interface IVirtualCamera
 	public bool Is3D() => this.As3D() != null;
 
 	public void NotifyIsLiveChanged(bool isLive) => this.AsNode().EmitSignal(SignalName_IsLiveChanged, isLive);
+}
+
+public static class IVirtualCameraExtensionMethods
+{
+	extension (IVirtualCamera camera)
+	{
+		public IVirtualCamera AsVirtualCamera() => camera;
+	}
 }

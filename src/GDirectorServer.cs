@@ -103,6 +103,9 @@ public partial class GDirectorServer : Node
 	public Vector2 ScreenSize
 		=> Engine.IsEditorHint()
 			? new Vector2(
+				// TODO Which is correct?
+				// RenderingServer.GetRenderingDevice().ScreenGetWidth(),
+				// RenderingServer.GetRenderingDevice().ScreenGetHeight(),
 				ProjectSettings.GetSetting("display/window/size/viewport_width").AsInt32(),
 				ProjectSettings.GetSetting("display/window/size/viewport_height").AsInt32()
 			)
