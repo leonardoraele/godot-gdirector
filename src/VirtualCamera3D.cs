@@ -47,6 +47,17 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 		this.AsVirtualCamera().NotifyExitedTree();
 	}
 
+	public override void _Ready()
+	{
+		base._Ready();
+		if (Engine.IsEditorHint())
+		{
+			Node3D cameraPreview = GD.Load<PackedScene>($"res://addons/{nameof(GDirector)}/assets/CameraPreview.tscn")
+				.Instantiate<Node3D>();
+			this.AddChild(cameraPreview);
+		}
+	}
+
 	public override void _Process(double delta)
 	{
 		base._Process(delta);

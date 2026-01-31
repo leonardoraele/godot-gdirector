@@ -119,9 +119,7 @@ public partial class GDirectorServer : Node
 	{
 		base._Ready();
 		if (Engine.IsEditorHint())
-		{
 			return;
-		}
 		this.ReevaluateCameraSelection();
 	}
 

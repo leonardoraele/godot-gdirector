@@ -100,15 +100,18 @@ public abstract partial class VirtualCamera3DComponent : Node3D
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
-		if (!this.Position.IsZeroApprox())
+		if (Engine.IsEditorHint())
 		{
-			this.Camera.Position += this.Position;
-			this.Position = Vector3.Zero;
-		}
-		if (!this.Rotation.IsZeroApprox())
-		{
-			this.Camera.Rotation += this.Rotation;
-			this.Rotation = Vector3.Zero;
+			if (!this.Position.IsZeroApprox())
+			{
+				this.Camera.Position += this.Position;
+				this.Position = Vector3.Zero;
+			}
+			if (!this.Rotation.IsZeroApprox())
+			{
+				this.Camera.Rotation += this.Rotation;
+				this.Rotation = Vector3.Zero;
+			}
 		}
 		if (this.IsLive && GDirectorServer.Instance.GodotCamera3D is Camera3D rcam)
 			this._ProcessIsLive(rcam, delta);
