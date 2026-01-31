@@ -41,10 +41,10 @@ public partial class FramingComponent : VirtualCamera3DComponent
 
 	private Vector2 ScreenPositionPx => this.GetViewport().GetWindow().Size * this.ScreenPosition;
 	private Plane MovementPlaneAsPlane => this.MovementPlane switch {
-		MovementModeEnum.Global_XZ_Plane => new Plane(Vector3.Up, this.Camera.As3D()!.GlobalPosition),
-		MovementModeEnum.Global_XY_Plane => new Plane(Vector3.Forward, this.Camera.As3D()!.GlobalPosition),
-		MovementModeEnum.Global_YZ_Plane => new Plane(Vector3.Right, this.Camera.As3D()!.GlobalPosition),
-		MovementModeEnum.Local_XY_Plane => new Plane(this.Camera.As3D()!.GlobalBasis.Z * -1, this.Camera.As3D()!.GlobalPosition),
+		MovementModeEnum.Global_XZ_Plane => new Plane(Vector3.Up, this.Camera.GlobalPosition),
+		MovementModeEnum.Global_XY_Plane => new Plane(Vector3.Forward, this.Camera.GlobalPosition),
+		MovementModeEnum.Global_YZ_Plane => new Plane(Vector3.Right, this.Camera.GlobalPosition),
+		MovementModeEnum.Local_XY_Plane => new Plane(this.Camera.GlobalBasis.Z * -1, this.Camera.GlobalPosition),
 		_ => throw new NotImplementedException("VirtualCamera's FramingConstraint node is set to an invalid MovementPlane option."),
 	};
 	private Vector3 FramingTargetOffsetedPosition => this.FramingTarget != null

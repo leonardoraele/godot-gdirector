@@ -30,7 +30,7 @@ public abstract partial class VirtualCamera3DComponent : Node3D
 	// -----------------------------------------------------------------------------------------------------------------
 
 	public VirtualCamera3D Camera => this.GetParent<VirtualCamera3D>();
-	public bool IsLive => this.Camera.AsInterface().IsLive;
+	public bool IsLive => this.Camera.AsVirtualCamera().IsLive;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
@@ -100,10 +100,18 @@ public abstract partial class VirtualCamera3DComponent : Node3D
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
-		if (this.IsLive && GDirectorServer.Instance.GodotCamera3D is Camera3D rcam)
+		if (!this.Position.IsZeroApprox())
 		{
-			this._ProcessIsLive(rcam, delta);
+			this.Camera.Position += this.Position;
+			this.Position = Vector3.Zero;
 		}
+		if (!this.Rotation.IsZeroApprox())
+		{
+			this.Camera.Rotation += this.Rotation;
+			this.Rotation = Vector3.Zero;
+		}
+		if (this.IsLive && GDirectorServer.Instance.GodotCamera3D is Camera3D rcam)
+			this._ProcessIsLive(rcam, delta);
 	}
 
 	protected virtual void _IsLiveEnter() {}
