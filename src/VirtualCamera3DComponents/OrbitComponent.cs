@@ -340,7 +340,7 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 		}
 
 		// Apply automatic orbiting
-		if (this.AutoOrbitDelay?.IsRunning() != true)
+		if (this.AutoOrbitEnabled && this.AutoOrbitDelay?.IsRunning() != true)
 			newCameraPosition = newCameraPosition.RotatedAround(
 				pivot.Origin,
 				Vector3.Up,

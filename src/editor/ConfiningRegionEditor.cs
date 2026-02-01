@@ -123,9 +123,7 @@ public partial class ConfiningRegionEditor : ResizeableRect
 	private void OnRectResizing(Rect2 newRect, Rect2 oldRect)
 	{
 		if (this.EditTarget == null)
-		{
 			return;
-		}
 
 		Rect2 newRegion = this.OverlayToWorld * newRect;
 		Rect2 oldRegion = this.OverlayToWorld * oldRect;

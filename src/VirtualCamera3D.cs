@@ -14,6 +14,11 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	[Export] public double BasePriority { get; private set; } = 0;
 	[Export] public double AdditionalLivePriority { get; private set; } = 0;
 
+	[ExportGroup("Debug", "Debug")]
+	[Export] public bool DebugShow3DGizmo
+		{ get; set => this.Debug3DGizmo?.Visible = field = value; }
+		= false;
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// SIGNALS
 	// -----------------------------------------------------------------------------------------------------------------
@@ -26,6 +31,7 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 	// -----------------------------------------------------------------------------------------------------------------
 
 	public double Priority { get; set; }
+	private Node3D? Debug3DGizmo;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// PROPERTIES
@@ -52,9 +58,10 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 		base._Ready();
 		if (Engine.IsEditorHint())
 		{
-			Node3D cameraPreview = GD.Load<PackedScene>($"res://addons/{nameof(GDirector)}/assets/CameraPreview.tscn")
+			this.Debug3DGizmo = GD.Load<PackedScene>($"res://addons/{nameof(GDirector)}/assets/CameraPreview.tscn")
 				.Instantiate<Node3D>();
-			this.AddChild(cameraPreview);
+			this.Debug3DGizmo.Visible = this.DebugShow3DGizmo;
+			this.AddChild(this.Debug3DGizmo);
 		}
 	}
 

@@ -11,20 +11,29 @@ public partial class GDirectorPlugin : EditorPlugin
 {
 	private ConfinementComponent? AreaEditTarget = null;
 	private ConfiningRegionEditor AreaEditor = new();
-	public override bool _Handles(GodotObject @object) => @object is ConfinementComponent;
+	private OrbitPreviewer OrbitPreviewer = new();
+	public override bool _Handles(GodotObject @object)
+		=> @object is ConfinementComponent or OrbitComponent;
 	public override void _Edit(GodotObject @object)
 	{
 		base._Edit(@object);
 		this.AreaEditor.EditTarget = this.AreaEditTarget = @object as ConfinementComponent;
 		this.AreaEditor.UndoRedo = this.GetUndoRedo();
+		this.OrbitPreviewer.PreviewTarget = @object as OrbitComponent;
+		this.OrbitPreviewer.UndoRedo = this.GetUndoRedo();
 	}
 	public override void _ForwardCanvasDrawOverViewport(Control viewportControl)
 	{
 		base._ForwardCanvasDrawOverViewport(viewportControl);
 		if (this.AreaEditor?.GetParent() != viewportControl)
-		{
 			viewportControl.AddChild(this.AreaEditor);
-		}
+	}
+
+	public override void _Forward3DDrawOverViewport(Control viewportControl)
+	{
+		base._Forward3DDrawOverViewport(viewportControl);
+		if (this.OrbitPreviewer?.GetParent() != viewportControl)
+			viewportControl.AddChild(this.OrbitPreviewer);
 	}
 
 	public override void _EnterTree()
