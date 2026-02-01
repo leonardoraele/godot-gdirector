@@ -1,4 +1,6 @@
+using System.Linq;
 using Godot;
+using Godot.Collections;
 using Raele.GodotUtils.Extensions;
 
 namespace Raele.GDirector.VirtualCamera3DComponents;
@@ -11,6 +13,11 @@ public partial class LookAtTargetComponent : VirtualCamera3DComponent
 	//==================================================================================================================
 
 	[Export] public Node3D? LookTarget;
+	[Export] public UpDirectionEnum UpDirection
+		{ get; set { field = value; this.UpdateConfigurationWarnings(); } }
+		= UpDirectionEnum.WorldUp;
+	[Export] public PhysicsBody3D? ReferenceBody
+		{ get; set { field = value; this.UpdateConfigurationWarnings(); } }
 
 	[ExportGroup("Offset")]
 	/// <summary>
@@ -80,9 +87,40 @@ public partial class LookAtTargetComponent : VirtualCamera3DComponent
 	// INTERNAL TYPES
 	//==================================================================================================================
 
+	public enum UpDirectionEnum : sbyte
+	{
+		WorldUp = 16,
+		TargetUp = 32,
+		GravityUp = 64,
+		None = 127,
+	}
+
 	//==================================================================================================================
 	// OVERRIDES
 	//==================================================================================================================
+
+	public override string[] _GetConfigurationWarnings()
+		=> (base._GetConfigurationWarnings() ?? [])
+			.AppendIf(
+				this.UpDirection == UpDirectionEnum.GravityUp &&  this.ReferenceBody == null,
+				$"Field '{nameof(this.ReferenceBody)}' is mandatory when {nameof(this.UpDirection)} is set to {UpDirectionEnum.GravityUp}."
+			)
+			.ToArray();
+
+	public override void _ValidateProperty(Dictionary property)
+	{
+		base._ValidateProperty(property);
+		switch (property["name"].AsString())
+		{
+			case nameof(this.UpDirection):
+				property["usage"] = (long) PropertyUsageFlags.Default | (long) PropertyUsageFlags.UpdateAllIfModified;
+				break;
+			case nameof(this.ReferenceBody):
+				if (this.UpDirection != UpDirectionEnum.GravityUp)
+					property["usage"] = (long) PropertyUsageFlags.None;
+				break;
+		}
+	}
 
 	public override void _Ready()
 	{
@@ -93,24 +131,25 @@ public partial class LookAtTargetComponent : VirtualCamera3DComponent
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
+		Vector3 cameraPos = this.Camera.GlobalPosition;
 		if (this.LookTarget == null)
 			return;
 		Vector3 lookTarget = this.GetOffsetedLookTarget();
-		if (lookTarget.IsEqualApprox(this.Camera.GlobalPosition))
+		if (lookTarget.IsEqualApprox(cameraPos))
 			return;
 		this.SmoothedTargetPosition = this.SmoothedTargetPosition.Lerp(lookTarget, this.LerpWeight);
-		if (this.SmoothedTargetPosition.IsEqualApprox(this.Camera.GlobalPosition)) {
+		if (this.SmoothedTargetPosition.IsEqualApprox(cameraPos))
 			return;
-		}
-		Vector3 lookDirection = (this.SmoothedTargetPosition - this.Camera.GlobalPosition).Normalized();
-		if (this.LimitEnabled) {
+		Vector3 lookDirection = (this.SmoothedTargetPosition - cameraPos).Normalized();
+		if (this.LimitEnabled)
+		{
 			Vector3 neutralDirection = this.GetDirectionToLookAnchor();
 			float angle = neutralDirection.AngleTo(lookDirection);
 			if (angle > this.MaxAngle) {
 				lookDirection = neutralDirection.RotateToward(lookDirection, this.MaxAngle);
 			}
 		}
-		this.Camera.GlobalBasis = this.ApplyOffsetRotation(Basis.LookingAt(lookDirection, this.Camera.GlobalBasis.Y));
+		this.Camera.GlobalBasis = this.ApplyOffsetRotation(Basis.LookingAt(lookDirection, this.GetUpDirection()));
 	}
 
 	//==================================================================================================================
@@ -138,4 +177,17 @@ public partial class LookAtTargetComponent : VirtualCamera3DComponent
 		=> basis
 			.Rotated(basis.X, this.OffsetRotation.Y)
 			.Rotated(Vector3.Up, this.OffsetRotation.X);
+
+	private Vector3 GetUpDirection()
+		=> this.UpDirection switch
+		{
+			UpDirectionEnum.WorldUp => Vector3.Up,
+			UpDirectionEnum.TargetUp when this.LookTarget != null => this.LookTarget.GlobalBasis.Up,
+			UpDirectionEnum.GravityUp
+				when this.ReferenceBody != null
+				&& this.ReferenceBody.GetGravity() is Vector3 gravity
+				&& !gravity.IsZeroApprox()
+					=> gravity * -1,
+			_ => this.Camera.GlobalBasis.Y,
+		};
 }
