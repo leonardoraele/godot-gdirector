@@ -1,5 +1,4 @@
 using Godot;
-using Godot.Collections;
 using Raele.GodotUtils.Extensions;
 
 namespace Raele.GDirector.VirtualCamera3DComponents;
@@ -33,7 +32,7 @@ public partial class LookAtTargetComponent : VirtualCamera3DComponent
 	[Export(PropertyHint.None, "radians_as_degrees,suffix:°")] public Vector2 OffsetRotation;
 
 	[ExportGroup("Smoothing")]
-	[Export(PropertyHint.Range, "0.01,1,0.01")] public float LerpWeight = 1f;
+	[Export(PropertyHint.Range, "0,100,1")] public float SmoothingFactor = 0f;
 	// [Export] public float MaxAngleDiffDeg = float.PositiveInfinity; // TODO
 
 	[ExportGroup("Limit Rotation")]
@@ -74,6 +73,8 @@ public partial class LookAtTargetComponent : VirtualCamera3DComponent
 	//==================================================================================================================
 	// COMPUTED PROPERTIES
 	//==================================================================================================================
+
+	private float LerpWeight => 1f / (this.SmoothingFactor + 1f);
 
 	//==================================================================================================================
 	// INTERNAL TYPES

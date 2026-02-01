@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Godot;
+using Godot.Collections;
 using Raele.GodotUtils.Extensions;
 
 namespace Raele.GDirector.VirtualCamera3DComponents;
@@ -40,7 +38,7 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 	/// If the pivot is not set, this property offsets from the world origin to determine the position the camera will
 	/// orbit around.
 	/// </summary>
-	[Export(PropertyHint.None, "suffix:m")] public Vector3 PivotOffset; // Used by pivotPositionCalculation
+	[Export(PropertyHint.None, "suffix:m")] public Vector3 PivotOffset;
 	/// <summary>
 	/// The camera distance from the pivot.
 	///
@@ -52,11 +50,15 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 		get;
 		set
 		{
-			field = value.AtLeast(0.0001f);
+			field = value.AtLeast(Mathf.Epsilon * 10);
 			if (field < this.MinDistance)
 				this.MinDistance = field;
 			if (field > this.MaxDistance)
 				this.MaxDistance = field;
+			if (field < this.ZoomMinDistance)
+				this.ZoomMinDistance = field;
+			if (field > this.ZoomMaxDistance)
+				this.ZoomMaxDistance = field;
 		}
 	}
 		= 5f;
@@ -80,7 +82,19 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 	/// If player-controlled spherical movement is enabled, this is the initial angle the camera will be when the scene
 	/// starts, and the player will be able to move the camera around the orbit at runtime.
 	/// </summary>
-	[Export(PropertyHint.Range, "-90,90,5,radians_as_degrees")] public float Angle = 0f; // Used by cameraDirectionCalculation
+	[Export(PropertyHint.Range, "-90,90,5,radians_as_degrees")] public float RestAngle
+	{
+		get;
+		set
+		{
+			field = value.Clamped(-Mathf.Pi / 2 + Mathf.Epsilon * 10, Mathf.Pi / 2 - Mathf.Epsilon * 10);
+			if (field < this.PlayerInputLowestAngle)
+				this.PlayerInputLowestAngle = field;
+			if (field > this.PlayerInputHighestAngle)
+				this.PlayerInputHighestAngle = field;
+		}
+	}
+		= 0f;
 
 	[ExportGroup("Smoothing")]
 	/// <summary>
@@ -107,19 +121,19 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 				this.RestDistance = field;
 		}
 	}
-		= float.PositiveInfinity; // Used by pivotPositionCalculation
+		= float.PositiveInfinity;
 	[Export(PropertyHint.None, "suffix:m")] public float MinDistance
 	{
 		get;
 		set
 		{
-			field = value.Clamped(0, this.MaxDistance);
+			field = value.Clamped(Mathf.Epsilon * 10, this.MaxDistance);
 			this.MinDistanceSqr = field * field;
 			if (field > this.RestDistance)
 				this.RestDistance = field;
 		}
 	}
-		= 0f; // Used by pivotPositionCalculation
+		= 1f;
 
 	[ExportGroup("Automatic Orbiting", "AutoOrbit")]
 	[Export(PropertyHint.GroupEnable)] public bool AutoOrbitEnabled;
@@ -129,29 +143,68 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 	/// If player-controlled spherical movement is enabled, the automatic orbiting is disabled while the player is
 	/// controlling the camera.
 	/// </summary>
-	[Export(PropertyHint.Range, "5,360,5,or_greater,radians_as_degrees,suffix:°/s")] public float AutoOrbitAngularVelocity = Mathf.Pi / 6; // Used by cameraDirectionCalculation
+	[Export(PropertyHint.Range, "5,360,5,or_greater,radians_as_degrees,suffix:°/s")] public float AutoOrbitAngularVelocity = Mathf.Pi / 6;
 	/// <summary>
 	/// The delay, in seconds, after the player stops controlling the camera before the camera starts automatically
 	/// rotating around the pivot again.
 	/// </summary>
-	[Export(PropertyHint.None, "suffix:s")] public float AutoOrbitStartDelay = 0f; // Used by cameraDirectionCalculation
+	[Export(PropertyHint.None, "suffix:s")] public float AutoOrbitStartDelay
+		{ get; set { field = value.AtLeast(0f); } }
+		= 2f;
 
-	[ExportGroup("Player Controls")]
-	[Export(PropertyHint.GroupEnable)] public bool EnablePlayerControls = false;
-	[Export(PropertyHint.None, "radians_as_degrees,suffix:°/s")] public float VerticalVelocity = 1f;
-	[Export(PropertyHint.None, "radians_as_degrees,suffix:°/s")] public float HorizontalVelocity = 1f;
+	[ExportGroup("Player Controls", "PlayerInput")]
+	/// <summary>
+	/// The highest vertical angle the camera can move, in degrees the ZX plane at the pivot's position.
+	///
+	/// Positive angles are rotations toward the positive Y axis, and vice-versa.
+	/// </summary>
+	[Export(PropertyHint.Range, "-90,90,5,radians_as_degrees")] public float PlayerInputHighestAngle
+	{
+		get;
+		set
+		{
+			field = value.Clamped(this.PlayerInputLowestAngle, Mathf.Pi / 2 - Mathf.Epsilon * 10);
+			if (field < this.RestAngle)
+				this.RestAngle = field;
+		}
+	}
+		= Mathf.Pi / 3f;
+	/// <summary>
+	/// The lowest vertical angle the camera can move, in degrees the ZX plane at the pivot's position.
+	///
+	/// Negative angles are rotations toward the negative Y axis, and vice-versa.
+	/// </summary>
+	[Export(PropertyHint.Range, "-90,90,5,radians_as_degrees")] public float PlayerInputLowestAngle
+	{
+		get;
+		set
+		{
+			field = value.Clamped(-Mathf.Pi / 2 + Mathf.Epsilon * 10, this.PlayerInputHighestAngle);
+			if (field > this.RestAngle)
+				this.RestAngle = field;
+		}
+	}
+		= Mathf.Pi / -12f;
 
-	[ExportSubgroup("Input Mapping")]
-	[Export(PropertyHint.InputName)] public string InputRotateUp = "camera_look_up";
-	[Export(PropertyHint.InputName)] public string InputRotateRight = "camera_look_right";
-	[Export(PropertyHint.InputName)] public string InputRotateDown = "camera_look_down";
-	[Export(PropertyHint.InputName)] public string InputRotateLeft = "camera_look_left";
+	[ExportSubgroup("Use Input Actions", "InputActions")]
+	[Export(PropertyHint.GroupEnable)] public bool InputActionsEnabled
+		{ get; set { field = value; this.NotifyPropertyListChanged(); } }
+		= true;
+	[Export(PropertyHint.InputName)] public string InputActionsRotateUp = "camera_look_up";
+	[Export(PropertyHint.InputName)] public string InputActionsRotateRight = "camera_look_right";
+	[Export(PropertyHint.InputName)] public string InputActionsRotateDown = "camera_look_down";
+	[Export(PropertyHint.InputName)] public string InputActionsRotateLeft = "camera_look_left";
+	[Export(PropertyHint.Link, "radians_as_degrees,suffix:°/s")] public Vector2 InputActionsAngularVelocity
+		{ get; set { field = value.Clamp(Vector2.Zero, Vector2.Inf); } }
+		= Mathf.Pi * Vector2.One;
 
-	[ExportSubgroup("Mouse Controls", "Mouse")]
+	[ExportSubgroup("Use Mouse Controls", "Mouse")]
 	/// <summary>
 	/// If enabled, the player can control the camera's spherical movement around the pivot using the mouse.
 	/// </summary>
-	[Export(PropertyHint.GroupEnable)] public bool MouseEnabled = false;
+	[Export(PropertyHint.GroupEnable)] public bool MouseEnabled
+		{ get; set { field = value; this.NotifyPropertyListChanged(); } }
+		= false;
 	/// <summary>
 	/// The number of pixels the mouse has to move to rotate the camera by one degree. (assuming mouse sensitivity is 1)
 	/// </summary>
@@ -161,26 +214,10 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 	/// horizontal movement.
 	/// </summary>
 	[Export(PropertyHint.None, "suffix:x")] public Vector2 MouseSensitivity = Vector2.One;
-	/// <summary>
-	/// The highest vertical angle the camera can move, in degrees the ZX plane at the pivot's position.
-	///
-	/// Positive angles are rotations toward the positive Y axis, and vice-versa.
-	/// </summary>
-	[Export(PropertyHint.Range, "-90,90,5,radians_as_degrees")] public float MouseMaxVerticalAngle
-		{ get; set { field = value.Clamped(this.MouseMinVerticalAngle, Mathf.Pi); } }
-		= Mathf.Pi / 3f;
-	/// <summary>
-	/// The lowest vertical angle the camera can move, in degrees the ZX plane at the pivot's position.
-	///
-	/// Negative angles are rotations toward the negative Y axis, and vice-versa.
-	/// </summary>
-	[Export(PropertyHint.Range, "-90,90,5,radians_as_degrees")] public float MouseMinVerticalAngle
-		{ get; set { field = value.Clamped(-Mathf.Pi, this.MouseMaxVerticalAngle); } }
-		= 0f;
 	// [Export] public Curve? DistanceMultiplierCurve; // TODO Use to change the camera distance based on the angle
 	// [Export] public Curve FieldOfViewPerAngle; // TODO Use to change the camera FOV based on the angle
 
-	[ExportSubgroup("Zoom", "Zoom")]
+	[ExportSubgroup("Enable Distance Controls", "Zoom")]
 	/// <summary>
 	/// If enabled, the player can control the camera's zoom.
 	/// </summary>
@@ -194,22 +231,38 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 	/// </summary>
 	[Export(PropertyHint.InputName)] public string ZoomInputMoveFarther = "camera_zoom_out";
 	/// <summary>
+	/// The amount of distance units the camera will zoom in or out per tick. (i.e. each time the zoom in or zoom out
+	/// input action is activated)
+	/// </summary>
+	[Export(PropertyHint.None, "suffix:m/s")] public float ZoomVelocity = 10f;
+	/// <summary>
 	/// The minimum distance the player can move the camera towards the pivot.
 	/// </summary>
 	[Export(PropertyHint.None, "suffix:m")] public float ZoomMinDistance
-		{ get; set { field = value.AtMost(ZoomMaxDistance); } }
+	{
+		get;
+		set
+		{
+			field = value.Clamped(Mathf.Epsilon * 10, ZoomMaxDistance);
+			if (field > this.RestDistance)
+				this.RestDistance = field;
+		}
+	}
 		= 1f;
 	/// <summary>
 	/// The maximum distance the player can move the camera away from the pivot.
 	/// </summary>
 	[Export(PropertyHint.None, "suffix:m")] public float ZoomMaxDistance
-		{ get; set { field = value.AtLeast(ZoomMinDistance); } }
-		= 10f;
-	/// <summary>
-	/// The amount of distance units the camera will zoom in or out per tick. (i.e. each time the zoom in or zoom out
-	/// input action is activated)
-	/// </summary>
-	[Export(PropertyHint.None, "suffix:m/s")] public float ZoomVelocity = 10f;
+	{
+		get;
+		set
+		{
+			field = value.AtLeast(ZoomMinDistance);
+			if (field < this.RestDistance)
+				this.RestDistance = field;
+		}
+	}
+		= float.PositiveInfinity;
 
 	//==================================================================================================================
 	// FIELDS
@@ -217,6 +270,8 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 
 	private float MaxDistanceSqr;
 	private float MinDistanceSqr;
+	private Vector3 SmoothedCameraPosition = Vector3.Zero;
+	private Tween? AutoOrbitDelay;
 
 	//==================================================================================================================
 	// COMPUTED PROPERTIES
@@ -224,243 +279,160 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 
 	public float SmoothingLerpWeight
 		=> 1f / (this.SmoothingFactor + 1f);
-	public IEnumerable<Func<Vector3, Transform3D, Vector3>> AllModifiers
-	{
-		get
-		{
-			yield return this.ApplyOrbit;
-			yield return this.ApplySmoothing;
-			yield return this.ApplyAutoOrbit;
-		}
-	}
 
 	//==================================================================================================================
 	// OVERRIDES
 	//==================================================================================================================
 
+	public override void _ValidateProperty(Dictionary property)
+	{
+		base._ValidateProperty(property);
+		switch (property["name"].AsString())
+		{
+			case nameof(this.PlayerInputHighestAngle):
+			case nameof(this.PlayerInputLowestAngle):
+				property["usage"] = this.InputActionsEnabled || this.MouseEnabled
+					? (long) PropertyUsageFlags.Default
+					: (long) PropertyUsageFlags.None;
+				break;
+		}
+	}
+
+	public override void _Ready()
+	{
+		base._Ready();
+		this.SmoothedCameraPosition = this.Camera.GlobalPosition;
+	}
+
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
+
+		Vector3 newCameraPosition;
+
+		// Calculate the pivot's position with offset
 		Transform3D pivot = this.Pivot?.GlobalTransform.Translated(this.PivotOffset) ?? Transform3D.Identity;
-		this.Camera.GlobalPosition
-			= this.AllModifiers.Aggregate(this.Camera.GlobalPosition, (pos, func) => func(pos, pivot));
+
+		// Gets the position closest to the camera that is in the orbit around the pivot, at rest distance of the pivot,
+		// and at the right angle.
+		{
+			float orbitHeight = pivot.Origin.Y + Mathf.Sin(this.RestAngle) * this.RestDistance;
+			Vector3 pivotAtOrbitHeight = pivot.Origin with { Y = orbitHeight };
+			Vector3 cameraAtOrbitHeight = this.Camera.GlobalPosition with { Y = orbitHeight };
+			newCameraPosition = cameraAtOrbitHeight.IsEqualApprox(pivotAtOrbitHeight)
+				? cameraAtOrbitHeight + Vector3.Back * this.RestDistance
+				: pivotAtOrbitHeight
+					+ pivotAtOrbitHeight.DirectionTo(cameraAtOrbitHeight)
+					* Mathf.Cos(this.RestAngle)
+					* this.RestDistance;
+		}
+
+		// Applies smoothing
+		{
+			this.SmoothedCameraPosition = this.SmoothedCameraPosition.Lerp(newCameraPosition, this.SmoothingLerpWeight);
+			if (pivot.Origin.DistanceSquaredTo(this.SmoothedCameraPosition) > this.MaxDistanceSqr)
+				this.SmoothedCameraPosition = pivot.Origin.MoveToward(this.SmoothedCameraPosition, this.MaxDistance);
+			else if (pivot.Origin.DistanceSquaredTo(this.SmoothedCameraPosition) < this.MinDistanceSqr)
+				this.SmoothedCameraPosition = pivot.Origin
+					+ pivot.Origin.DirectionTo(this.SmoothedCameraPosition)
+					* this.MinDistance;
+			newCameraPosition = this.SmoothedCameraPosition;
+		}
+
+		// Apply automatic orbiting
+		if (this.AutoOrbitDelay?.IsRunning() != true)
+			newCameraPosition = newCameraPosition.RotatedAround(
+				pivot.Origin,
+				Vector3.Up,
+				this.AutoOrbitAngularVelocity * (float) delta
+			);
+
+		// Apply player control
+		if (!Engine.IsEditorHint())
+		{
+			// Apply player-input rotation
+			{
+				Vector2 playerInput =
+					Input.GetVector(
+						this.InputActionsRotateLeft,
+						this.InputActionsRotateRight,
+						this.InputActionsRotateDown,
+						this.InputActionsRotateUp
+					)
+					* this.InputActionsAngularVelocity
+					* (float) delta
+					* this.InputActionsEnabled.ToInt()
+					+ this.AccumulatedMouseMovement * this.MouseSensitivity / Mathf.RadToDeg(this.MousePixelsPerDegree);
+
+				// Flush accumulated mouse movement
+				this.AccumulatedMouseMovement = Vector2.Zero;
+
+				// Rotate the camera based on the player's input
+				if (!playerInput.IsZeroApprox())
+				{
+					Vector3 newCameraDir = (newCameraPosition - pivot.Origin).Normalized();
+
+					// Rotate horizontally
+					{
+						newCameraDir = newCameraDir.Rotated(Vector3.Up, playerInput.X);
+					}
+
+					// Rotate vertically
+					{
+						Vector3 crossAxis = Basis.LookingAt(newCameraDir).X;
+						float currentVerticalAngle = newCameraDir.AngleTo(Vector3.Down) - Mathf.Pi / 2;
+						float newVerticalAngle = Mathf.Clamp(
+							currentVerticalAngle + playerInput.Y,
+							this.PlayerInputLowestAngle,
+							this.PlayerInputHighestAngle
+						);
+						newCameraDir = newCameraDir.Rotated(crossAxis, newVerticalAngle - currentVerticalAngle);
+					}
+
+					// Apply rotation
+					newCameraPosition = pivot.Origin + newCameraDir * newCameraPosition.DistanceTo(pivot.Origin);
+				}
+			}
+
+			// Apply player-input zoom
+			{
+				float playerInput = Input.GetAxis(this.ZoomInputMoveCloser, this.ZoomInputMoveFarther);
+				newCameraPosition = pivot.Origin + pivot.Origin.DirectionTo(newCameraPosition)
+					* Mathf.Max(
+						this.MinDistance,
+						newCameraPosition.DistanceTo(pivot.Origin) + playerInput * this.ZoomVelocity * (float) delta
+					);
+			}
+		}
+
+		this.Camera.GlobalPosition = newCameraPosition;
 	}
 
-	// public override void _Input(InputEvent @event)
-	// {
-	// 	base._Input(@event);
-	// 	this.CameraDirectionController.HandleInput(@event);
-	// }
+	private Vector2 AccumulatedMouseMovement = Vector2.Zero;
+
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		base._UnhandledInput(@event);
+		if (Engine.IsEditorHint())
+		{
+			this.SetProcessUnhandledInput(false);
+			return;
+		}
+		if (this.MouseEnabled && @event is InputEventMouseMotion mouseMotion)
+		{
+			this.AccumulatedMouseMovement += mouseMotion.Relative;
+			if (this.AutoOrbitEnabled)
+				if (this.AutoOrbitDelay?.IsRunning() == true)
+				{
+					this.AutoOrbitDelay.Stop();
+					this.AutoOrbitDelay.Play();
+				}
+				else
+					this.AutoOrbitDelay = this.CreateTween().AddIntervalTweener(this.AutoOrbitStartDelay);
+		}
+	}
 
 	//==================================================================================================================
 	// METHODS
 	//==================================================================================================================
-
-	/// <summary>
-	/// Gets the position closest to the camera that is in the orbit around the pivot, at rest distance of the pivot,
-	/// and at the right angle.
-	/// </summary>
-	private Vector3 ApplyOrbit(Vector3 cameraPosition, Transform3D pivot)
-	{
-		float orbitHeight = pivot.Origin.Y + Mathf.Sin(this.Angle) * this.RestDistance;
-		Vector3 pivotAtOrbitHeight = pivot.Origin with { Y = orbitHeight };
-		Vector3 cameraAtOrbitHeight = cameraPosition with { Y = orbitHeight };
-		return cameraAtOrbitHeight.IsEqualApprox(pivotAtOrbitHeight)
-			? cameraAtOrbitHeight + Vector3.Back * this.RestDistance
-			: pivotAtOrbitHeight
-				+ pivotAtOrbitHeight.DirectionTo(cameraAtOrbitHeight)
-				* Mathf.Cos(this.Angle)
-				* this.RestDistance;
-	}
-
-	/// <summary>
-	/// Applies smoothing to the camera's position.
-	/// </summary>
-	private Func<Vector3, Transform3D, Vector3> ApplySmoothing
-	{
-		get
-		{
-			if (field != null)
-				return field;
-			Vector3 smoothedPosition = this.Camera.GlobalPosition;
-			return field = (cameraPosition, pivot) =>
-			{
-				smoothedPosition = smoothedPosition.Lerp(cameraPosition, this.SmoothingLerpWeight);
-				if (pivot.Origin.DistanceSquaredTo(smoothedPosition) > this.MaxDistanceSqr)
-					smoothedPosition = pivot.Origin.MoveToward(smoothedPosition, this.MaxDistance);
-				else if (pivot.Origin.DistanceSquaredTo(smoothedPosition) < this.MinDistanceSqr)
-					smoothedPosition = pivot.Origin + pivot.Origin.DirectionTo(smoothedPosition) * this.MinDistance;
-				return smoothedPosition;
-			};
-		}
-	}
-
-	private Vector3 ApplyAutoOrbit(Vector3 cameraPosition, Transform3D pivot)
-		=> cameraPosition.RotateAround(pivot.Origin, Vector3.Up, this.AutoOrbitAngularVelocity * (float) this.GetProcessDeltaTime());
-
-	// //==================================================================================================================
-	// // CALCULATE CAMERA DIRECTION
-	// //==================================================================================================================
-
-	// private class CameraDirectionControllerClass
-	// {
-	// 	/// <summary>
-	// 	/// This is the position the camera was positioned in relation to the pivot the last frame, in global space. If the
-	// 	/// pivot moves, the actual direction of the camera in relation to pivot will change, so we use this value to
-	// 	/// preserve the camera's direction in relation to the pivot from one frame to the next.
-	// 	/// </summary>
-	// 	private Vector3 AnchorCameraDirection = Vector3.Back;
-	// 	/// <summary>
-	// 	/// This is the direction the camera should be positioned in relation to the pivot, in global space.
-	// 	/// </summary>
-	// 	private Vector3 TargetCameraDirection = Vector3.Back;
-	// 	/// <summary>
-	// 	/// The timestamp of the last time the player moved the camera around the pivot. This is used to determine when the
-	// 	/// camera should start automatically rotating around the pivot again.
-	// 	/// </summary>
-	// 	private ulong LastOrbitalMovementPlayerInputTimestamp = 0;
-	// 	private OrbitComponent Controller;
-	// 	private Vector2 MouseInput;
-
-	// 	private ulong TimeSinceLastOrbitalMovementPlayerInputMs
-	// 		=> Time.GetTicksMsec() - this.LastOrbitalMovementPlayerInputTimestamp;
-	// 	private float AutomaticHorizontalMovementRadPSec => Mathf.DegToRad(this.Controller.DegreesPerSecond);
-	// 	private float InitialAngleRad => Mathf.DegToRad(this.Controller.AngleDeg);
-	// 	private float MinAngleRad => Mathf.DegToRad(this.Controller.MinAngleDeg);
-	// 	private float MaxAngleRad => Mathf.DegToRad(this.Controller.MaxAngleDeg);
-	// 	public CameraDirectionControllerClass(OrbitComponent controller) => Controller = controller;
-	// 	public Vector3 InitializeCameraDirection(Vector3 pivotPosition)
-	// 	{
-	// 		if (this.Controller.Camera.GlobalPosition.DistanceSquaredTo(pivotPosition) < Mathf.Epsilon) {
-	// 			return this.TargetCameraDirection = this.AnchorCameraDirection = Vector3.Back;
-	// 		}
-	// 		Vector3 direction = ((this.Controller.Camera.GlobalPosition - pivotPosition) with { Y = 0}).Normalized();
-	// 		return this.TargetCameraDirection
-	// 			= this.AnchorCameraDirection
-	// 			= direction.Rotated(Basis.LookingAt(direction).X, this.InitialAngleRad);
-	// 	}
-	// 	/// <summary>
-	// 	/// This method calculates the direction the camera should be positioned in relation to the pivot in the next
-	// 	/// frame. It reads the player's input, applies smoothing, and applies automatic orbiting movement. (whichever
-	// 	/// of these features are enabled)
-	// 	/// </summary>
-	// 	public Vector3 NextCameraDirection()
-	// 	{
-	// 		Vector2 mouseInput = this.ConsumeMouseInput();
-
-	// 		// Rotate the camera based on the player's input
-	// 		if (this.Controller.EnableMouseMotionControls && mouseInput.LengthSquared() > Mathf.Epsilon) {
-	// 			float xAngleInputRad = Mathf.DegToRad(mouseInput.X / this.Controller.PixelsPerDegree) * this.Controller.MouseSensibilityX;
-	// 			float yAngleInputRad = Mathf.DegToRad(mouseInput.Y / this.Controller.PixelsPerDegree) * this.Controller.MouseSensibilityY;
-	// 			Vector3 xRotatedCamDir = !GDirectorUtil.CheckNormalsAreParallel(this.TargetCameraDirection, Vector3.Up)
-	// 				? this.TargetCameraDirection.Rotated(Vector3.Down, xAngleInputRad)
-	// 				: Vector3.Back; // Reset the camera direction if it's looking straight up or down
-	// 			Vector3 crossAxis = Basis.LookingAt(xRotatedCamDir).X;
-	// 			float currentVerticalAngle = xRotatedCamDir.AngleTo(Vector3.Down) - Mathf.Pi / 2;
-	// 			float newVerticalAngle = Mathf.Clamp(currentVerticalAngle + yAngleInputRad, this.MinAngleRad, this.MaxAngleRad);
-	// 			this.TargetCameraDirection = xRotatedCamDir.Rotated(crossAxis, newVerticalAngle - currentVerticalAngle);
-	// 			this.LastOrbitalMovementPlayerInputTimestamp = Time.GetTicksMsec();
-
-	// 		// Rotate the camera based on automatic rotation settings
-	// 		} else if (
-	// 			this.AutomaticHorizontalMovementRadPSec != 0
-	// 			&& (
-	// 				!this.Controller.EnableMouseMotionControls
-	// 				|| this.TimeSinceLastOrbitalMovementPlayerInputMs > this.Controller.DelayAfterPlayerControlSec * 1000
-	// 			)
-	// 		) {
-	// 			this.TargetCameraDirection = this.TargetCameraDirection.Rotated(
-	// 				Vector3.Up,
-	// 				this.AutomaticHorizontalMovementRadPSec * (float) this.Controller.GetProcessDeltaTime()
-	// 			);
-	// 		}
-
-	// 		// Calculate the new camera direction by approximating the current direction to the expected direction
-	// 		// (determined by this.TargetCameraDirection).
-	// 		float angle = this.AnchorCameraDirection.AngleTo(this.TargetCameraDirection);
-	// 		this.AnchorCameraDirection = angle < Mathf.Epsilon
-	// 			? this.TargetCameraDirection
-	// 			: this.AnchorCameraDirection.Slerp(this.TargetCameraDirection, this.Controller.OrbitalMovementLerpWeight);
-
-	// 		return this.AnchorCameraDirection;
-	// 	}
-	// 	private Vector2 ConsumeMouseInput()
-	// 	{
-	// 		Vector2 mouseInput = this.MouseInput;
-	// 		this.MouseInput = Vector2.Zero;
-	// 		return mouseInput;
-	// 	}
-	// 	public void HandleInput(InputEvent @event)
-	// 	{
-	// 		if (@event is InputEventMouseMotion mouseMotion) {
-	// 			this.MouseInput = mouseMotion.Relative;
-	// 		}
-	// 	}
-	// }
-
-	// //==================================================================================================================
-	// // CALCULATE CAMERA DISTANCE
-	// //==================================================================================================================
-
-	// /// <summary>
-	// /// This class is responsible for calculating the distance the camera should be from the pivot. It reads the
-	// /// player's input if player-controlled zoom is enabled, and applies the zoom with soomthing (if enabled).
-	// /// </summary>
-	// private class CameraDistanceControllerClass
-	// {
-	// 	/// <summary>
-	// 	/// The distance the camera was from the pivot the last frame. If the pivot moves, the actual distance of the camera
-	// 	/// from the pivot will change, so we use this value to preserve the camera's distance from the pivot from one frame
-	// 	/// to the next.
-	// 	/// </summary>
-	// 	private float AnchorCameraDistance {
-	// 		get => this.Controller.RestDistance;
-	// 		set => this.Controller.RestDistance = value;
-	// 	}
-	// 	/// <summary>
-	// 	/// The distance the camera should be from the pivot. Every time the player changes the zoom level, the target
-	// 	/// camera distance is redefined, and every time <see cref="NextCameraDistance"/> is called, the camera distance
-	// 	/// is smoothed toward this target distance.
-	// 	/// </summary>
-	// 	private float TargetCameraDistance;
-	// 	private OrbitComponent Controller;
-	// 	public CameraDistanceControllerClass(OrbitComponent controller) => Controller = controller;
-	// 	public float InitializeCameraDistance()
-	// 		=> this.TargetCameraDistance = this.AnchorCameraDistance = this.Controller.RestDistance;
-	// 	/// <summary>
-	// 	/// This method calculates the distance the camera should be from the pivot in the next frame. It reads the
-	// 	/// player's input and applies smoothing. (whichever of these features is enabled) Every time this method is
-	// 	/// called, the distance is smoothed toward the target distance, according to the player input.
-	// 	/// If player-controlled zoom is disabled, this method will return the same distance every time.
-	// 	/// </summary>
-	// 	public float NextCameraDistance()
-	// 	{
-	// 		// Zoom in and out based on the player's input
-	// 		if (this.Controller.ZoomEnabled) {
-	// 			// Read input & update target zoom
-	// 			if (!string.IsNullOrEmpty(this.Controller.ZoomOutAction) && Input.IsActionJustPressed(this.Controller.ZoomOutAction)) {
-	// 				this.TargetCameraDistance = Mathf.Clamp(
-	// 					this.TargetCameraDistance + this.Controller.ZoomAmountUnPerTick,
-	// 					this.Controller.MinDistance,
-	// 					this.Controller.MaxDistance
-	// 				);
-	// 			} else if (!string.IsNullOrEmpty(this.Controller.ZoomInAction) && Input.IsActionJustPressed(this.Controller.ZoomInAction)) {
-	// 				this.TargetCameraDistance = Mathf.Clamp(
-	// 					this.TargetCameraDistance - this.Controller.ZoomAmountUnPerTick,
-	// 					this.Controller.MinDistance,
-	// 					this.Controller.MaxDistance
-	// 				);
-	// 			}
-
-	// 			// Lerp toward the target zoom
-	// 			this.AnchorCameraDistance = Mathf.Lerp(
-	// 				this.AnchorCameraDistance,
-	// 				this.TargetCameraDistance,
-	// 				this.Controller.ZoomLerpWeight
-	// 			);
-	// 		}
-
-	// 		return this.AnchorCameraDistance;
-	// 	}
-	// }
 }
