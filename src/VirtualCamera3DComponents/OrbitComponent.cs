@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Godot;
 using Godot.Collections;
 using Raele.GodotUtils.Extensions;
@@ -50,7 +51,7 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 		get;
 		set
 		{
-			field = value.AtLeast(Mathf.Epsilon * 10);
+			this.CurrentDistance = field = value.AtLeast(Mathf.Epsilon * 10);
 			// if (field < this.TranslationMinDistance)
 			// 	this.TranslationMinDistance = field;
 			// if (field > this.TranslationMaxDistance)
@@ -88,6 +89,7 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 		set
 		{
 			field = value.Clamped(-Mathf.Pi / 2 + Mathf.Epsilon * 10, Mathf.Pi / 2 - Mathf.Epsilon * 10);
+			this.CurrentDirection = Vector3.Back.Rotated(Vector3.Left, field);
 			if (field < this.PlayerInputLowestAngle)
 				this.PlayerInputLowestAngle = field;
 			if (field > this.PlayerInputHighestAngle)
@@ -269,6 +271,8 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 
 	private Tween? AutoOrbitDelay;
 	private Vector2 AccumulatedMouseMovement = Vector2.Zero;
+	private Vector3 CurrentDirection = Vector3.Back;
+	private float CurrentDistance = 0f;
 
 	//==================================================================================================================
 	// COMPUTED PROPERTIES
@@ -309,22 +313,27 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 		}
 	}
 
+	public override void _Ready()
+	{
+		base._Ready();
+		this.CurrentDistance = this.RestDistance;
+		this.CurrentDirection = Vector3.Back.Rotated(Vector3.Right, this.RestAngle);
+	}
+
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
 
-		Vector3 newCameraPosition = this.Camera.GlobalPosition;
-
 		// Calculate the pivot's position with offset
 		Transform3D pivot = this.Pivot?.GlobalTransform.Translated(this.PivotOffset) ?? Transform3D.Identity;
 
+		Vector3 cameraDirection = this.CurrentDirection;
+		float cameraDistance = this.CurrentDistance;
+		Vector3 crossAxis = cameraDirection.Cross(Vector3.Up).Normalized();
+
 		// Apply automatic orbiting
 		if (this.AutoOrbitEnabled && this.AutoOrbitDelay?.IsRunning() != true)
-			newCameraPosition = newCameraPosition.RotatedAround(
-				pivot.Origin,
-				Vector3.Up,
-				this.AutoOrbitAngularVelocity * (float) delta
-			);
+			cameraDirection = cameraDirection.Rotated(Vector3.Up, this.AutoOrbitAngularVelocity * (float) delta);
 
 		// Apply player control
 		if (!Engine.IsEditorHint() && this.Camera.AsVirtualCamera().IsLive)
@@ -341,7 +350,9 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 					* this.InputActionsAngularVelocity
 					* (float) delta
 					* this.InputActionsEnabled.ToInt()
-					+ this.AccumulatedMouseMovement * this.MouseSensitivity / Mathf.RadToDeg(this.MousePixelsPerDegree);
+					+ this.AccumulatedMouseMovement
+						* new Vector2(1, -1) // Invert Y because mouse movement +Y is down
+						* this.MouseSensitivity / Mathf.RadToDeg(this.MousePixelsPerDegree);
 
 				// Flush accumulated mouse movement
 				this.AccumulatedMouseMovement = Vector2.Zero;
@@ -349,56 +360,45 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 				// Rotate the camera based on the player's input
 				if (!playerInput.IsZeroApprox())
 				{
-					Vector3 cameraDir = (newCameraPosition - pivot.Origin).Normalized();
-
 					// Rotate horizontally
 					{
-						cameraDir = cameraDir.Rotated(Vector3.Down, playerInput.X);
+						cameraDirection = cameraDirection.Rotated(Vector3.Down, playerInput.X);
 					}
 
 					// Rotate vertically
 					{
-						Vector3 crossAxis = Basis.LookingAt(cameraDir).X;
-						float currentVerticalAngle = cameraDir.AngleTo(Vector3.Down) - Mathf.Pi / 2;
+						float currentVerticalAngle = cameraDirection.AngleTo(Vector3.Down) - Mathf.Pi / 2;
 						float newVerticalAngle = Mathf.Clamp(
-							currentVerticalAngle + playerInput.Y,
+							currentVerticalAngle - playerInput.Y,
 							this.PlayerInputLowestAngle,
 							this.PlayerInputHighestAngle
 						);
-						cameraDir = cameraDir.Rotated(crossAxis, currentVerticalAngle - newVerticalAngle);
+						cameraDirection = cameraDirection.Rotated(crossAxis, newVerticalAngle - currentVerticalAngle);
 					}
-
-					// Apply rotation
-					newCameraPosition = pivot.Origin + cameraDir * newCameraPosition.DistanceTo(pivot.Origin);
 				}
 			}
 
 			// Apply player-input zoom
+			if (this.ZoomEnabled)
 			{
 				float playerInput = Input.GetAxis(this.ZoomInputMoveCloser, this.ZoomInputMoveFarther);
-				newCameraPosition = pivot.Origin
-					+ pivot.Origin.DirectionTo(newCameraPosition)
-					* (pivot.Origin.DistanceTo(newCameraPosition) + playerInput * (float) delta)
-						.Clamped(this.ZoomMinDistance, this.ZoomMaxDistance);
+				cameraDistance = cameraDistance + playerInput * this.ZoomVelocity * (float) delta;
 			}
 		}
 
 		// Bring the camera within distance limits
-		newCameraPosition = pivot.Origin
-			+ pivot.Origin.DirectionTo(newCameraPosition)
-			* pivot.Origin.DistanceTo(newCameraPosition)
-				.Clamped(this.MinDistanceLimit, this.MaxDistanceLimit);
+		cameraDistance = cameraDistance.Clamped(this.MinDistanceLimit, this.MaxDistanceLimit);
 
 		// Bring the camera within angle limits
 		{
-			Vector3 direction = (newCameraPosition - pivot.Origin).Normalized().DefaultIfZero(Vector3.Back);
-			float currentAngle = direction.AngleTo(Vector3.Down) - Mathf.Pi / 2;
-			float newAngle = currentAngle.Clamped(this.LowAngleLimit, this.HighAngleLimit);
-			Vector3 newDirection = direction.Rotated(Basis.LookingAt(direction).X, newAngle - currentAngle);
-			newCameraPosition = pivot.Origin + newDirection * newCameraPosition.DistanceTo(pivot.Origin);
+			float currentAngle = cameraDirection.AngleTo(Vector3.Down) - Mathf.Pi / 2;
+			float clampedAngle = currentAngle.Clamped(this.LowAngleLimit, this.HighAngleLimit);
+			cameraDirection = cameraDirection.Rotated(crossAxis, clampedAngle - currentAngle);
 		}
 
-		this.Camera.GlobalPosition = newCameraPosition;
+		this.Camera.GlobalPosition = pivot.Origin + cameraDirection * cameraDistance;
+		this.CurrentDirection = cameraDirection;
+		this.CurrentDistance = cameraDistance;
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -411,7 +411,7 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 		}
 		if (this.MouseEnabled && @event is InputEventMouseMotion mouseMotion)
 		{
-			this.AccumulatedMouseMovement += mouseMotion.Relative * new Vector2(1, -1);
+			this.AccumulatedMouseMovement += mouseMotion.Relative;
 			if (this.AutoOrbitEnabled)
 				if (this.AutoOrbitDelay?.IsRunning() == true)
 				{
@@ -421,6 +421,20 @@ public partial class OrbitComponent : VirtualCamera3DComponent
 				else
 					this.AutoOrbitDelay = this.CreateTween().AddIntervalTweener(this.AutoOrbitStartDelay);
 		}
+	}
+
+	protected override void _IsLiveEnter()
+	{
+		base._IsLiveEnter();
+		if (!this.MouseEnabled)
+			return;
+		Input.MouseModeEnum previousMouseMode = Input.MouseMode;
+		Input.MouseMode = Input.MouseModeEnum.Captured;
+		this.Camera.Connect(
+			VirtualCamera3D.SignalName.IsLiveChanged,
+			Callable.From<bool>(isLive => Input.MouseMode = previousMouseMode),
+			(uint) ConnectFlags.OneShot
+		);
 	}
 
 	//==================================================================================================================

@@ -16,7 +16,7 @@ public partial class VirtualCamera3D : Node3D, IVirtualCamera
 
 	[ExportGroup("Debug", "Debug")]
 	[Export] public bool DebugShow3DGizmo
-		{ get; set => this.Debug3DGizmo?.Visible = field = value; }
+		{ get; set { field = value; this.Debug3DGizmo?.Visible = field; } }
 		= false;
 
 	// -----------------------------------------------------------------------------------------------------------------
