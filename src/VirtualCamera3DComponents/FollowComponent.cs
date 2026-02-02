@@ -1,4 +1,5 @@
 using Godot;
+using Raele.GodotUtils.Extensions;
 
 namespace Raele.GDirector.VirtualCamera3DComponents;
 
@@ -13,7 +14,7 @@ namespace Raele.GDirector.VirtualCamera3DComponents;
 /// This camera controller is useful for following objects that move at high speeds, but it's not ideal for
 /// player-controlled characters in most games.
 /// </summary>
-[GlobalClass]
+[Tool][GlobalClass]
 public partial class FollowComponent : VirtualCamera3DComponent
 {
 	/// <summary>
@@ -25,20 +26,14 @@ public partial class FollowComponent : VirtualCamera3DComponent
 	/// </summary>
 	[Export] public Vector3 FollowTargetOffset;
 	/// <summary>
-	/// The maximum distance the camera can be from the follow target. If the camera is farther than this distance from
-	/// the follow target, it will move directly to the follow target to keep the distance within the valid range.
+	/// The minimum distance the camera can be from the follow target. If the camera is closer than this distance from
+	/// the follow target, it will move directly alway from it to keep the distance within the valid range.
 	///
-	/// This value must be greater than the <see cref="DeadZoneFartherLimit"/>.
+	/// This value must be lower than or equal to the <see cref="DeadZoneCloserLimit"/>.
 	/// </summary>
-	[Export] public float MaxDistance = float.PositiveInfinity;
-	/// <summary>
-	/// The radius of the dead zone around the follow target. The camera will remain still for as long as the follow
-	/// target is within at least this distance and the distance set by <see cref="DeadZoneCloserLimit"/>.
-	///
-	/// This value must be greater than or equal to the <see cref="DeadZoneCloserLimit"/> and lower than or equal to the
-	/// <see cref="MaxDistance"/>.
-	/// </summary>
-	[Export] public float DeadZoneFartherLimit = 0;
+	[Export] public float MinDistance
+		{ get; set { field = value.Clamped(Mathf.Epsilon * 100, this.DeadZoneCloserLimit); } }
+		= 2f;
 	/// <summary>
 	/// The radius of the dead zone around the follow target. The camera will remain still for as long as the follow
 	/// target is within at least this distance and the distance set by <see cref="DeadZoneFartherLimit"/>.
@@ -46,14 +41,30 @@ public partial class FollowComponent : VirtualCamera3DComponent
 	/// This value must be greater than or equal to the <see cref="MinDistance"/> and lower than or equal to the
 	/// <see cref="DeadZoneFartherLimit"/>.
 	/// </summary>
-	[Export] public float DeadZoneCloserLimit = 0;
+	[Export] public float DeadZoneCloserLimit
+		{ get; set { field = value.Clamped(this.MinDistance, this.DeadZoneFartherLimit); } }
+		= 2f;
 	/// <summary>
-	/// The minimum distance the camera can be from the follow target. If the camera is closer than this distance from
-	/// the follow target, it will move directly alway from it to keep the distance within the valid range.
+	/// The radius of the dead zone around the follow target. The camera will remain still for as long as the follow
+	/// target is within at least this distance and the distance set by <see cref="DeadZoneCloserLimit"/>.
 	///
-	/// This value must be lower than or equal to the <see cref="DeadZoneCloserLimit"/>.
+	/// This value must be greater than or equal to the <see cref="DeadZoneCloserLimit"/> and lower than or equal to the
+	/// <see cref="MaxDistance"/>.
 	/// </summary>
-	[Export] public float MinDistance;
+	[Export] public float DeadZoneFartherLimit
+		{ get; set { field = value.Clamped(this.DeadZoneCloserLimit, this.MaxDistance); } }
+		= 5f;
+	/// <summary>
+	/// The maximum distance the camera can be from the follow target. If the camera is farther than this distance from
+	/// the follow target, it will move directly to the follow target to keep the distance within the valid range.
+	///
+	/// This value must be greater than the <see cref="DeadZoneFartherLimit"/>.
+	/// </summary>
+	[Export] public float MaxDistance
+		{ get; set { field = value.AtLeast(this.DeadZoneFartherLimit); } }
+		= float.PositiveInfinity;
+
+	[ExportGroup("Smoothing")]
 	/// <summary>
 	/// This is the weight of the linear interpolation used to smoothly move the camera toward the follow target while
 	/// it's outside the deadzone radius. (see <see cref="DeadZoneCloserLimit"/>)
@@ -62,16 +73,13 @@ public partial class FollowComponent : VirtualCamera3DComponent
 	/// camera will always be within the deadzone radius or in it's limites. If it's set to 0, the camera will
 	/// ignore the deadzone radius and will only move when it's farther than the <see cref="MaxDistance"/>.
 	/// </summary>
-	[Export(PropertyHint.Range, "0,1,0.01")] public float LerpWeight = 1f;
+	[Export(PropertyHint.Range, "0,100,1")] public float SmoothingFactor = 0f;
 
-	public Vector3 FollowTargetPosition {
-		get {
-			Transform3D? transform = this.FollowTarget?.GlobalTransform;
-			return transform != null
-				? transform.Value.Origin + transform.Value.Basis * this.FollowTargetOffset
-				: this.FollowTargetOffset;
-		}
-	}
+	private float LerpWeight
+		=> 1f / (this.SmoothingFactor + 1f);
+
+	public Vector3 FollowTargetPosition => (this.FollowTarget?.GlobalTransform ?? Transform3D.Identity)
+		* this.FollowTargetOffset;
 
 	public override void _Process(double delta)
 	{

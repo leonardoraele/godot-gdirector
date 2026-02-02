@@ -78,8 +78,6 @@ public interface IVirtualCamera
 	}
 
 	public Node AsNode() => (Node) this;
-	public bool Is2D() => this.As2D() != null;
-	public bool Is3D() => this.As3D() != null;
 
 	public void NotifyIsLiveChanged(bool isLive) => this.AsNode().EmitSignal(SignalName_IsLiveChanged, isLive);
 }

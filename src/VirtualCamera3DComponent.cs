@@ -114,12 +114,11 @@ public abstract partial class VirtualCamera3DComponent : Node3D
 			}
 		}
 		if (this.IsLive && GDirectorServer.Instance.GodotCamera3D is Camera3D rcam)
-			this._ProcessIsLive(rcam, delta);
+			this.CallDeferred(MethodName._ProcessIsLive, rcam, delta);
 	}
 
 	protected virtual void _IsLiveEnter() {}
 	protected virtual void _IsLiveExit() {}
-	protected virtual void _ProcessIsLive(Camera2D rcam, double delta) {}
 	protected virtual void _ProcessIsLive(Camera3D rcam, double delta) {}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -129,12 +128,8 @@ public abstract partial class VirtualCamera3DComponent : Node3D
 	private void OnIsLiveChanged(bool isLive)
 	{
 		if (isLive)
-		{
 			this._IsLiveEnter();
-		}
 		else
-		{
 			this._IsLiveExit();
-		}
 	}
 }
