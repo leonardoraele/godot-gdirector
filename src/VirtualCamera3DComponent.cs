@@ -88,12 +88,16 @@ public abstract partial class VirtualCamera3DComponent : Node3D
 	public override void _EnterTree()
 	{
 		base._EnterTree();
+		if (!Engine.IsEditorHint())
+			return;
 		this.Camera.IsLiveChanged += this.OnIsLiveChanged;
 	}
 
 	public override void _ExitTree()
 	{
 		base._ExitTree();
+		if (!Engine.IsEditorHint())
+			return;
 		this.Camera.IsLiveChanged -= this.OnIsLiveChanged;
 	}
 
