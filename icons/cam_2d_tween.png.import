@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/cam_2d_tween.png-d16b8fdfb6ce5a129c950ee68aa1
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
